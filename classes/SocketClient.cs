@@ -196,40 +196,44 @@ namespace TCPClient
 
         private static void ReadCallback(IAsyncResult result)
         {
-            if (_tcpClient != null)
+            try
             {
-                NetworkStream networkStream = _tcpClient.GetStream();
-
-                byte[] buffer = new byte[_tcpClient.ReceiveBufferSize];
-                try
+                if (_tcpClient != null)
                 {
-                    int length = networkStream.Read(buffer, 0, buffer.Length);
+                    NetworkStream networkStream = _tcpClient.GetStream();
 
-                    if (length > 0)
+                    byte[] buffer = new byte[_tcpClient.ReceiveBufferSize];
+                    try
                     {
-                        byte[] buffer2 = new byte[length];
-                        for (int i = 0; i < buffer2.Length; i++) { buffer2[i] = buffer[i]; }
-                        ReceivedData(buffer2, comStatus.OK);
-                        networkStream.BeginRead(buffer, 0, 0, ReadCallback, buffer);
+                        int length = networkStream.Read(buffer, 0, buffer.Length);
 
+                        if (length > 0)
+                        {
+                            byte[] buffer2 = new byte[length];
+                            for (int i = 0; i < buffer2.Length; i++) { buffer2[i] = buffer[i]; }
+                            ReceivedData(buffer2, comStatus.OK);
+                            networkStream.BeginRead(buffer, 0, 0, ReadCallback, buffer);
+
+                        }
+                        else
+                        {
+                            buffer = new byte[0];
+                            ReceivedData(buffer, comStatus.Close);
+                            if (_connType == ConnType.TcpServer)
+                                _tcpServer.BeginAcceptTcpClient(new AsyncCallback(ConnectCallbackServer), _tcpServer);
+                        }
                     }
-                    else
+                    catch (Exception)
                     {
                         buffer = new byte[0];
                         ReceivedData(buffer, comStatus.Close);
                         if (_connType == ConnType.TcpServer)
                             _tcpServer.BeginAcceptTcpClient(new AsyncCallback(ConnectCallbackServer), _tcpServer);
                     }
+
                 }
-                catch (Exception)
-                {
-                    buffer = new byte[0];
-                    ReceivedData(buffer, comStatus.Close);
-                    if (_connType == ConnType.TcpServer)
-                        _tcpServer.BeginAcceptTcpClient(new AsyncCallback(ConnectCallbackServer), _tcpServer);
-                }
-                
-            }
+            } catch { }
+            
         }
 
         /// <summary>
