@@ -499,9 +499,9 @@
             this.lblCoding.AutoSize = true;
             this.lblCoding.Location = new System.Drawing.Point(6, 20);
             this.lblCoding.Name = "lblCoding";
-            this.lblCoding.Size = new System.Drawing.Size(62, 13);
+            this.lblCoding.Size = new System.Drawing.Size(43, 13);
             this.lblCoding.TabIndex = 17;
-            this.lblCoding.Text = "Data folder:";
+            this.lblCoding.Text = "Coding:";
             // 
             // frmSettings
             // 
