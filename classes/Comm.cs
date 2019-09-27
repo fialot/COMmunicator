@@ -429,7 +429,7 @@ namespace COMunicator
                         break;
                 }
             }
-            catch (Exception)
+            catch (Exception err)
             {
 
             }

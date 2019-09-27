@@ -98,9 +98,9 @@ namespace TCPClient
             _connType = ConnType.Udp;
             if (listenPort >= 0)
             {
+                
                 IPEndPoint ep = new IPEndPoint(IPAddress.Any, listenPort);
                 _udpClientLisener = new UdpClient(ep);
-
                 _udpClientLisener.BeginReceive(new AsyncCallback(ReadCallbackUdp), ep);
             }
             else
@@ -131,14 +131,17 @@ namespace TCPClient
                 }
                 catch (Exception ex)
                 {
+                    if (_udpClientLisener != null)  // If closing -> no reconnect
+                    {
+                        Close();
+                        ConnectUdp(_hostIP, _hostPort, _localPort, true);
+                    }
                     //MessageBox.Show(ex.Message);
-                    Close();
-                    ConnectUdp(_hostIP, _hostPort, _localPort, true);
+                    
 
                     //ReceivedData(new byte[0], comStatus.Close);
                 }
 
-                
             }
         }
 
@@ -399,5 +402,7 @@ namespace TCPClient
 
             //if (_clientDone != null) _clientDone.Close();
         }
+
+
     }
 }
