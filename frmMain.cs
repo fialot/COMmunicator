@@ -324,8 +324,24 @@ namespace COMunicator
             CntSend.Items.Add("-");
 
             // ----- MENU -> OTHER ITEMS -----
+            
+
+            // ----- Add default items -----
+            
+
+            string[] items = Files.LoadFileLines(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + Path.DirectorySeparatorChar + "menu_items.txt", true);
+            AddMenuItems(items);
+
+            // ----- Add User defined items -----
+            items = Files.LoadFileLines(Files.ReplaceVarPaths(settings.Paths.dataFolder + Path.DirectorySeparatorChar + "menu_items.txt"), true);
+            AddMenuItems(items);
+
+
+        }
+
+        void AddMenuItems(string[] items)
+        {
             string[] CntItem;
-            string[] items = Files.LoadFileLines(Files.ReplaceVarPaths(settings.Paths.dataFolder + Path.DirectorySeparatorChar + "menu_items.txt"), true);
 
             for (int i = 0; i < items.Length; i++)
             {
@@ -362,9 +378,9 @@ namespace COMunicator
                             //CntSend.Items[i + 2].Tag = CntItem[1];
                             //CntSend.Items[i + 2].Click += new EventHandler(CntSend_Click);
                         }
-                            
+
                     }
-                    
+
                 }
                 catch { }
             }

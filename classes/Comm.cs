@@ -597,7 +597,7 @@ namespace COMunicator
                     else if ((prefix1 == "i") && (int.TryParse(cmd.Remove(0, 1).Trim(), out inum)))
                     {
                         insBytes = BitConverter.GetBytes(inum);
-                        Array.Reverse(insBytes);
+                        //Array.Reverse(insBytes);
                         remove(ref msg, ref byteList, ref boolList, pos, count + 1);
                         insert(ref msg, ref byteList, ref boolList, pos, insBytes);
                     } // hex
@@ -605,7 +605,7 @@ namespace COMunicator
                     {
 
                         insBytes = BitConverter.GetBytes(snum);
-                        Array.Reverse(insBytes);
+                        //Array.Reverse(insBytes);
                         remove(ref msg, ref byteList, ref boolList, pos, count + 1);
                         insert(ref msg, ref byteList, ref boolList, pos, insBytes);
                     } 
@@ -613,7 +613,7 @@ namespace COMunicator
                     {
 
                         insBytes = BitConverter.GetBytes(fnum);
-                        Array.Reverse(insBytes);
+                        //Array.Reverse(insBytes);
                         remove(ref msg, ref byteList, ref boolList, pos, count + 1);
                         insert(ref msg, ref byteList, ref boolList, pos, insBytes);
                     } // \n -> <10>
@@ -783,7 +783,11 @@ namespace COMunicator
                     fun.arguments[i] = fun.arguments[i].Trim();
                     if (fun.arguments.Length > 0)
                     {
-                        if (fun.arguments[i][0] == '\"' && fun.arguments[i][fun.arguments[i].Length-1] == '\"') fun.arguments[i] = fun.arguments[i].Substring(1, fun.arguments[i].Length - 2);
+                        if (fun.arguments[i].Length > 0)
+                        {
+                            if (fun.arguments[i][0] == '\"' && fun.arguments[i][fun.arguments[i].Length - 1] == '\"')
+                                fun.arguments[i] = fun.arguments[i].Substring(1, fun.arguments[i].Length - 2);
+                        }
                     }
                 }
                 fun.length = p2 - position;
