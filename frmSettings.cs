@@ -44,6 +44,8 @@ namespace COMunicator
 
             settings.Paths.ReplyFile = txtReplyFile.Text;
             settings.Fun.AutoReply = chbEnableReply.Checked;
+            settings.Fun.WaitForReply = chbEnableReplyWait.Checked;
+            settings.Fun.ReplyTimeout = Conv.ToIntDef(txtReplyTimeout.Text, 1000);
 
             settings.Paths.logFile = txtLogFile.Text;
             settings.Paths.logEnable = chbEnableLog.Checked;
@@ -113,6 +115,8 @@ namespace COMunicator
             chbRTS.Checked = settings.SP.RTS;
 
             txtAutoSendDelay.Text = settings.Fun.AutoSendDelay.ToString();
+            chbEnableReplyWait.Checked = settings.Fun.WaitForReply;
+            txtReplyTimeout.Text = settings.Fun.ReplyTimeout.ToString();
             txtSendingFile.Text = settings.Paths.SendingFile;
             chbEnableSendFromFile.Checked = settings.Paths.EnableSendingFile;
             chbEoF.Checked = settings.Paths.BeginAfterEoF;

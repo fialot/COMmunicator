@@ -68,6 +68,8 @@
             this.gbCoding = new System.Windows.Forms.GroupBox();
             this.cbCoding = new System.Windows.Forms.ComboBox();
             this.lblCoding = new System.Windows.Forms.Label();
+            this.chbEnableReplyWait = new System.Windows.Forms.CheckBox();
+            this.txtReplyTimeout = new System.Windows.Forms.TextBox();
             this.tabControl1.SuspendLayout();
             this.tabSerial.SuspendLayout();
             this.tabSending.SuspendLayout();
@@ -84,7 +86,7 @@
             // btnOk
             // 
             this.btnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnOk.Location = new System.Drawing.Point(12, 249);
+            this.btnOk.Location = new System.Drawing.Point(12, 306);
             this.btnOk.Name = "btnOk";
             this.btnOk.Size = new System.Drawing.Size(75, 23);
             this.btnOk.TabIndex = 0;
@@ -96,7 +98,7 @@
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.Location = new System.Drawing.Point(93, 249);
+            this.btnCancel.Location = new System.Drawing.Point(93, 306);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 1;
@@ -206,7 +208,7 @@
             this.tabControl1.Location = new System.Drawing.Point(12, 12);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(317, 231);
+            this.tabControl1.Size = new System.Drawing.Size(317, 288);
             this.tabControl1.TabIndex = 14;
             // 
             // tabSerial
@@ -234,7 +236,7 @@
             this.tabSending.Location = new System.Drawing.Point(4, 22);
             this.tabSending.Name = "tabSending";
             this.tabSending.Padding = new System.Windows.Forms.Padding(3);
-            this.tabSending.Size = new System.Drawing.Size(309, 205);
+            this.tabSending.Size = new System.Drawing.Size(309, 262);
             this.tabSending.TabIndex = 1;
             this.tabSending.Text = "Sending";
             this.tabSending.UseVisualStyleBackColor = true;
@@ -246,7 +248,7 @@
             this.gbReply.Controls.Add(this.btnReplyFile);
             this.gbReply.Controls.Add(this.chbEnableReply);
             this.gbReply.Controls.Add(this.txtReplyFile);
-            this.gbReply.Location = new System.Drawing.Point(6, 149);
+            this.gbReply.Location = new System.Drawing.Point(9, 205);
             this.gbReply.Name = "gbReply";
             this.gbReply.Size = new System.Drawing.Size(297, 51);
             this.gbReply.TabIndex = 14;
@@ -287,12 +289,14 @@
             // 
             this.gbAutosending.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.gbAutosending.Controls.Add(this.txtReplyTimeout);
+            this.gbAutosending.Controls.Add(this.chbEnableReplyWait);
             this.gbAutosending.Controls.Add(this.gbSendingFromFile);
             this.gbAutosending.Controls.Add(this.lblAutosendDelay);
             this.gbAutosending.Controls.Add(this.txtAutoSendDelay);
             this.gbAutosending.Location = new System.Drawing.Point(6, 6);
             this.gbAutosending.Name = "gbAutosending";
-            this.gbAutosending.Size = new System.Drawing.Size(297, 137);
+            this.gbAutosending.Size = new System.Drawing.Size(297, 193);
             this.gbAutosending.TabIndex = 12;
             this.gbAutosending.TabStop = false;
             this.gbAutosending.Text = "Autosending";
@@ -305,7 +309,7 @@
             this.gbSendingFromFile.Controls.Add(this.btnSendingFile);
             this.gbSendingFromFile.Controls.Add(this.chbEnableSendFromFile);
             this.gbSendingFromFile.Controls.Add(this.txtSendingFile);
-            this.gbSendingFromFile.Location = new System.Drawing.Point(10, 58);
+            this.gbSendingFromFile.Location = new System.Drawing.Point(6, 119);
             this.gbSendingFromFile.Name = "gbSendingFromFile";
             this.gbSendingFromFile.Size = new System.Drawing.Size(281, 68);
             this.gbSendingFromFile.TabIndex = 13;
@@ -503,12 +507,29 @@
             this.lblCoding.TabIndex = 17;
             this.lblCoding.Text = "Coding:";
             // 
+            // chbEnableReplyWait
+            // 
+            this.chbEnableReplyWait.AutoSize = true;
+            this.chbEnableReplyWait.Location = new System.Drawing.Point(9, 58);
+            this.chbEnableReplyWait.Name = "chbEnableReplyWait";
+            this.chbEnableReplyWait.Size = new System.Drawing.Size(219, 17);
+            this.chbEnableReplyWait.TabIndex = 15;
+            this.chbEnableReplyWait.Text = "Enable waiting for reply with timeout [ms]:";
+            this.chbEnableReplyWait.UseVisualStyleBackColor = true;
+            // 
+            // txtReplyTimeout
+            // 
+            this.txtReplyTimeout.Location = new System.Drawing.Point(236, 55);
+            this.txtReplyTimeout.Name = "txtReplyTimeout";
+            this.txtReplyTimeout.Size = new System.Drawing.Size(55, 20);
+            this.txtReplyTimeout.TabIndex = 16;
+            // 
             // frmSettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
-            this.ClientSize = new System.Drawing.Size(341, 280);
+            this.ClientSize = new System.Drawing.Size(341, 337);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOk);
@@ -581,5 +602,7 @@
         private System.Windows.Forms.GroupBox gbCoding;
         private System.Windows.Forms.ComboBox cbCoding;
         private System.Windows.Forms.Label lblCoding;
+        private System.Windows.Forms.TextBox txtReplyTimeout;
+        private System.Windows.Forms.CheckBox chbEnableReplyWait;
     }
 }

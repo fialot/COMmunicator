@@ -45,7 +45,6 @@
             this.chkString = new System.Windows.Forms.ToolStripMenuItem();
             this.chkLine = new System.Windows.Forms.ToolStripMenuItem();
             this.mnutxtLine = new System.Windows.Forms.ToolStripTextBox();
-            this.mnuShowCommandChars = new System.Windows.Forms.ToolStripMenuItem();
             this.chkByte = new System.Windows.Forms.ToolStripMenuItem();
             this.chkHex = new System.Windows.Forms.ToolStripMenuItem();
             this.chkFormat = new System.Windows.Forms.ToolStripMenuItem();
@@ -77,7 +76,7 @@
             this.chbEndChar = new System.Windows.Forms.CheckBox();
             this.TimeOut = new System.Windows.Forms.Timer(this.components);
             this.lbLog = new System.Windows.Forms.ListBox();
-            this.txtLog = new System.Windows.Forms.RichTextBox();
+            this.txtPackets = new System.Windows.Forms.RichTextBox();
             this.btnNetConn = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabCOM = new System.Windows.Forms.TabPage();
@@ -100,6 +99,10 @@
             this.btnNetSConn = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.chbSendFromFile = new System.Windows.Forms.CheckBox();
+            this.tabsMessages = new System.Windows.Forms.TabControl();
+            this.tabComm = new System.Windows.Forms.TabPage();
+            this.tabProcessLog = new System.Windows.Forms.TabPage();
+            this.txtLog = new System.Windows.Forms.RichTextBox();
             this.CntMnu.SuspendLayout();
             this.StatusStrip1.SuspendLayout();
             this.CntSend.SuspendLayout();
@@ -107,6 +110,9 @@
             this.tabCOM.SuspendLayout();
             this.tabTCPClient.SuspendLayout();
             this.tabTCPServer.SuspendLayout();
+            this.tabsMessages.SuspendLayout();
+            this.tabComm.SuspendLayout();
+            this.tabProcessLog.SuspendLayout();
             this.SuspendLayout();
             // 
             // chbBaudTest
@@ -216,7 +222,7 @@
             this.toolStripMenuItem5,
             this.chkMarsA});
             this.mnuShowType.Name = "mnuShowType";
-            this.mnuShowType.Size = new System.Drawing.Size(132, 22);
+            this.mnuShowType.Size = new System.Drawing.Size(180, 22);
             this.mnuShowType.Text = "Show Type";
             // 
             // chkString
@@ -224,10 +230,9 @@
             this.chkString.Checked = true;
             this.chkString.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkString.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.chkLine,
-            this.mnuShowCommandChars});
+            this.chkLine});
             this.chkString.Name = "chkString";
-            this.chkString.Size = new System.Drawing.Size(124, 22);
+            this.chkString.Size = new System.Drawing.Size(180, 22);
             this.chkString.Text = "String";
             this.chkString.Click += new System.EventHandler(this.chkString_Click);
             // 
@@ -236,59 +241,52 @@
             this.chkLine.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.mnutxtLine});
             this.chkLine.Name = "chkLine";
-            this.chkLine.Size = new System.Drawing.Size(192, 22);
+            this.chkLine.Size = new System.Drawing.Size(180, 22);
             this.chkLine.Text = "Line separator";
-            this.chkLine.Click += new System.EventHandler(this.chkString_Click);
+            this.chkLine.Click += new System.EventHandler(this.chkTime_Click);
             // 
             // mnutxtLine
             // 
             this.mnutxtLine.Name = "mnutxtLine";
             this.mnutxtLine.Size = new System.Drawing.Size(100, 23);
             // 
-            // mnuShowCommandChars
-            // 
-            this.mnuShowCommandChars.Name = "mnuShowCommandChars";
-            this.mnuShowCommandChars.Size = new System.Drawing.Size(192, 22);
-            this.mnuShowCommandChars.Text = "Show command chars";
-            this.mnuShowCommandChars.Click += new System.EventHandler(this.chkString_Click);
-            // 
             // chkByte
             // 
             this.chkByte.Name = "chkByte";
-            this.chkByte.Size = new System.Drawing.Size(124, 22);
+            this.chkByte.Size = new System.Drawing.Size(180, 22);
             this.chkByte.Text = "Byte";
             this.chkByte.Click += new System.EventHandler(this.chkString_Click);
             // 
             // chkHex
             // 
             this.chkHex.Name = "chkHex";
-            this.chkHex.Size = new System.Drawing.Size(124, 22);
+            this.chkHex.Size = new System.Drawing.Size(180, 22);
             this.chkHex.Text = "Hex Num";
             this.chkHex.Click += new System.EventHandler(this.chkString_Click);
             // 
             // chkFormat
             // 
             this.chkFormat.Name = "chkFormat";
-            this.chkFormat.Size = new System.Drawing.Size(124, 22);
+            this.chkFormat.Size = new System.Drawing.Size(180, 22);
             this.chkFormat.Text = "Format";
             this.chkFormat.Click += new System.EventHandler(this.chkString_Click);
             // 
             // toolStripMenuItem5
             // 
             this.toolStripMenuItem5.Name = "toolStripMenuItem5";
-            this.toolStripMenuItem5.Size = new System.Drawing.Size(121, 6);
+            this.toolStripMenuItem5.Size = new System.Drawing.Size(177, 6);
             // 
             // chkMarsA
             // 
             this.chkMarsA.Name = "chkMarsA";
-            this.chkMarsA.Size = new System.Drawing.Size(124, 22);
+            this.chkMarsA.Size = new System.Drawing.Size(180, 22);
             this.chkMarsA.Text = "MARS-A";
             this.chkMarsA.Click += new System.EventHandler(this.chkString_Click);
             // 
             // ToolStripMenuItem4
             // 
             this.ToolStripMenuItem4.Name = "ToolStripMenuItem4";
-            this.ToolStripMenuItem4.Size = new System.Drawing.Size(129, 6);
+            this.ToolStripMenuItem4.Size = new System.Drawing.Size(177, 6);
             // 
             // mnuShow
             // 
@@ -296,22 +294,22 @@
             this.chkTime,
             this.chkBaudRate});
             this.mnuShow.Name = "mnuShow";
-            this.mnuShow.Size = new System.Drawing.Size(132, 22);
+            this.mnuShow.Size = new System.Drawing.Size(180, 22);
             this.mnuShow.Text = "Show";
             // 
             // chkTime
             // 
             this.chkTime.Name = "chkTime";
-            this.chkTime.Size = new System.Drawing.Size(124, 22);
+            this.chkTime.Size = new System.Drawing.Size(180, 22);
             this.chkTime.Text = "Time";
-            this.chkTime.Click += new System.EventHandler(this.chkString_Click);
+            this.chkTime.Click += new System.EventHandler(this.chkTime_Click);
             // 
             // chkBaudRate
             // 
             this.chkBaudRate.Name = "chkBaudRate";
-            this.chkBaudRate.Size = new System.Drawing.Size(124, 22);
+            this.chkBaudRate.Size = new System.Drawing.Size(180, 22);
             this.chkBaudRate.Text = "BaudRate";
-            this.chkBaudRate.Click += new System.EventHandler(this.chkString_Click);
+            this.chkBaudRate.Click += new System.EventHandler(this.chkTime_Click);
             // 
             // lblStatus
             // 
@@ -508,19 +506,17 @@
             this.lbLog.Size = new System.Drawing.Size(328, 32);
             this.lbLog.TabIndex = 42;
             // 
-            // txtLog
+            // txtPackets
             // 
-            this.txtLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtLog.BackColor = System.Drawing.SystemColors.Window;
-            this.txtLog.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.txtLog.Location = new System.Drawing.Point(0, 213);
-            this.txtLog.Name = "txtLog";
-            this.txtLog.ReadOnly = true;
-            this.txtLog.Size = new System.Drawing.Size(328, 276);
-            this.txtLog.TabIndex = 49;
-            this.txtLog.Text = "";
+            this.txtPackets.BackColor = System.Drawing.SystemColors.Window;
+            this.txtPackets.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txtPackets.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.txtPackets.Location = new System.Drawing.Point(3, 3);
+            this.txtPackets.Name = "txtPackets";
+            this.txtPackets.ReadOnly = true;
+            this.txtPackets.Size = new System.Drawing.Size(299, 244);
+            this.txtPackets.TabIndex = 49;
+            this.txtPackets.Text = "";
             // 
             // btnNetConn
             // 
@@ -778,15 +774,62 @@
             this.chbSendFromFile.UseVisualStyleBackColor = true;
             this.chbSendFromFile.CheckedChanged += new System.EventHandler(this.chbSendFromFile_CheckedChanged);
             // 
+            // tabsMessages
+            // 
+            this.tabsMessages.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tabsMessages.Controls.Add(this.tabComm);
+            this.tabsMessages.Controls.Add(this.tabProcessLog);
+            this.tabsMessages.Location = new System.Drawing.Point(8, 213);
+            this.tabsMessages.Name = "tabsMessages";
+            this.tabsMessages.SelectedIndex = 0;
+            this.tabsMessages.Size = new System.Drawing.Size(313, 276);
+            this.tabsMessages.TabIndex = 54;
+            // 
+            // tabComm
+            // 
+            this.tabComm.Controls.Add(this.txtPackets);
+            this.tabComm.Location = new System.Drawing.Point(4, 22);
+            this.tabComm.Name = "tabComm";
+            this.tabComm.Padding = new System.Windows.Forms.Padding(3);
+            this.tabComm.Size = new System.Drawing.Size(305, 250);
+            this.tabComm.TabIndex = 0;
+            this.tabComm.Text = "Packets";
+            this.tabComm.UseVisualStyleBackColor = true;
+            // 
+            // tabProcessLog
+            // 
+            this.tabProcessLog.Controls.Add(this.txtLog);
+            this.tabProcessLog.Location = new System.Drawing.Point(4, 22);
+            this.tabProcessLog.Name = "tabProcessLog";
+            this.tabProcessLog.Padding = new System.Windows.Forms.Padding(3);
+            this.tabProcessLog.Size = new System.Drawing.Size(305, 250);
+            this.tabProcessLog.TabIndex = 1;
+            this.tabProcessLog.Text = "Log";
+            this.tabProcessLog.UseVisualStyleBackColor = true;
+            // 
+            // txtLog
+            // 
+            this.txtLog.BackColor = System.Drawing.SystemColors.Window;
+            this.txtLog.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txtLog.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.txtLog.Location = new System.Drawing.Point(3, 3);
+            this.txtLog.Name = "txtLog";
+            this.txtLog.ReadOnly = true;
+            this.txtLog.Size = new System.Drawing.Size(299, 244);
+            this.txtLog.TabIndex = 50;
+            this.txtLog.Text = "";
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(328, 549);
+            this.Controls.Add(this.tabsMessages);
             this.Controls.Add(this.chbSendFromFile);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.tabControl1);
-            this.Controls.Add(this.txtLog);
             this.Controls.Add(this.chbEndChar);
             this.Controls.Add(this.lbLog);
             this.Controls.Add(this.StatusStrip1);
@@ -813,6 +856,9 @@
             this.tabTCPClient.PerformLayout();
             this.tabTCPServer.ResumeLayout(false);
             this.tabTCPServer.PerformLayout();
+            this.tabsMessages.ResumeLayout(false);
+            this.tabComm.ResumeLayout(false);
+            this.tabProcessLog.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -851,7 +897,7 @@
         private System.Windows.Forms.ToolStripMenuItem mnuAddSend;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem3;
         internal System.Windows.Forms.ListBox lbLog;
-        private System.Windows.Forms.RichTextBox txtLog;
+        private System.Windows.Forms.RichTextBox txtPackets;
         private System.Windows.Forms.Button btnNetConn;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabCOM;
@@ -876,7 +922,6 @@
         private System.Windows.Forms.ToolStripMenuItem chkString;
         private System.Windows.Forms.ToolStripMenuItem chkLine;
         private System.Windows.Forms.ToolStripTextBox mnutxtLine;
-        private System.Windows.Forms.ToolStripMenuItem mnuShowCommandChars;
         private System.Windows.Forms.ToolStripMenuItem chkByte;
         private System.Windows.Forms.ToolStripMenuItem chkHex;
         private System.Windows.Forms.ToolStripMenuItem chkFormat;
@@ -890,5 +935,9 @@
         internal System.Windows.Forms.Button btnSettings3;
         internal System.Windows.Forms.CheckBox chbSendFromFile;
         private System.Windows.Forms.ToolStripMenuItem mnuEditSend;
+        private System.Windows.Forms.TabControl tabsMessages;
+        private System.Windows.Forms.TabPage tabComm;
+        private System.Windows.Forms.TabPage tabProcessLog;
+        private System.Windows.Forms.RichTextBox txtLog;
     }
 }

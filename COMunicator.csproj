@@ -57,9 +57,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="classes\Global.cs" />
     <Compile Include="classes\History.cs" />
     <Compile Include="classes\iniFile.cs" />
     <Compile Include="classes\Comm.cs" />
+    <Compile Include="classes\ProcessLog.cs" />
     <Compile Include="frmMain.cs">
       <SubType>Form</SubType>
     </Compile>

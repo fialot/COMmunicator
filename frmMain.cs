@@ -12,6 +12,7 @@ using LOG;
 using TCPClient;
 using myFunctions;
 using COMunicator.Protocol;
+using GlobalClasses;
 
 using System.Net.Sockets;
 using System.Threading;
@@ -25,7 +26,8 @@ namespace COMunicator
 
         // ----- Auto send from file data ---
         string[] AutoSendData;
-        int AutoSendDataIndex; 
+        int AutoSendDataIndex;
+        bool ReplyCome = false;
 
 
         static frmSettings formSet;
@@ -239,8 +241,6 @@ namespace COMunicator
 
             chkLine.Checked = settings.Show.Line;
             mnutxtLine.Text = settings.Show.LineNum;
-            mnuShowCommandChars.Checked = settings.Show.ShowCommandChars;
-            //mnuFormatString.Text = settings.Log.FormatString;
 
             chkTime.Checked = settings.Show.Time;
             chkBaudRate.Checked = settings.Show.BaudRate;
@@ -285,7 +285,6 @@ namespace COMunicator
 
             settings.Show.Line = chkLine.Checked;
             settings.Show.LineNum = mnutxtLine.Text;
-            settings.Show.ShowCommandChars = mnuShowCommandChars.Checked;
             //settings.Log.FormatString = mnuFormatString.Text;
 
             settings.Show.Time = chkTime.Checked;
@@ -555,126 +554,22 @@ namespace COMunicator
 
         private string ShowData(byte[] message, bool input)
         {
-            uint data;
-            string dataS = "", dataBS = "", dataHex = "";
-            string txt = "", encTxt = "";
-            bool add = false;
-            byte[] EndChar;
+            string description = "";
 
-            string arrows;
-            if (input) arrows = ">>";
-            else arrows = "<<";
-
-
-            try
-            {
-                EndChar = com.FormatMsg(mnutxtLine.Text);
-                if (EndChar.Length == 0) EndChar = new byte[1];
-            }
-            catch (Exception)
-            {
-                EndChar = new byte[1];
-                EndChar[0] = (byte)'\n';
-            }
-
-            
-
-            //dataS = SP.ReadExisting
-            if (message.Length <= 4)
-            {
-                //dataS = ByteToHex(message);
-                //data = CInt("&H" & dataS);
-                data = 0;
+            // ----- Status log packets -----
+            if (input) {
+                var delay = DateTime.Now - Global.Log.LastLogTime;
+                Global.Log.Add("Input message length: " + message.Length + ", delay: " + delay.TotalSeconds, Color.Blue);
+                ReplyCome = true;
             }
             else
             {
-                data = 0;
-            }
-            List<byte> bList = message.ToList();
-            List<int> nullList = new List<int>();
-
-            // ----- Replace null bytes -----
-            dataS = settings.encoding.GetString(bList.ToArray());
-            if (dataS.Length == bList.Count)    // if not unicode
-            {
-                for (int i = bList.Count - 1; i >= 0; i--)
-                    if (bList[i] == 0)
-                    {
-                        nullList.Add(i);
-                        bList.RemoveAt(i);
-                        bList.Insert(i, 1);
-                    }
-                dataS = settings.encoding.GetString(bList.ToArray());
+                Global.Log.Add("Send message length: " + message.Length.ToString(), Color.Black, true, false);
+                ReplyCome = false;
             }
 
-            byte[] byteMsg = Encoding.Default.GetBytes(dataS);
-
-            // Replace special chars
-            for (int i = byteMsg.Length - 1; i >= 0; i--)
-            {
-                if (mnuShowCommandChars.Checked && byteMsg[i] < 32)
-                {
-                    dataS = dataS.Remove(i, 1);
-                    if (nullList.Contains(i))
-                    {
-                        dataS = dataS.Insert(i, "{0}");
-                    }
-                    else
-                    {
-                        dataS = dataS.Insert(i, "{" + byteMsg[i].ToString() + "}");
-                    }
-
-                }
-            }
-
-            byte[] test = new byte[1];
-
-            for (int i = 0; i < message.Length; i++)
-            {
-                dataBS += @"\" + message[i].ToString();
-                dataHex += message[i].ToString("X2") + " ";
-            }
-
-            //if (dataBS.Length > 0) dataBS = dataBS.Remove(dataBS.Length - 1);
-
-
-
-            if (chkString.Checked)
-            {
-                if (add) txt += " <-> ";
-                add = true;
-                txt += dataS;
-                //txt = txt + '"' + dataS + '"';
-            }
-
-            //If chkLine.Checked Then txt = txt & """" & dataS & """ <-> "
-
-            if (chkByte.Checked)
-            {
-                if (add) txt += " <-> ";
-                txt += dataBS;
-                add = true;
-            }
-
-            /*if (chkNumber.Checked)
-            {
-                if (add) txt += " <-> ";
-                txt = txt + data.ToString();
-                add = true;
-            }*/
-
-            if (chkHex.Checked)
-            {
-                if (add) txt += " <-> ";
-                txt += dataHex;
-                add = true;
-            }
-
-            if (chkMarsA.Checked)
-            {
-                if (add) txt += " <-> ";
-                string dataMars = "";
-
+             if (chkMarsA.Checked)
+             {
                 if (message.Length > 2)
                 {
                     int frameNum = 0;
@@ -683,120 +578,66 @@ namespace COMunicator
                         int frame = Conv.SwapBytes(BitConverter.ToUInt16(message, 0));
                         int length = (frame & 2047) - 6; // dala length
                         frameNum = (frame & 12288) + 6 + (128 << 8) + +(1 << 8);
-                        for (int i = 8; i < 8 + length; i++)
-                        {
-                            test[0] = message[i];
-                            encTxt = settings.encoding.GetString(test);
-                            if (!mnuShowCommandChars.Checked || message[i] > 31)
-                            {
-                                if (message[i] != 0) dataMars += encTxt;
-                            }
-                            else dataMars += "{" + message[i].ToString() + "}";
-
-                        }
                     }
-                    catch (Exception err)
-                    {
+                    catch (Exception){}
 
-                    }
                     Send(@"\s" + frameNum.ToString());
                 }
-
-                txt += dataMars;
-                add = true;
             }
 
-            /*if (chkFixedPoint.Checked)
+            var endChar = settings.encoding.GetString(com.FormatMsg(mnutxtLine.Text));
+
+            if (chkLine.Checked && endChar != "")
             {
-                if (add) txt += " <-> ";
-                if (IsNumeric(mnutxtFixPoint.Text))
-                {
-                    int num = CInt(mnutxtFixPoint.Text);
-                    if ((num <= 32) & (num > 0))
-                    {
-                        txt = txt + CFixToFloat(data, num);
-                    }
-                }
-                else txt = txt + CFixToFloat(data);
-                add = true;
-            }*/
+                Global.LogPacket.LineSeparatingChar = endChar;
+            }
+            else
+            {
+                Global.LogPacket.LineSeparatingChar = "";
+            }
+
 
             if (chkBaudRate.Checked)
             {
-                if (txt.Length > 0)
-                    txt = cbBaud.Text + " " + arrows + " " + txt;
+                description = cbBaud.Text + "[Bd]";
             }
 
-            if (chkTime.Checked)
+            string text = "";
+            if (input)
+                text = Global.LogPacket.Add(description, message, Color.Blue, chkTime.Checked, input);
+            else
+                text = Global.LogPacket.Add(description, message, Color.Black, chkTime.Checked, input);
+
+
+            if (text.Length > 0)
             {
-                if (txt.Length > 0)
-                    txt = DateTime.Now.ToString("HH:mm:ss.fff") + " " + arrows + " " + txt;
+                lbLog.Items.Add(text);
             }
 
-
-            if (chkLine.Checked & !(message[message.Length - 1] == EndChar[0]))
-            {
-                txt = txt.Replace((char)EndChar[0], '\n');
-            }
-
-
-
-            if (txt.Length > 0)
-            {
-                lbLog.Items.Add(arrows + "  " + txt);
-            }
-
-
-            if (txtLog.Text.Length > 100000)
-            {
-                int startIndex = txt.Length;
-                if (startIndex >= txtLog.Text.Length) txtLog.Text = "";
-                else
-                {
-                    txtLog.Select(0, startIndex);
-                    txtLog.SelectionColor = Color.Red;
-                    txtLog.SelectedText = " ";          // Empty not worked!!! <<<
-
-                    //txtLog.Text = txtLog.Text.Remove(txtLog.SelectionStart, txtLog.SelectionLength);
-
-                    //txtLog.Text = txtLog.Text.Substring(startIndex);
-                    //var regExp = new System.Text.RegularExpressions.Regex(@"\bis\b");
-                    //txtLog.Rtf = regExp.sub(txtLog.Rtf, "are");
-
-                    //txtLog.Rtf = txtLog.Rtf.Substring(startIndex);
-                }
-
-            }
-                
             if (lbLog.Items.Count > 100)
                 lbLog.Items.RemoveAt(0);
 
 
-            txtLog.SelectionStart = txtLog.Text.Length;
-       
             
-            if (input)
-                txtLog.SelectionColor = Color.Blue;
-            else
-                txtLog.SelectionColor = Color.Black;
 
-            txt = txt.Replace("{13}{10}", "\n");
-            txt = txt.Replace("{10}", "\n");
-            //str.Split(new string[] { "\n", "\r\n" }, StringSplitOptions.None);
-            if (txt.Length > 0 && txt[0] == '\n') txt = txt.Remove(0,1);
-            txtLog.AppendText(txt);
-            if (txt.Length > 0)
+            if (text.Length > 0)
             {
-                Log.add(arrows + "  " + txt);
+                Log.add(text);
             }
-            if (txt.Length > 0 && !(txt[txt.Length - 1] == '\n' || txt[txt.Length - 1] == '\r')) txtLog.AppendText("\n");
+            
+            lbLog.SelectedIndex = lbLog.Items.Count - 1;
+
+            // ----- Show Packet list -----
+            txtPackets.Rtf = Global.LogPacket.TextRTF();
+            txtPackets.SelectionStart = txtPackets.Text.Length;
+            txtPackets.ScrollToCaret();
+
+            // ----- Show communication log -----
+            txtLog.Rtf = Global.Log.TextRTF();
             txtLog.SelectionStart = txtLog.Text.Length;
             txtLog.ScrollToCaret();
 
-            lbLog.SelectedIndex = lbLog.Items.Count - 1;
-
-
-            return dataS;
+            return text;
         }
 
         
@@ -813,7 +654,34 @@ namespace COMunicator
 
         private void chkString_Click(object sender, EventArgs e)
         {
-            if (((ToolStripMenuItem)sender).Checked) ((ToolStripMenuItem)sender).Checked = false; else ((ToolStripMenuItem)sender).Checked = true;
+            chkFormat.Checked = false;
+            chkByte.Checked = false;
+            chkHex.Checked = false;
+            chkString.Checked = false;
+            chkMarsA.Checked = false;
+            ((ToolStripMenuItem)sender).Checked = true;
+
+            if (chkString.Checked)
+            {
+                Global.LogPacket.SetPacketView(Logging.ePacketView.StringReplaceCommandChars);
+            }
+            else if (chkByte.Checked)
+            {
+                Global.LogPacket.SetPacketView(Logging.ePacketView.Bytes);
+            }
+            else if (chkHex.Checked)
+            {
+                Global.LogPacket.SetPacketView(Logging.ePacketView.Hex);
+            }
+            else if (chkMarsA.Checked)
+            {
+                Global.LogPacket.SetPacketView(Logging.ePacketView.MARS_A);
+            }
+
+            txtPackets.Rtf = Global.LogPacket.TextRTF();
+            txtPackets.SelectionStart = txtPackets.Text.Length;
+            txtPackets.ScrollToCaret();
+
             if (chkMarsA.Checked) TimeOut.Interval = 80;
             else TimeOut.Interval = 20;
         }
@@ -849,7 +717,12 @@ namespace COMunicator
                 }
                 text = tbSend.Text;
                 if (chbEndChar.Checked) text += txtEndCMD.Text;
-                if (text != "") Send(text);
+
+                if (text != "")
+                {
+                    if (!settings.Fun.WaitForReply || (settings.Fun.WaitForReply && ReplyCome))
+                    Send(text);
+                }
             }
             
         }
@@ -887,7 +760,7 @@ namespace COMunicator
                 dialog.Filter = "Log File *.log|*.log|All Files (*.*)|*.*";
                 if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
-                    Files.SaveFile(dialog.FileName, txtLog.Text);
+                    Files.SaveFile(dialog.FileName, txtPackets.Text);
                 }
             }
             catch (Exception err)
@@ -929,7 +802,8 @@ namespace COMunicator
         private void clearToolStripMenuItem_Click(object sender, EventArgs e)
         {
             lbLog.Items.Clear();
-            txtLog.Clear();
+            txtPackets.Clear();
+            Global.Log.ClearLog();
         }
 
         private void btnSettings_Click(object sender, EventArgs e)
@@ -1194,6 +1068,11 @@ namespace COMunicator
         private void mnuEditSend_Click(object sender, EventArgs e)
         {
             System.Diagnostics.Process.Start(Files.ReplaceVarPaths(settings.Paths.dataFolder + Path.DirectorySeparatorChar + "menu_items.txt"));
+        }
+
+        private void chkTime_Click(object sender, EventArgs e)
+        {
+            ((ToolStripMenuItem)sender).Checked = !((ToolStripMenuItem)sender).Checked;
         }
     }
 

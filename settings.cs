@@ -55,6 +55,9 @@ namespace COMunicator
             public int AutoSendDelay;
             public bool IsEndChar;
             public string EndChar;
+
+            public bool WaitForReply;
+            public int ReplyTimeout;
         }
 
         public struct TPaths
@@ -135,6 +138,7 @@ namespace COMunicator
             Fun.AutoSendDelay = ini.ReadInt("Send", "AutoSendDelay", 1000);
             Fun.IsEndChar = ini.ReadBool("Send", "IsEndChar", false);
             Fun.EndChar = ini.Read("Send", "EndChar", "");
+            Fun.WaitForReply = ini.ReadBool("Send", "WaitForReply", false);
 
 
             tab = ini.ReadInt("GUI", "Tab", 0);
@@ -219,6 +223,7 @@ namespace COMunicator
             ini.Write("Send", "AutoSendDelay", Fun.AutoSendDelay);
             ini.Write("Send", "IsEndChar", Fun.IsEndChar);
             ini.Write("Send", "EndChar", Fun.EndChar);
+            ini.Write("Send", "WaitForReply", Fun.WaitForReply);
 
             ini.Write("Send", "Encoding", encoding.HeaderName);
 
