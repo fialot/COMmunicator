@@ -365,16 +365,27 @@ namespace Logging
         {
             try
             {
-                var LogFile = new FileStream(LogFileDirectory + "log.log", FileMode.Append, FileAccess.Write, FileShare.None);
+                string path = "";
+                if (LogFileDirectory != "")
+                {
+                    path = LogFileDirectory + Path.DirectorySeparatorChar + "log" + DateTime.Now.ToString("yyyy-MM-dd") + ".log";
+                } else
+                {
+                    path = "log" + DateTime.Now.ToString("yyyy-MM-dd") + ".log";
+                }
+
+                bool newFile = !File.Exists(path);
+
+                var LogFile = new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.None);
                 var FileWriter = new StreamWriter(LogFile);
 
 
-                if (false)
+                if (newFile)
                 {
                     // ----- IF NEW DAY -> NEW HEAD -----
                     FileWriter.WriteLine("");
                     FileWriter.WriteLine("---------------------------------------------------------");
-                    FileWriter.WriteLine("   " + DateTime.Now.ToString());
+                    FileWriter.WriteLine("   LOG " + DateTime.Now.ToString("YYYY-MM-dd"));
                     FileWriter.WriteLine("---------------------------------------------------------");
                 }
 
@@ -389,6 +400,45 @@ namespace Logging
                 return false;
             }
         }
+
+        public bool SaveHeader(string text)
+        {
+            if (SaveToFile)
+            {
+                try
+                {
+                    string path = "";
+                    if (LogFileDirectory != "")
+                    {
+                        path = LogFileDirectory + Path.DirectorySeparatorChar + "log" + DateTime.Now.ToString("yyyy-MM-dd") + ".log";
+                    }
+                    else
+                    {
+                        path = "log" + DateTime.Now.ToString("yyyy-MM-dd") + ".log";
+                    }
+
+                    var LogFile = new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.None);
+                    var FileWriter = new StreamWriter(LogFile);
+
+                    FileWriter.WriteLine("");
+                    FileWriter.WriteLine("---------------------------------------------------------");
+                    FileWriter.WriteLine("   " + text);
+                    FileWriter.WriteLine("---------------------------------------------------------");
+                    FileWriter.Close();
+                    LogFile.Close();
+
+                    return true;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }
+            else
+                return true;
+        }
+
+
 
         /// <summary>
         /// Set progress 

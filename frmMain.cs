@@ -8,7 +8,6 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO.Ports;
 using System.IO;
-using LOG;
 using TCPClient;
 using myFunctions;
 using COMunicator.Protocol;
@@ -58,7 +57,7 @@ namespace COMunicator
                 else if (com.OpenInterface == Comm.interfaces.TCPServer) 
                 {
                     lblStatus.Text = "Server: Client disconnected";
-                    Log.add("Client disconnected");
+                    Global.Log.Add("Client disconnected.");
                 } else if (com.OpenInterface == Comm.interfaces.COM)
                 {
                     btnConnect_Click(new object(), new EventArgs());
@@ -85,7 +84,7 @@ namespace COMunicator
                 else if (com.OpenInterface == Comm.interfaces.TCPServer)
                 {
                     lblStatus.Text = "Server: Client connected";
-                    Log.add("Client connected");
+                    Global.Log.Add("Client connected.");
                 }
                 
             }
@@ -119,6 +118,9 @@ namespace COMunicator
             settings.LoadSettings();
             // ----- Creating data folder -----
             if (!Directory.Exists(Files.ReplaceVarPaths(settings.Paths.dataFolder))) Directory.CreateDirectory(Files.ReplaceVarPaths(settings.Paths.dataFolder));
+
+            Global.LogPacket.LogFileDirectory = Files.ReplaceVarPaths(settings.Paths.logFile);
+            Global.LogPacket.SaveToFile = settings.Paths.logEnable;
 ;
             Encoding enc = settings.encoding;
 
@@ -365,9 +367,37 @@ namespace COMunicator
                                 CntSend.Items.Add(CntItem[0]);
                                 index = CntSend.Items.Count - 1;
                             }
-                            ((ToolStripMenuItem)CntSend.Items[index]).DropDownItems.Add(CntItem[1]);
-                            ((ToolStripMenuItem)CntSend.Items[index]).DropDownItems[((ToolStripMenuItem)CntSend.Items[index]).DropDownItems.Count - 1].Tag = CntItem[CntItem.Length - 1];
-                            ((ToolStripMenuItem)CntSend.Items[index]).DropDownItems[((ToolStripMenuItem)CntSend.Items[index]).DropDownItems.Count - 1].Click += new EventHandler(CntSend_Click);
+
+                            if (CntItem.Length > 3)
+                            {
+                                int index2 = -1;
+                                for (int j = 0; j < ((ToolStripMenuItem)CntSend.Items[index]).DropDownItems.Count; j++)
+                                {
+                                    if (((ToolStripMenuItem)CntSend.Items[index]).DropDownItems[j].Text == CntItem[1])
+                                    {
+                                        index2 = j;
+                                        break;
+                                    }
+                                }
+                                if (index2 < 0)
+                                {
+                                    ((ToolStripMenuItem)CntSend.Items[index]).DropDownItems.Add(CntItem[1]);
+                                    index2 = ((ToolStripMenuItem)CntSend.Items[index]).DropDownItems.Count - 1;
+                                }
+
+                                ToolStripMenuItem dpItem = ((ToolStripMenuItem)((ToolStripMenuItem)CntSend.Items[index]).DropDownItems[index2]);
+
+                                dpItem.DropDownItems.Add(CntItem[2]);
+                                dpItem.DropDownItems[dpItem.DropDownItems.Count - 1].Tag = CntItem[CntItem.Length - 1];
+                                dpItem.DropDownItems[dpItem.DropDownItems.Count - 1].Click += new EventHandler(CntSend_Click);
+                            }
+                            else
+                            {
+                                ToolStripMenuItem dpItem = ((ToolStripMenuItem)CntSend.Items[index]);
+                                dpItem.DropDownItems.Add(CntItem[1]);
+                                dpItem.DropDownItems[dpItem.DropDownItems.Count - 1].Tag = CntItem[CntItem.Length - 1];
+                                dpItem.DropDownItems[dpItem.DropDownItems.Count - 1].Click += new EventHandler(CntSend_Click);
+                            }
                         }
                         else
                         {
@@ -409,7 +439,7 @@ namespace COMunicator
                     statusImg.Image = COMunicator.Properties.Resources.circ_green24;
                     btnNetConn.Enabled = false;
                     btnNetSConn.Enabled = false;
-                    Log.init(Files.ReplaceVarPaths(settings.Paths.logFile), cbbCOMPorts.Text);
+                    Global.LogPacket.SaveHeader(cbbCOMPorts.Text);
                 }
                 catch (Exception ex)
                 {
@@ -617,13 +647,6 @@ namespace COMunicator
             if (lbLog.Items.Count > 100)
                 lbLog.Items.RemoveAt(0);
 
-
-            
-
-            if (text.Length > 0)
-            {
-                Log.add(text);
-            }
             
             lbLog.SelectedIndex = lbLog.Items.Count - 1;
 
@@ -976,7 +999,7 @@ namespace COMunicator
             historyIP.Add(cbIP.Text);
             historyPort.Add(cbPort.Text);
             RefreshHistNet();
-            Log.init(Files.ReplaceVarPaths(settings.Paths.logFile), "Net " + cbIP.Text + ":" + cbPort.Text);
+            Global.LogPacket.SaveHeader("Net " + cbIP.Text + ":" + cbPort.Text);
         }
 
         private void btnSPRefresh_Click(object sender, EventArgs e)
@@ -1029,7 +1052,7 @@ namespace COMunicator
             btnNetConn.Enabled = false;
             historyPortServer.Add(cbSPort.Text);
             RefreshHistNet();
-            Log.init(Files.ReplaceVarPaths(settings.Paths.logFile), "Net TCP Server port: " + cbSPort.Text);
+            Global.LogPacket.SaveHeader("Net TCP Server port: " + cbSPort.Text);
         }
 
         private void cbProtocol_SelectedIndexChanged(object sender, EventArgs e)

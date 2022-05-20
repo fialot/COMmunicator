@@ -122,7 +122,7 @@ namespace COMunicator
             Show.BaudRate = ini.ReadBool("Show", "Baud", false);
 
             // ----- PATHS -----
-            Paths.logFile = ini.Read("Path", "LogFile", @"%AppPath%" + System.IO.Path.DirectorySeparatorChar + "com.log");
+            Paths.logFile = ini.Read("Path", "LogFile", @"%AppPath%");
             Paths.logEnable = ini.ReadBool("Path", "LogEnable", true);
             Paths.logNewFile = ini.ReadBool("Path", "LogNewFile" ,false);
             Paths.dataFolder = ini.Read("Path", "dataFolder", @"%AppData%" + System.IO.Path.DirectorySeparatorChar + "COMunicator");

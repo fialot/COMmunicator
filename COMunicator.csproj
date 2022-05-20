@@ -74,7 +74,6 @@
     <Compile Include="frmSettings.Designer.cs">
       <DependentUpon>frmSettings.cs</DependentUpon>
     </Compile>
-    <Compile Include="classes\Log.cs" />
     <Compile Include="functions\Conv.cs" />
     <Compile Include="functions\DevFun.cs" />
     <Compile Include="functions\Dialogs.cs" />
