@@ -152,6 +152,13 @@ namespace COMunicator
 
             AutoSendDataIndex = -1;
 
+            olvPacket.SetObjects(Global.LogPacket.Recods);
+            
+            colTime.AspectGetter = delegate (object x) {
+                return ((Logging.LogRecord)x).time.ToString("hh:mm:ss.fff");
+            };
+            colPacket.AspectGetter = delegate (object x) { return ((Logging.LogRecord)x).text; };
+
         }
 
         void LoadAutoSendData()
@@ -651,14 +658,16 @@ namespace COMunicator
             lbLog.SelectedIndex = lbLog.Items.Count - 1;
 
             // ----- Show Packet list -----
-            txtPackets.Rtf = Global.LogPacket.TextRTF();
+            /*txtPackets.Rtf = Global.LogPacket.TextRTF();
             txtPackets.SelectionStart = txtPackets.Text.Length;
-            txtPackets.ScrollToCaret();
+            txtPackets.ScrollToCaret();*/
 
             // ----- Show communication log -----
             txtLog.Rtf = Global.Log.TextRTF();
             txtLog.SelectionStart = txtLog.Text.Length;
             txtLog.ScrollToCaret();
+
+            olvPacket.UpdateObjects(Global.LogPacket.Recods);
 
             return text;
         }
@@ -701,9 +710,11 @@ namespace COMunicator
                 Global.LogPacket.SetPacketView(Logging.ePacketView.MARS_A);
             }
 
-            txtPackets.Rtf = Global.LogPacket.TextRTF();
+            /*txtPackets.Rtf = Global.LogPacket.TextRTF();
             txtPackets.SelectionStart = txtPackets.Text.Length;
-            txtPackets.ScrollToCaret();
+            txtPackets.ScrollToCaret();*/
+
+            olvPacket.UpdateObjects(Global.LogPacket.Recods);
 
             if (chkMarsA.Checked) TimeOut.Interval = 80;
             else TimeOut.Interval = 20;
@@ -783,7 +794,7 @@ namespace COMunicator
                 dialog.Filter = "Log File *.log|*.log|All Files (*.*)|*.*";
                 if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
-                    Files.SaveFile(dialog.FileName, txtPackets.Text);
+                    //Files.SaveFile(dialog.FileName, txtPackets.Text);
                 }
             }
             catch (Exception err)
@@ -825,8 +836,8 @@ namespace COMunicator
         private void clearToolStripMenuItem_Click(object sender, EventArgs e)
         {
             lbLog.Items.Clear();
-            txtPackets.Clear();
             Global.Log.ClearLog();
+            Global.LogPacket.ClearLog();
         }
 
         private void btnSettings_Click(object sender, EventArgs e)
@@ -1096,6 +1107,23 @@ namespace COMunicator
         private void chkTime_Click(object sender, EventArgs e)
         {
             ((ToolStripMenuItem)sender).Checked = !((ToolStripMenuItem)sender).Checked;
+        }
+
+        private void olvPacket_Resize(object sender, EventArgs e)
+        {
+            colPacket.Width = olvPacket.Width - colTime.Width;
+        }
+
+        private void olvPacket_FormatRow(object sender, BrightIdeasSoftware.FormatRowEventArgs e)
+        {
+            if (((Logging.LogRecord)e.Item.RowObject).input)
+            {
+                e.Item.ForeColor = Color.Blue;
+            }
+            else
+            {
+                e.Item.ForeColor = Color.Black;
+            }
         }
     }
 

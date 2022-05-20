@@ -76,7 +76,6 @@
             this.chbEndChar = new System.Windows.Forms.CheckBox();
             this.TimeOut = new System.Windows.Forms.Timer(this.components);
             this.lbLog = new System.Windows.Forms.ListBox();
-            this.txtPackets = new System.Windows.Forms.RichTextBox();
             this.btnNetConn = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabCOM = new System.Windows.Forms.TabPage();
@@ -101,6 +100,9 @@
             this.chbSendFromFile = new System.Windows.Forms.CheckBox();
             this.tabsMessages = new System.Windows.Forms.TabControl();
             this.tabComm = new System.Windows.Forms.TabPage();
+            this.olvPacket = new BrightIdeasSoftware.FastObjectListView();
+            this.colTime = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.colPacket = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.tabProcessLog = new System.Windows.Forms.TabPage();
             this.txtLog = new System.Windows.Forms.RichTextBox();
             this.CntMnu.SuspendLayout();
@@ -112,6 +114,7 @@
             this.tabTCPServer.SuspendLayout();
             this.tabsMessages.SuspendLayout();
             this.tabComm.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.olvPacket)).BeginInit();
             this.tabProcessLog.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -222,7 +225,7 @@
             this.toolStripMenuItem5,
             this.chkMarsA});
             this.mnuShowType.Name = "mnuShowType";
-            this.mnuShowType.Size = new System.Drawing.Size(180, 22);
+            this.mnuShowType.Size = new System.Drawing.Size(130, 22);
             this.mnuShowType.Text = "Show Type";
             // 
             // chkString
@@ -232,7 +235,7 @@
             this.chkString.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.chkLine});
             this.chkString.Name = "chkString";
-            this.chkString.Size = new System.Drawing.Size(180, 22);
+            this.chkString.Size = new System.Drawing.Size(125, 22);
             this.chkString.Text = "String";
             this.chkString.Click += new System.EventHandler(this.chkString_Click);
             // 
@@ -241,7 +244,7 @@
             this.chkLine.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.mnutxtLine});
             this.chkLine.Name = "chkLine";
-            this.chkLine.Size = new System.Drawing.Size(180, 22);
+            this.chkLine.Size = new System.Drawing.Size(148, 22);
             this.chkLine.Text = "Line separator";
             this.chkLine.Click += new System.EventHandler(this.chkTime_Click);
             // 
@@ -253,40 +256,40 @@
             // chkByte
             // 
             this.chkByte.Name = "chkByte";
-            this.chkByte.Size = new System.Drawing.Size(180, 22);
+            this.chkByte.Size = new System.Drawing.Size(125, 22);
             this.chkByte.Text = "Byte";
             this.chkByte.Click += new System.EventHandler(this.chkString_Click);
             // 
             // chkHex
             // 
             this.chkHex.Name = "chkHex";
-            this.chkHex.Size = new System.Drawing.Size(180, 22);
+            this.chkHex.Size = new System.Drawing.Size(125, 22);
             this.chkHex.Text = "Hex Num";
             this.chkHex.Click += new System.EventHandler(this.chkString_Click);
             // 
             // chkFormat
             // 
             this.chkFormat.Name = "chkFormat";
-            this.chkFormat.Size = new System.Drawing.Size(180, 22);
+            this.chkFormat.Size = new System.Drawing.Size(125, 22);
             this.chkFormat.Text = "Format";
             this.chkFormat.Click += new System.EventHandler(this.chkString_Click);
             // 
             // toolStripMenuItem5
             // 
             this.toolStripMenuItem5.Name = "toolStripMenuItem5";
-            this.toolStripMenuItem5.Size = new System.Drawing.Size(177, 6);
+            this.toolStripMenuItem5.Size = new System.Drawing.Size(122, 6);
             // 
             // chkMarsA
             // 
             this.chkMarsA.Name = "chkMarsA";
-            this.chkMarsA.Size = new System.Drawing.Size(180, 22);
+            this.chkMarsA.Size = new System.Drawing.Size(125, 22);
             this.chkMarsA.Text = "MARS-A";
             this.chkMarsA.Click += new System.EventHandler(this.chkString_Click);
             // 
             // ToolStripMenuItem4
             // 
             this.ToolStripMenuItem4.Name = "ToolStripMenuItem4";
-            this.ToolStripMenuItem4.Size = new System.Drawing.Size(177, 6);
+            this.ToolStripMenuItem4.Size = new System.Drawing.Size(127, 6);
             // 
             // mnuShow
             // 
@@ -294,20 +297,20 @@
             this.chkTime,
             this.chkBaudRate});
             this.mnuShow.Name = "mnuShow";
-            this.mnuShow.Size = new System.Drawing.Size(180, 22);
+            this.mnuShow.Size = new System.Drawing.Size(130, 22);
             this.mnuShow.Text = "Show";
             // 
             // chkTime
             // 
             this.chkTime.Name = "chkTime";
-            this.chkTime.Size = new System.Drawing.Size(180, 22);
+            this.chkTime.Size = new System.Drawing.Size(124, 22);
             this.chkTime.Text = "Time";
             this.chkTime.Click += new System.EventHandler(this.chkTime_Click);
             // 
             // chkBaudRate
             // 
             this.chkBaudRate.Name = "chkBaudRate";
-            this.chkBaudRate.Size = new System.Drawing.Size(180, 22);
+            this.chkBaudRate.Size = new System.Drawing.Size(124, 22);
             this.chkBaudRate.Text = "BaudRate";
             this.chkBaudRate.Click += new System.EventHandler(this.chkTime_Click);
             // 
@@ -505,18 +508,6 @@
             this.lbLog.Name = "lbLog";
             this.lbLog.Size = new System.Drawing.Size(328, 32);
             this.lbLog.TabIndex = 42;
-            // 
-            // txtPackets
-            // 
-            this.txtPackets.BackColor = System.Drawing.SystemColors.Window;
-            this.txtPackets.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txtPackets.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.txtPackets.Location = new System.Drawing.Point(3, 3);
-            this.txtPackets.Name = "txtPackets";
-            this.txtPackets.ReadOnly = true;
-            this.txtPackets.Size = new System.Drawing.Size(299, 244);
-            this.txtPackets.TabIndex = 49;
-            this.txtPackets.Text = "";
             // 
             // btnNetConn
             // 
@@ -789,7 +780,7 @@
             // 
             // tabComm
             // 
-            this.tabComm.Controls.Add(this.txtPackets);
+            this.tabComm.Controls.Add(this.olvPacket);
             this.tabComm.Location = new System.Drawing.Point(4, 22);
             this.tabComm.Name = "tabComm";
             this.tabComm.Padding = new System.Windows.Forms.Padding(3);
@@ -797,6 +788,38 @@
             this.tabComm.TabIndex = 0;
             this.tabComm.Text = "Packets";
             this.tabComm.UseVisualStyleBackColor = true;
+            // 
+            // olvPacket
+            // 
+            this.olvPacket.AllColumns.Add(this.colTime);
+            this.olvPacket.AllColumns.Add(this.colPacket);
+            this.olvPacket.CellEditUseWholeCell = false;
+            this.olvPacket.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.colTime,
+            this.colPacket});
+            this.olvPacket.Cursor = System.Windows.Forms.Cursors.Default;
+            this.olvPacket.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.olvPacket.HideSelection = false;
+            this.olvPacket.Location = new System.Drawing.Point(3, 3);
+            this.olvPacket.Name = "olvPacket";
+            this.olvPacket.ShowGroups = false;
+            this.olvPacket.Size = new System.Drawing.Size(299, 244);
+            this.olvPacket.TabIndex = 50;
+            this.olvPacket.UseCompatibleStateImageBehavior = false;
+            this.olvPacket.View = System.Windows.Forms.View.Details;
+            this.olvPacket.VirtualMode = true;
+            this.olvPacket.FormatRow += new System.EventHandler<BrightIdeasSoftware.FormatRowEventArgs>(this.olvPacket_FormatRow);
+            this.olvPacket.Resize += new System.EventHandler(this.olvPacket_Resize);
+            // 
+            // colTime
+            // 
+            this.colTime.Text = "Time";
+            this.colTime.Width = 76;
+            // 
+            // colPacket
+            // 
+            this.colPacket.Text = "Packet";
+            this.colPacket.Width = 214;
             // 
             // tabProcessLog
             // 
@@ -858,6 +881,7 @@
             this.tabTCPServer.PerformLayout();
             this.tabsMessages.ResumeLayout(false);
             this.tabComm.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.olvPacket)).EndInit();
             this.tabProcessLog.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -897,7 +921,6 @@
         private System.Windows.Forms.ToolStripMenuItem mnuAddSend;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem3;
         internal System.Windows.Forms.ListBox lbLog;
-        private System.Windows.Forms.RichTextBox txtPackets;
         private System.Windows.Forms.Button btnNetConn;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabCOM;
@@ -939,5 +962,8 @@
         private System.Windows.Forms.TabPage tabComm;
         private System.Windows.Forms.TabPage tabProcessLog;
         private System.Windows.Forms.RichTextBox txtLog;
+        private BrightIdeasSoftware.FastObjectListView olvPacket;
+        private BrightIdeasSoftware.OLVColumn colTime;
+        private BrightIdeasSoftware.OLVColumn colPacket;
     }
 }
