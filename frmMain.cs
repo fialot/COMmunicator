@@ -15,6 +15,10 @@ using GlobalClasses;
 
 using System.Net.Sockets;
 using System.Threading;
+using Fx.Connection;
+using Fx.Logging;
+using AppSettings;
+using Fx.IO;
 
 namespace COMunicator
 {
@@ -26,7 +30,7 @@ namespace COMunicator
         // ----- Auto send from file data ---
         string[] AutoSendData;
         int AutoSendDataIndex;
-        bool ReplyCome = false;
+        bool ReplyCome = true;
 
 
         static frmSettings formSet;
@@ -40,12 +44,38 @@ namespace COMunicator
         //int historyIndex;
 
         public delegate void MyDelegate(comStatus status);
+        public delegate void NewLogDelegate(LogRecord record);
 
         public Comm com;
         public History history;
         public History historyIP;
         public History historyPort;
         public History historyPortServer;
+
+        public void ShowLog(LogRecord record)
+        {
+            olvPacket.SetObjects(Global.LogPacket.Recods);
+
+            if (olvPacket.GetItemCount() > 0)
+            {
+                olvPacket.EnsureVisible(olvPacket.GetItemCount() - 1);
+            }
+
+            // ----- Add to rtf text -----
+            txtLog.Select(txtLog.TextLength, 0);
+            txtLog.SelectionColor = record.color;
+            txtLog.AppendText(record.text + Environment.NewLine);
+
+            if (txtLog.Lines.Length > 100)
+            {
+                int index = txtLog.GetFirstCharIndexFromLine(txtLog.Lines.Length - 100);
+                txtLog.Select(0, index);
+                txtLog.SelectedText = " ";
+            }
+
+            txtLog.SelectionStart = txtLog.Text.Length;
+            txtLog.ScrollToCaret();
+        }
 
         public void updateLog(comStatus status)
         {
@@ -57,7 +87,7 @@ namespace COMunicator
                 else if (com.OpenInterface == Comm.interfaces.TCPServer) 
                 {
                     lblStatus.Text = "Server: Client disconnected";
-                    Global.Log.Add("Client disconnected.");
+                    //Global.Log.Add("Client disconnected.");
                 } else if (com.OpenInterface == Comm.interfaces.COM)
                 {
                     btnConnect_Click(new object(), new EventArgs());
@@ -84,7 +114,7 @@ namespace COMunicator
                 else if (com.OpenInterface == Comm.interfaces.TCPServer)
                 {
                     lblStatus.Text = "Server: Client connected";
-                    Global.Log.Add("Client connected.");
+                    //Global.Log.Add("Client connected.");
                 }
                 
             }
@@ -103,8 +133,14 @@ namespace COMunicator
 
         private void DataReceive(object source, comStatus status)
         {
-            lbLog.Invoke(new MyDelegate(updateLog), new Object[] { status }); //BeginInvoke
+            olvPacket.Invoke(new MyDelegate(updateLog), new Object[] { status }); //BeginInvoke
             
+        }
+
+        private void NewLogRecord(LogRecord record)
+        {
+            olvPacket.Invoke(new NewLogDelegate(ShowLog), new Object[] { record }); //BeginInvoke
+
         }
 
         #region LoadForm
@@ -115,19 +151,23 @@ namespace COMunicator
             this.Text = this.Text + " v" + Application.ProductVersion.Substring(0,Application.ProductVersion.Length-2);
 
             // ----- LOAD SETTINGS -----
+            Settings.LoadXml();
             settings.LoadSettings();
+
+
             // ----- Creating data folder -----
             if (!Directory.Exists(Files.ReplaceVarPaths(settings.Paths.dataFolder))) Directory.CreateDirectory(Files.ReplaceVarPaths(settings.Paths.dataFolder));
 
-            Global.LogPacket.LogFileDirectory = Files.ReplaceVarPaths(settings.Paths.logFile);
-            Global.LogPacket.SaveToFile = settings.Paths.logEnable;
+            Global.LogPacket.LogFileDirectory = Files.ReplaceVarPaths(Settings.Messages.LogFileDirectory);
+            Global.LogPacket.SaveToFile = Settings.Messages.SaveToFile;
 ;
-            Encoding enc = settings.encoding;
+            Encoding enc = Settings.Messages.UsedEncoding;
 
             // ----- CREATE NEW COMMUNICATION INSTANCE -----
             com = new Comm(enc);
-            com.SetParamsSP(ToParity(settings.SP.parity), settings.SP.bits, ToStopBits(settings.SP.stopbits), settings.SP.DTR, settings.SP.RTS);
+            com.SetParamsSP(Settings.Connection.Parity, Settings.Connection.DataBits, Settings.Connection.StopBits, Settings.Connection.DTR, Settings.Connection.RTS);
             com.ReceivedData += new ReceivedEventHandler(DataReceive);
+
 
             // ----- APPLY SETTINGS TO FORM -----
             ApplySettingsToForm();
@@ -139,12 +179,30 @@ namespace COMunicator
             LoadMenu();
 
             // ----- READ REPLY FILE -----
-            ReplyData = LoadReplyFile(Files.ReplaceVarPaths(settings.Paths.ReplyFile));
+            ReplyData = LoadReplyFile(Files.ReplaceVarPaths(Settings.Messages.ReplyFile));
 
             // ----- READ AUTO SEND FILE -----
             LoadAutoSendData();
 
-            
+            if (chkString.Checked)
+            {
+                Global.LogPacket.SetPacketView(ePacketView.StringReplaceCommandChars);
+            }
+            else if (chkByte.Checked)
+            {
+                Global.LogPacket.SetPacketView(ePacketView.Bytes);
+            }
+            else if (chkHex.Checked)
+            {
+                Global.LogPacket.SetPacketView(ePacketView.Hex);
+            }
+            else if (chkMarsA.Checked)
+            {
+                Global.LogPacket.SetPacketView(ePacketView.MARS_A);
+            }
+            Global.LogPacket.NewRecord += new NewRecordEventHandler(NewLogRecord);
+
+
 
             formSet = new frmSettings();
 
@@ -152,18 +210,29 @@ namespace COMunicator
 
             AutoSendDataIndex = -1;
 
-            olvPacket.SetObjects(Global.LogPacket.Recods);
-            
+            olvPacket.UpdateObjects(Global.LogPacket.Recods); //SetObjects
+
             colTime.AspectGetter = delegate (object x) {
-                return ((Logging.LogRecord)x).time.ToString("hh:mm:ss.fff");
+                if (x == null) return "";
+                return ((LogRecord)x).time.ToString("hh:mm:ss.fff");
             };
-            colPacket.AspectGetter = delegate (object x) { return ((Logging.LogRecord)x).text; };
+            colDelay.AspectGetter = delegate (object x) {
+                if (x == null) return "";
+                return ((LogRecord)x).delay.TotalSeconds.ToString("0.000");
+            };
+            colLength.AspectGetter = delegate (object x) {
+                if (x == null) return ""; return ((LogRecord)x).data.Length;
+            };
+            colPacket.AspectGetter = delegate (object x) {
+                if (x == null) return "";
+                return ((LogRecord)x).text;
+            };
 
         }
 
         void LoadAutoSendData()
         {
-            AutoSendData = Files.LoadFileLines(Files.ReplaceVarPaths(settings.Paths.SendingFile), true);
+            AutoSendData = Files.LoadFileLines(Files.ReplaceVarPaths(Settings.Messages.SendingFile), true);
             AutoSendDataIndex = 0;
         }
 
@@ -223,57 +292,67 @@ namespace COMunicator
         {
             // ----- Read COM port list -----
             RefreshCOMPorts();
-            cbbCOMPorts.Text = settings.SP.port;
+            cbbCOMPorts.Text = Settings.Connection.SerialPort;
             if ((cbbCOMPorts.Items.Count > 0) & cbbCOMPorts.Text == "")
             {
                 cbbCOMPorts.Text = cbbCOMPorts.Items[0].ToString();
             }
 
-            Timer1.Interval = settings.Fun.AutoSendDelay;                   // auto sending interval
+            Timer1.Interval = Settings.Messages.AutoSendingPeriod;                   // auto sending interval
 
-            cbBaud.Text = settings.SP.baudrate.ToString();
-            cbIP.Text = settings.TCPClient.IP;
-            cbPort.Text = settings.TCPClient.port.ToString();
-            txtLocalPort.Text = settings.TCPClient.localPort.ToString();
-            cbSPort.Text = settings.TCPClient.serverPort.ToString();
+            cbBaud.Text = Settings.Connection.BaudRate.ToString();
+            cbIP.Text = Settings.Connection.IP;
+            cbPort.Text = Settings.Connection.Port.ToString();
+            txtLocalPort.Text = Settings.Connection.LocalPort.ToString();
+            cbSPort.Text = Settings.Connection.LocalPort.ToString();
             cbProtocol.SelectedIndex = 0;
-            if (settings.TCPClient.UDP) cbProtocol.SelectedIndex = 1;
+            if (Settings.Connection.Type == ConnectionType.UDP) cbProtocol.SelectedIndex = 1;
 
             if (settings.tab >= tabControl1.TabPages.Count) settings.tab = 0;
             tabControl1.SelectedIndex = settings.tab;
 
-            chkString.Checked = settings.Show.String;
-            chkByte.Checked = settings.Show.Byte;
-            chkHex.Checked = settings.Show.HexNum;
-            chkFormat.Checked = settings.Show.Format;
-            chkMarsA.Checked = settings.Show.MarsA;
+            switch (Settings.Messages.PacketView)
+            {
+                case ePacketView.Bytes:
+                    chkByte.Checked = true; break;
+                case ePacketView.Hex:
+                    chkHex.Checked = true; break;
+                case ePacketView.String:
+                case ePacketView.StringReplaceCommandChars:
+                    chkString.Checked = true; break;
+                case ePacketView.MARS_A:
+                    chkMarsA.Checked = true; break;
+            }
+            
 
-            chkLine.Checked = settings.Show.Line;
-            mnutxtLine.Text = settings.Show.LineNum;
+            chkLine.Checked = Settings.Messages.UseLineSeparatingChar;
+            mnutxtLine.Text = Settings.Messages.LineSeparatingChar;
 
-            chkTime.Checked = settings.Show.Time;
-            chkBaudRate.Checked = settings.Show.BaudRate;
+            chkTime.Checked = Settings.Messages.ShowTime;
+            chkBaudRate.Checked = Settings.Messages.ShowBaudRate;
 
-            chbClear.Checked = settings.Fun.NoClear;
-            chbAutoReply.Checked = settings.Fun.AutoReply;
-            chbAutoSend.Checked = settings.Fun.AutoSend;
-            chbEndChar.Checked = settings.Fun.IsEndChar;
-            txtEndCMD.Text = settings.Fun.EndChar;
+            chbClear.Checked = Settings.Messages.ClearEditbox;
+            chbAutoReply.Checked = Settings.Messages.EnableReplyFile;
+            chbAutoSend.Checked = Settings.Messages.EnableAutoSending;
+            chbEndChar.Checked = Settings.Messages.AddEndChar;
+            txtEndCMD.Text = Settings.Messages.EndChar;
         }
 
         #endregion
 
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
-            settings.SP.port = cbbCOMPorts.Text;
-            settings.SP.baudrate = Conv.ToIntDef(cbBaud.Text, 115200);
+            Settings.Connection.SerialPort = cbbCOMPorts.Text;
+            Settings.Connection.BaudRate = Conv.ToIntDef(cbBaud.Text, 115200);
 
-            settings.TCPClient.IP = cbIP.Text;
-            settings.TCPClient.port = Conv.ToIntDef(cbPort.Text, 17000);
-            settings.TCPClient.localPort = Conv.ToIntDef(txtLocalPort.Text, 17001);
-            settings.TCPClient.serverPort = Conv.ToIntDef(cbSPort.Text,17000);
-            if (cbProtocol.SelectedIndex == 1) settings.TCPClient.UDP = true;
-            else settings.TCPClient.UDP = false;
+            Settings.Connection.IP = cbIP.Text;
+            Settings.Connection.Port = Conv.ToIntDef(cbPort.Text, 17000);
+            if (Settings.Connection.Type == ConnectionType.UDP)
+                Settings.Connection.LocalPort = Conv.ToIntDef(txtLocalPort.Text, 17001);
+            else
+                Settings.Connection.LocalPort = Conv.ToIntDef(cbSPort.Text,17000);
+            if (cbProtocol.SelectedIndex == 1) Settings.Connection.Type = ConnectionType.UDP;
+            else Settings.Connection.Type = ConnectionType.Serial;
 
             settings.tab = tabControl1.SelectedIndex;
 
@@ -285,27 +364,32 @@ namespace COMunicator
             //settings.SP.RTS = SP.RtsEnable;
 
 
+            if (chkByte.Checked)
+                Settings.Messages.PacketView = ePacketView.Bytes;
+            if (chkHex.Checked)
+                Settings.Messages.PacketView = ePacketView.Hex;
+            if (chkString.Checked)
+                Settings.Messages.PacketView = ePacketView.StringReplaceCommandChars;
+            if (chkMarsA.Checked)
+                Settings.Messages.PacketView = ePacketView.MARS_A;
 
-            settings.Show.String = chkString.Checked;
-            settings.Show.Byte = chkByte.Checked;
-            settings.Show.HexNum = chkHex.Checked;
-            settings.Show.Format = chkFormat.Checked;
-            settings.Show.MarsA = chkMarsA.Checked;
+            Settings.Messages.UseLineSeparatingChar = chkLine.Checked;
+            Settings.Messages.LineSeparatingChar = mnutxtLine.Text;
 
-            settings.Show.Line = chkLine.Checked;
-            settings.Show.LineNum = mnutxtLine.Text;
-            //settings.Log.FormatString = mnuFormatString.Text;
 
-            settings.Show.Time = chkTime.Checked;
-            settings.Show.BaudRate = chkBaudRate.Checked;
-            
+            Settings.Messages.ShowTime = chkTime.Checked;
+            Settings.Messages.ShowBaudRate = chkBaudRate.Checked;
 
-            settings.Fun.NoClear = chbClear.Checked;
-            settings.Fun.AutoReply = chbAutoReply.Checked;
-            settings.Fun.AutoSend = chbAutoSend.Checked;
-            settings.Fun.IsEndChar = chbEndChar.Checked;
-            settings.Fun.EndChar = txtEndCMD.Text;
+
+
+            Settings.Messages.ClearEditbox = chbClear.Checked;
+            Settings.Messages.EnableReplyFile = chbAutoReply.Checked;
+            Settings.Messages.EnableAutoSending = chbAutoSend.Checked;
+            Settings.Messages.AddEndChar = chbEndChar.Checked;
+            Settings.Messages.EndChar = txtEndCMD.Text;
             settings.SaveSettings();
+
+            Settings.SaveXml();
 
             // ----- SAVE COMMANDS HISTORY -----
             history.SetTemporary(tbSend.Text);
@@ -595,13 +679,13 @@ namespace COMunicator
 
             // ----- Status log packets -----
             if (input) {
-                var delay = DateTime.Now - Global.Log.LastLogTime;
-                Global.Log.Add("Input message length: " + message.Length + ", delay: " + delay.TotalSeconds, Color.Blue);
+                //var delay = DateTime.Now - Global.Log.LastLogTime;
+                //Global.Log.Add("Input message length: " + message.Length + ", delay: " + delay.TotalSeconds, Color.Blue);
                 ReplyCome = true;
             }
             else
             {
-                Global.Log.Add("Send message length: " + message.Length.ToString(), Color.Black, true, false);
+                //Global.Log.Add("Send message length: " + message.Length.ToString(), Color.Black, true, false);
                 ReplyCome = false;
             }
 
@@ -622,7 +706,7 @@ namespace COMunicator
                 }
             }
 
-            var endChar = settings.encoding.GetString(com.FormatMsg(mnutxtLine.Text));
+            var endChar = Settings.Messages.UsedEncoding.GetString(com.FormatMsg(mnutxtLine.Text));
 
             if (chkLine.Checked && endChar != "")
             {
@@ -646,7 +730,7 @@ namespace COMunicator
                 text = Global.LogPacket.Add(description, message, Color.Black, chkTime.Checked, input);
 
 
-            if (text.Length > 0)
+            /*if (text.Length > 0)
             {
                 lbLog.Items.Add(text);
             }
@@ -655,7 +739,7 @@ namespace COMunicator
                 lbLog.Items.RemoveAt(0);
 
             
-            lbLog.SelectedIndex = lbLog.Items.Count - 1;
+            lbLog.SelectedIndex = lbLog.Items.Count - 1;*/
 
             // ----- Show Packet list -----
             /*txtPackets.Rtf = Global.LogPacket.TextRTF();
@@ -663,11 +747,13 @@ namespace COMunicator
             txtPackets.ScrollToCaret();*/
 
             // ----- Show communication log -----
-            txtLog.Rtf = Global.Log.TextRTF();
+            /*txtLog.Rtf = Global.LogPacket.TextRTF();
             txtLog.SelectionStart = txtLog.Text.Length;
-            txtLog.ScrollToCaret();
+            txtLog.ScrollToCaret();*/
 
-            olvPacket.UpdateObjects(Global.LogPacket.Recods);
+            //olvPacket.UpdateObjects(Global.LogPacket.Recods);
+            /*if (olvPacket.GetItemCount() > 0)
+                olvPacket.EnsureVisible(olvPacket.GetItemCount() - 1);*/
 
             return text;
         }
@@ -677,7 +763,7 @@ namespace COMunicator
 
         private void SP_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            lbLog.Invoke(new MyDelegate(updateLog), new Object[] { }); //BeginInvoke
+            olvPacket.Invoke(new MyDelegate(updateLog), new Object[] { }); //BeginInvoke
             //TimeOut.Enabled = true;
             //TimeOut_Tick(sender, e);
     
@@ -695,26 +781,27 @@ namespace COMunicator
 
             if (chkString.Checked)
             {
-                Global.LogPacket.SetPacketView(Logging.ePacketView.StringReplaceCommandChars);
+                Global.LogPacket.SetPacketView(ePacketView.StringReplaceCommandChars);
             }
             else if (chkByte.Checked)
             {
-                Global.LogPacket.SetPacketView(Logging.ePacketView.Bytes);
+                Global.LogPacket.SetPacketView(ePacketView.Bytes);
             }
             else if (chkHex.Checked)
             {
-                Global.LogPacket.SetPacketView(Logging.ePacketView.Hex);
+                Global.LogPacket.SetPacketView(ePacketView.Hex);
             }
             else if (chkMarsA.Checked)
             {
-                Global.LogPacket.SetPacketView(Logging.ePacketView.MARS_A);
+                Global.LogPacket.SetPacketView(ePacketView.MARS_A);
             }
 
             /*txtPackets.Rtf = Global.LogPacket.TextRTF();
             txtPackets.SelectionStart = txtPackets.Text.Length;
             txtPackets.ScrollToCaret();*/
 
-            olvPacket.UpdateObjects(Global.LogPacket.Recods);
+            olvPacket.SetObjects(Global.LogPacket.Recods);
+            txtLog.Rtf = Global.LogPacket.TextRTF();
 
             if (chkMarsA.Checked) TimeOut.Interval = 80;
             else TimeOut.Interval = 20;
@@ -733,7 +820,7 @@ namespace COMunicator
                         AutoSendDataIndex += 1;
                         if (AutoSendDataIndex == AutoSendData.Length)
                         {
-                            if (settings.Paths.BeginAfterEoF)
+                            if (Settings.Messages.SendingFileRepeating)
                                 AutoSendDataIndex = 0;
                             else
                                 AutoSendDataIndex--;
@@ -754,7 +841,7 @@ namespace COMunicator
 
                 if (text != "")
                 {
-                    if (!settings.Fun.WaitForReply || (settings.Fun.WaitForReply && ReplyCome))
+                    if (!Settings.Messages.WaitForReply || (Settings.Messages.WaitForReply && ReplyCome))
                     Send(text);
                 }
             }
@@ -778,12 +865,18 @@ namespace COMunicator
 
         private void CntText_Click(object sender, EventArgs e)
         {
-            tbSend.Text = lbLog.Items[lbLog.SelectedIndex].ToString().Remove(0, 4);
+            if (olvPacket.SelectedIndex >= 0)
+            {
+                tbSend.Text = ((LogRecord)olvPacket.SelectedItem.RowObject).text;
+            }
         }
 
         private void CntCopy_Click(object sender, EventArgs e)
         {
-            System.Windows.Forms.Clipboard.SetText(lbLog.Items[lbLog.SelectedIndex].ToString().Remove(0, 4));
+            if (olvPacket.SelectedIndex >= 0)
+            {
+                System.Windows.Forms.Clipboard.SetText(((LogRecord)olvPacket.SelectedItem.RowObject).text);
+            }
         }
 
         private void CntSaveAs_Click(object sender, EventArgs e)
@@ -827,7 +920,7 @@ namespace COMunicator
             }
 
 
-            lbLog.SelectedIndex = lbLog.Items.Count - 1;
+            //lbLog.SelectedIndex = lbLog.Items.Count - 1;
             //lbLog.Invoke(new MyDelegate(updateLog), new Object[] { });
             //txt = "";
             PrevData = new byte[0];
@@ -835,9 +928,11 @@ namespace COMunicator
 
         private void clearToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            lbLog.Items.Clear();
-            Global.Log.ClearLog();
+            //Global.Log.ClearLog();
             Global.LogPacket.ClearLog();
+            olvPacket.SetObjects(Global.LogPacket.Recods);
+            txtLog.Text = "";
+
         }
 
         private void btnSettings_Click(object sender, EventArgs e)
@@ -847,25 +942,25 @@ namespace COMunicator
 
         private void ChangeSettings(int tab) 
         {
-            settings.Fun.AutoReply = chbAutoReply.Checked;
-            settings.Paths.EnableSendingFile = chbSendFromFile.Checked;
+            Settings.Messages.EnableReplyFile = chbAutoReply.Checked;
+            Settings.Messages.EnableSendingFile = chbSendFromFile.Checked;
             formSet.ShowDialog(tab);
 
             try
             {
                 if (com != null)
                 {
-                    com.SetParamsSP(ToParity(settings.SP.parity), settings.SP.bits, ToStopBits(settings.SP.stopbits), settings.SP.DTR, settings.SP.RTS);
-                    com.SetEncoding(settings.encoding);
+                    com.SetParamsSP(Settings.Connection.Parity, Settings.Connection.DataBits, Settings.Connection.StopBits, Settings.Connection.DTR, Settings.Connection.RTS);
+                    com.SetEncoding(Settings.Messages.UsedEncoding);
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            Timer1.Interval = settings.Fun.AutoSendDelay;
-            chbAutoReply.Checked = settings.Fun.AutoReply;
-            chbSendFromFile.Checked = settings.Paths.EnableSendingFile;
+            Timer1.Interval = Settings.Messages.AutoSendingPeriod;
+            chbAutoReply.Checked = Settings.Messages.EnableReplyFile;
+            chbSendFromFile.Checked = Settings.Messages.EnableSendingFile;
             LoadAutoSendData();
         }
 
@@ -1111,12 +1206,14 @@ namespace COMunicator
 
         private void olvPacket_Resize(object sender, EventArgs e)
         {
-            colPacket.Width = olvPacket.Width - colTime.Width;
+            colPacket.Width = olvPacket.Width - colTime.Width - colLength.Width;
         }
 
         private void olvPacket_FormatRow(object sender, BrightIdeasSoftware.FormatRowEventArgs e)
         {
-            if (((Logging.LogRecord)e.Item.RowObject).input)
+            if (e.Item.RowObject == null) return;
+
+            if (((LogRecord)e.Item.RowObject).input)
             {
                 e.Item.ForeColor = Color.Blue;
             }

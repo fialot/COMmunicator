@@ -60,11 +60,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="classes\AbortableBackgroundWorker.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="classes\Fx\ConnectionStructs.cs" />
+    <Compile Include="classes\Fx\EncryptPassword.cs" />
     <Compile Include="classes\Global.cs" />
     <Compile Include="classes\History.cs" />
     <Compile Include="classes\iniFile.cs" />
     <Compile Include="classes\Comm.cs" />
-    <Compile Include="classes\ProcessLog.cs" />
+    <Compile Include="classes\Fx\Paths.cs" />
+    <Compile Include="classes\Fx\ProcessLog.cs" />
+    <Compile Include="classes\Sender.cs" />
+    <Compile Include="classes\Settings.cs" />
     <Compile Include="frmMain.cs">
       <SubType>Form</SubType>
     </Compile>

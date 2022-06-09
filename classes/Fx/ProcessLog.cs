@@ -1,4 +1,4 @@
-﻿using myFunctions;
+﻿using Fx.IO;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Logging
+namespace Fx.Logging
 {
     public enum ePacketView
     {
@@ -19,9 +19,12 @@ namespace Logging
         MARS_A,
     }
 
+    public delegate void NewRecordEventHandler(LogRecord record);
+
     public class LogRecord
     {
         public DateTime time = DateTime.MinValue;
+        public TimeSpan delay;
         public string description = "";
         public string text = "";
         public byte[] data = new byte[0];
@@ -48,7 +51,7 @@ namespace Logging
             this.color = color;
         }
 
-        public LogRecord(DateTime time, string description, string text, byte[] data, Color color, bool withTime, bool input)
+        public LogRecord(DateTime time, string description, string text, byte[] data, Color color, bool withTime, bool input, TimeSpan delay)
         {
             this.color = color;
             this.description = description;
@@ -57,12 +60,15 @@ namespace Logging
             this.data = data;
             this.withTime = withTime;
             this.input = input;
+            this.delay = delay;
         }
     }
 
     public class ProcessLog
     {
-        
+
+        public event NewRecordEventHandler NewRecord;
+
         public string Name { get; private set; } = "Log";
         
         public int Progress { get; private set; } = 0;
@@ -81,15 +87,11 @@ namespace Logging
 
 
 
-
         private ePacketView PacketView = ePacketView.StringReplaceCommandChars;
         
 
         //public bool EnableSeparateLineWithChar { get; set; } = false;
         
-
-
-        RichTextBox rtf = new RichTextBox();
 
         public ProcessLog(int maxRecords = 100, bool showDate = true, bool showTimeMs = true, bool showDirection = true)
         {
@@ -114,8 +116,6 @@ namespace Logging
             {
                 PacketView = packetView;
 
-                rtf.Clear();
-
                 for (int i = 0; i < Recods.Count; i++)
                 {
                     var item = Recods[i];
@@ -123,10 +123,6 @@ namespace Logging
                     item.text = CreateLogText(item.description, item.text, item.withTime, item.input);
                     Recods.RemoveAt(i);
                     Recods.Insert(i, item);
-
-                    rtf.Select(rtf.TextLength, 0);
-                    rtf.SelectionColor = item.color;
-                    rtf.AppendText(item.text + Environment.NewLine);
                 }
             }
         }
@@ -138,7 +134,6 @@ namespace Logging
         /// </summary>
         public void ClearLog()
         {
-            rtf.Clear();
             Recods.Clear();
         }
 
@@ -150,13 +145,24 @@ namespace Logging
         {
             string text = "";
 
-            LastLogTime = DateTime.Now;
+            var now = DateTime.Now;
+
+            
+            var delay = now - LastLogTime;
+            if (LastLogTime == DateTime.MinValue)
+                delay = new TimeSpan();
+
+            LastLogTime = now;
 
             text = ConvertToText(data);
             text = CreateLogText(description, text, withTime, input);
 
             // ----- Add message -----
-            Recods.Add(new LogRecord(LastLogTime, description, text, data, color, withTime, input));
+            var record = new LogRecord(LastLogTime, description, text, data, color, withTime, input, delay);
+            Recods.Add(record);
+
+            // ----- Event -----
+            if (NewRecord != null) NewRecord(record);
 
             // ----- Save log to file -----
             if (SaveToFile)
@@ -165,9 +171,9 @@ namespace Logging
             }
 
             // ----- Add rich text -----
-            rtf.Select(rtf.TextLength, 0);
+           /* rtf.Select(rtf.TextLength, 0);
             rtf.SelectionColor = color;
-            rtf.AppendText(text + Environment.NewLine);
+            rtf.AppendText(text + Environment.NewLine);*/
 
             // ----- Max records -----
             if (MaxRecords > 0)
@@ -177,8 +183,8 @@ namespace Logging
                     var RecordLength = Recods[0].text.Length;
                     Recods.RemoveAt(0);
 
-                    rtf.Select(0, RecordLength + 1);
-                    rtf.SelectedText = "";
+                    /*rtf.Select(0, RecordLength + 1);
+                    rtf.SelectedText = "";*/
                 }
             }
 
@@ -465,6 +471,15 @@ namespace Logging
 
         public string TextRTF()
         {
+            RichTextBox rtf = new RichTextBox();
+
+            foreach (var item in Recods)
+            {
+                rtf.Select(rtf.TextLength, 0);
+                rtf.SelectionColor = item.color;
+                rtf.AppendText(item.text + Environment.NewLine);
+            }
+
             return rtf.Rtf;
         }
     }

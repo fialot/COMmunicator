@@ -3,136 +3,143 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Globalization;
+using System.IO;
+using System.Drawing;
 
-namespace myFunctions
+namespace Fx.IO
 {
-	/// <summary>
-	/// Conversion
-	/// Version:    1.1
-	/// Date:       2015-10-02   
-	/// </summary>
+    public class Utf8StringWriter : StringWriter
+    {
+        public override Encoding Encoding { get { return Encoding.UTF8; } }
+    }
+
+    /// <summary>
+    /// Conversion
+    /// Version:    1.2
+    /// Date:       2017-05-03   
+    /// </summary>
     static class Conv
-	{
-		#region Testing number
+    {
+        #region Testing number
 
-		/// <summary>
-		/// Check if string is Short
-		/// </summary>
-		/// <param name="text">Number string</param>
-		/// <returns>Return True if string is Short</returns>
+        /// <summary>
+        /// Check if string is Short
+        /// </summary>
+        /// <param name="text">Number string</param>
+        /// <returns>Return True if string is Short</returns>
         public static bool IsShort(string text)
-		{
-			short value;
-			return short.TryParse(text, out value);
-		}
+        {
+            short value;
+            return short.TryParse(text, out value);
+        }
 
-		/// <summary>
-		/// Check if string is positive Short
-		/// </summary>
-		/// <param name="text">Number string</param>
-		/// <returns>Return True if string is positive short</returns>
+        /// <summary>
+        /// Check if string is positive Short
+        /// </summary>
+        /// <param name="text">Number string</param>
+        /// <returns>Return True if string is positive short</returns>
         public static bool IsPositiveShort(string text)
-		{
-			short value;
-			bool res = short.TryParse(text, out value);
-			if (res)
-				if (value < 0) res = false;
-			return res;
-		}
+        {
+            short value;
+            bool res = short.TryParse(text, out value);
+            if (res)
+                if (value < 0) res = false;
+            return res;
+        }
 
-		/// <summary>
-		/// Check if string is Integer
-		/// </summary>
-		/// <param name="text">Number string</param>
-		/// <returns>Return True if string is integer</returns>
+        /// <summary>
+        /// Check if string is Integer
+        /// </summary>
+        /// <param name="text">Number string</param>
+        /// <returns>Return True if string is integer</returns>
         public static bool IsInt(string text)
-		{
-			int value;
-			return int.TryParse(text, out value);
-		}
+        {
+            int value;
+            return int.TryParse(text, out value);
+        }
 
-		/// <summary>
-		/// Check if string is positive Int
-		/// </summary>
-		/// <param name="text">Number string</param>
-		/// <returns>Return True if string is positive integer</returns>
+        /// <summary>
+        /// Check if string is positive Int
+        /// </summary>
+        /// <param name="text">Number string</param>
+        /// <returns>Return True if string is positive integer</returns>
         public static bool IsPositiveInt(string text)
-		{
-			int value;
-			bool res = int.TryParse(text, out value);
-			if (res)
-				if (value < 0) res = false;
-			return res;
-		}
+        {
+            int value;
+            bool res = int.TryParse(text, out value);
+            if (res)
+                if (value < 0) res = false;
+            return res;
+        }
 
-		/// <summary>
-		/// Check if string is Float
-		/// </summary>
-		/// <param name="text">Number string</param>
-		/// <returns>Return True if string is float</returns>
+        /// <summary>
+        /// Check if string is Float
+        /// </summary>
+        /// <param name="text">Number string</param>
+        /// <returns>Return True if string is float</returns>
         public static bool IsFloat(string text)
-		{
-			float value;
-			return float.TryParse(text, out value);
-		}
+        {
+            float value;
+            return float.TryParse(text, out value);
+        }
 
-		/// <summary>
-		/// Check if string is positive Float
-		/// </summary>
-		/// <param name="text">Number string</param>
-		/// <returns>Return True if string is positive float</returns>
+        /// <summary>
+        /// Check if string is positive Float
+        /// </summary>
+        /// <param name="text">Number string</param>
+        /// <returns>Return True if string is positive float</returns>
         public static bool IsPositiveFloat(string text)
-		{
-			float value;
-			bool res = float.TryParse(text, out value);
-			if (res)
-				if (value < 0) res = false;
-			return res;
-		}
+        {
+            float value;
+            bool res = float.TryParse(text, out value);
+            if (res)
+                if (value < 0) res = false;
+            return res;
+        }
 
-		/// <summary>
-		/// Check if string is DateTime
-		/// </summary>
-		/// <param name="text">String</param>
-		/// <returns>Return True if string is DateTime</returns>
+        /// <summary>
+        /// Check if string is DateTime
+        /// </summary>
+        /// <param name="text">String</param>
+        /// <returns>Return True if string is DateTime</returns>
         public static bool IsDate(string text)
-		{
-			DateTime value;
-			return DateTime.TryParse(text, out value);
-		}
+        {
+            DateTime value;
+            return DateTime.TryParse(text, out value);
+        }
 
-		/// <summary>
-		/// Check if string is number
-		/// </summary>
-		/// <param name="Expression">Number string</param>
-		/// <returns>Return True if string is number</returns>
+        /// <summary>
+        /// Check if string is number
+        /// </summary>
+        /// <param name="Expression">Number string</param>
+        /// <returns>Return True if string is number</returns>
         public static bool IsNumeric(object Expression)
-		{
-			bool isNum;
-			double retNum;
+        {
+            bool isNum;
+            double retNum;
 
-			isNum = Double.TryParse(Convert.ToString(Expression), System.Globalization.NumberStyles.Any, System.Globalization.NumberFormatInfo.InvariantInfo, out retNum);
-			return isNum;
-		}
+            isNum = Double.TryParse(Convert.ToString(Expression), System.Globalization.NumberStyles.Any, System.Globalization.NumberFormatInfo.InvariantInfo, out retNum);
+            return isNum;
+        }
 
-		/// <summary>
-		/// Check if string is integer (INT32)
-		/// </summary>
-		/// <param name="Expression">Number string</param>
-		/// <returns>Return True if string is integer</returns>
+        /// <summary>
+        /// Check if string is integer (INT32)
+        /// </summary>
+        /// <param name="Expression">Number string</param>
+        /// <returns>Return True if string is integer</returns>
         public static bool IsInteger(object Expression)
-		{
-			bool isNum;
-			int retNum;
+        {
+            bool isNum;
+            int retNum;
 
-			isNum = Int32.TryParse(Convert.ToString(Expression), System.Globalization.NumberStyles.Any, System.Globalization.NumberFormatInfo.InvariantInfo, out retNum);
-			return isNum;
-		}
+            isNum = Int32.TryParse(Convert.ToString(Expression), System.Globalization.NumberStyles.Any, System.Globalization.NumberFormatInfo.InvariantInfo, out retNum);
+            return isNum;
+        }
 
-		#endregion
+        #endregion
 
         #region To Number with Default number
-		
+        
         /// <summary>
         /// Convert String to Bool with default value on convert Error
         /// </summary>
@@ -155,8 +162,31 @@ namespace myFunctions
                     return false;
                 }
                 return def;
+            } 
+        }
+
+        /// <summary>
+        /// Convert String to Bool with null
+        /// </summary>
+        /// <param name="text">Number string</param>
+        /// <returns>Short number</returns>
+        public static bool? ToBoolNull(string text)
+        {
+            bool value;
+            if (bool.TryParse(text, out value))
+                return value;
+            else
+            {
+                if (text == "1")
+                {
+                    return true;
+                }
+                else if (text == "0")
+                {
+                    return false;
+                }
+                return null;
             }
-                
         }
 
         /// <summary>
@@ -175,6 +205,50 @@ namespace myFunctions
         }
 
         /// <summary>
+        /// Convert String to Short with default value on convert Error
+        /// </summary>
+        /// <param name="text">Number string</param>
+        /// <returns>Short number</returns>
+        public static short? ToShortNull(string text)
+        {
+            short value;
+            if (short.TryParse(text, out value))
+                return value;
+            else
+                return null;
+        }
+
+        /// <summary>
+        /// Convert String to Unsigned Short with default value on convert Error
+        /// </summary>
+        /// <param name="text">Number string</param>
+        /// <param name="def">Default value</param>
+        /// <returns>Short number</returns>
+        public static ushort ToUShortDef(string text, ushort def)
+        {
+            ushort value;
+            if (ushort.TryParse(text, out value))
+                return value;
+            else
+                return def;
+        }
+        
+        /// <summary>
+        /// Convert String to Unsigned Short with default value on convert Error
+        /// </summary>
+        /// <param name="text">Number string</param>
+        /// <returns>Short number</returns>
+        public static ushort? ToUShortNull(string text)
+        {
+            ushort value;
+            if (ushort.TryParse(text, out value))
+                return value;
+            else
+                return null;
+        }
+
+
+        /// <summary>
         /// Convert String to Integer with default value on convert Error
         /// </summary>
         /// <param name="text">Number string</param>
@@ -189,6 +263,49 @@ namespace myFunctions
                 return def;
         }
 
+        /// <summary>
+        /// Convert String to Integer with default value on convert Error
+        /// </summary>
+        /// <param name="text">Number string</param>
+        /// <returns>Integer number</returns>
+        public static int? ToIntNull(string text)
+        {
+            int value;
+            if (int.TryParse(text, out value))
+                return value;
+            else
+                return null;
+        }
+
+        /// <summary>
+        /// Convert String to Unsigned Integer with default value on convert Error
+        /// </summary>
+        /// <param name="text">Number string</param>
+        /// <param name="def">Default value</param>
+        /// <returns>Integer number</returns>
+        public static uint ToUIntDef(string text, uint def)
+        {
+            uint value;
+            if (uint.TryParse(text, out value))
+                return value;
+            else
+                return def;
+        }
+        
+        /// <summary>
+        /// Convert String to Unsigned Integer with default value on convert Error
+        /// </summary>
+        /// <param name="text">Number string</param>
+        /// <returns>Integer number</returns>
+        public static uint? ToUIntNull(string text)
+        {
+            uint value;
+            if (uint.TryParse(text, out value))
+                return value;
+            else
+                return null;
+        }
+        
         /// <summary>
         /// Convert String to Int32 with default value on convert Error
         /// </summary>
@@ -267,6 +384,20 @@ namespace myFunctions
         /// Convert String to Double with default value on convert Error
         /// </summary>
         /// <param name="text">Number string</param>
+        /// <returns>Double number</returns>
+        public static double? ToDoubleNull(string text)
+        {
+            double value;
+            if (double.TryParse(text, out value))
+                return value;
+            else
+                return null;
+        }
+
+        /// <summary>
+        /// Convert String to Double with default value on convert Error
+        /// </summary>
+        /// <param name="text">Number string</param>
         /// <param name="def">Default value</param>
         /// <returns>Double number</returns>
         public static double ToDoubleDef(string text, double def, NumberFormatInfo format)
@@ -290,6 +421,66 @@ namespace myFunctions
         }
 
         #endregion
+
+        /// <summary>
+        /// Convert to number without 
+        /// </summary>
+        /// <param name="val"></param>
+        /// <returns></returns>
+        public static long ToNumber(string val)
+        {
+            string clean = "";
+            for (int i = 0; i < val.Length; i++)
+            {
+                if (val[i] >= '0' && val[i] <= '9')
+                    clean += val[i];
+            }
+            return (long)ToLongDef(clean, 0);
+        }
+
+        /// <summary>
+        /// Convert to number without 
+        /// </summary>
+        /// <param name="val"></param>
+        /// <returns></returns>
+        public static double ToRealNumber(string val)
+        {
+            val = val.Replace(",", ".");
+            string clean = "";
+            for (int i = 0; i < val.Length; i++)
+            {
+                if (val[i] >= '0' && val[i] <= '9' || val[i] == '.')
+                    clean += val[i];
+            }
+            return ToDoubleDefI(clean, 0);
+        }
+
+        public static T ToEnum<T>(this string value, T defaultValue)
+        {
+            try
+            {
+                return (T)Enum.Parse(typeof(T), value, true);
+            }
+            catch (Exception)
+            {
+                return defaultValue;
+            }
+            
+        }
+
+        public static Encoding ToEncoding(string value, Encoding defaultValue)
+        {
+            try
+            {
+                return Encoding.GetEncoding(value);
+            }
+            catch (Exception)
+            {
+                return defaultValue;
+            }
+        }
+
+
         /// <summary>
         /// Return bool value like "0" or "1"
         /// </summary>
@@ -346,6 +537,7 @@ namespace myFunctions
         public static string ArrToStr(object Expression, string separator = "; ")
         {
             string res = "";
+            if (Expression == null) return "";
             if (Expression.GetType() == typeof(ushort[]))
             {
                 ushort[] exp = (ushort[])Expression;
@@ -390,6 +582,12 @@ namespace myFunctions
                         boolStr = "0";
                     res += separator + boolStr;
                 }
+            }
+            else if (Expression.GetType() == typeof(string[]))
+            {
+                string[] exp = (string[])Expression;
+                if (exp.Length > 0) res = exp[0];
+                for (int i = 1; i < exp.Length; i++) res += separator + exp[i];
             }
             else
                 res = Expression.ToString();
@@ -584,6 +782,74 @@ namespace myFunctions
 
         }
 
+        public static DateTime? ToDateTimeNull(string text)
+        {
+            DateTime? date;
+            try
+            {
+                date = DateTime.Parse(text);
+            } catch
+            {
+                date = null;
+            }
+            return date;
+        }
+
+        public static Guid ToGuid(string text)
+        {
+            Guid ID;
+            try
+            {
+                ID = Guid.Parse(text);
+            }
+            catch
+            {
+                ID = Guid.Empty;
+            }
+            return ID;
+        }
+
+
+        public static byte[] ImageToByteArray(Image imageIn)
+        {
+            try
+            {
+                if (imageIn != null)
+                {
+                    using (var ms = new MemoryStream())
+                    {
+                        imageIn.Save(ms, imageIn.RawFormat);
+                        return ms.ToArray();
+                    }
+                }
+                else return new byte[0];
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public static Image ByteArrayToImage(byte[] arr)
+        {
+            try
+            {
+                if (arr != null)
+                {
+                    using (var ms = new MemoryStream(arr))
+                    {
+                        return Image.FromStream(ms);
+                    }
+                }
+                else return null;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+
         #region Swap
 
         /// <summary>
@@ -643,7 +909,7 @@ namespace myFunctions
             {
                 return uint.Parse(hex, System.Globalization.NumberStyles.HexNumber);
             } 
-            catch (Exception err)
+            catch (Exception)
             {
                 return def;
             }
@@ -670,12 +936,12 @@ namespace myFunctions
             }
             
         }
-
-        /// <summary>
-        /// Convert Hex to byte array
+		
+		/// <summary>
+        /// Convert Hex to byte
         /// </summary>
         /// <param name="hex">Hex number</param>
-        /// <returns>Byte array</returns>
+        /// <returns>Byte number</returns>
         public static byte HexToByte(string hex)
         {
             /*return Enumerable.Range(0, hex.Length)

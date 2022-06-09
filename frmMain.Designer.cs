@@ -75,7 +75,6 @@
             this.Timer1 = new System.Windows.Forms.Timer(this.components);
             this.chbEndChar = new System.Windows.Forms.CheckBox();
             this.TimeOut = new System.Windows.Forms.Timer(this.components);
-            this.lbLog = new System.Windows.Forms.ListBox();
             this.btnNetConn = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabCOM = new System.Windows.Forms.TabPage();
@@ -102,6 +101,8 @@
             this.tabComm = new System.Windows.Forms.TabPage();
             this.olvPacket = new BrightIdeasSoftware.FastObjectListView();
             this.colTime = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.colDelay = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.colLength = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.colPacket = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.tabProcessLog = new System.Windows.Forms.TabPage();
             this.txtLog = new System.Windows.Forms.RichTextBox();
@@ -225,17 +226,15 @@
             this.toolStripMenuItem5,
             this.chkMarsA});
             this.mnuShowType.Name = "mnuShowType";
-            this.mnuShowType.Size = new System.Drawing.Size(130, 22);
+            this.mnuShowType.Size = new System.Drawing.Size(180, 22);
             this.mnuShowType.Text = "Show Type";
             // 
             // chkString
             // 
-            this.chkString.Checked = true;
-            this.chkString.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkString.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.chkLine});
             this.chkString.Name = "chkString";
-            this.chkString.Size = new System.Drawing.Size(125, 22);
+            this.chkString.Size = new System.Drawing.Size(180, 22);
             this.chkString.Text = "String";
             this.chkString.Click += new System.EventHandler(this.chkString_Click);
             // 
@@ -244,7 +243,7 @@
             this.chkLine.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.mnutxtLine});
             this.chkLine.Name = "chkLine";
-            this.chkLine.Size = new System.Drawing.Size(148, 22);
+            this.chkLine.Size = new System.Drawing.Size(180, 22);
             this.chkLine.Text = "Line separator";
             this.chkLine.Click += new System.EventHandler(this.chkTime_Click);
             // 
@@ -256,40 +255,40 @@
             // chkByte
             // 
             this.chkByte.Name = "chkByte";
-            this.chkByte.Size = new System.Drawing.Size(125, 22);
+            this.chkByte.Size = new System.Drawing.Size(180, 22);
             this.chkByte.Text = "Byte";
             this.chkByte.Click += new System.EventHandler(this.chkString_Click);
             // 
             // chkHex
             // 
             this.chkHex.Name = "chkHex";
-            this.chkHex.Size = new System.Drawing.Size(125, 22);
+            this.chkHex.Size = new System.Drawing.Size(180, 22);
             this.chkHex.Text = "Hex Num";
             this.chkHex.Click += new System.EventHandler(this.chkString_Click);
             // 
             // chkFormat
             // 
             this.chkFormat.Name = "chkFormat";
-            this.chkFormat.Size = new System.Drawing.Size(125, 22);
+            this.chkFormat.Size = new System.Drawing.Size(180, 22);
             this.chkFormat.Text = "Format";
             this.chkFormat.Click += new System.EventHandler(this.chkString_Click);
             // 
             // toolStripMenuItem5
             // 
             this.toolStripMenuItem5.Name = "toolStripMenuItem5";
-            this.toolStripMenuItem5.Size = new System.Drawing.Size(122, 6);
+            this.toolStripMenuItem5.Size = new System.Drawing.Size(177, 6);
             // 
             // chkMarsA
             // 
             this.chkMarsA.Name = "chkMarsA";
-            this.chkMarsA.Size = new System.Drawing.Size(125, 22);
+            this.chkMarsA.Size = new System.Drawing.Size(180, 22);
             this.chkMarsA.Text = "MARS-A";
             this.chkMarsA.Click += new System.EventHandler(this.chkString_Click);
             // 
             // ToolStripMenuItem4
             // 
             this.ToolStripMenuItem4.Name = "ToolStripMenuItem4";
-            this.ToolStripMenuItem4.Size = new System.Drawing.Size(127, 6);
+            this.ToolStripMenuItem4.Size = new System.Drawing.Size(177, 6);
             // 
             // mnuShow
             // 
@@ -297,7 +296,7 @@
             this.chkTime,
             this.chkBaudRate});
             this.mnuShow.Name = "mnuShow";
-            this.mnuShow.Size = new System.Drawing.Size(130, 22);
+            this.mnuShow.Size = new System.Drawing.Size(180, 22);
             this.mnuShow.Text = "Show";
             // 
             // chkTime
@@ -495,19 +494,6 @@
             // 
             this.TimeOut.Interval = 20;
             this.TimeOut.Tick += new System.EventHandler(this.TimeOut_Tick);
-            // 
-            // lbLog
-            // 
-            this.lbLog.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lbLog.ContextMenuStrip = this.CntMnu;
-            this.lbLog.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.lbLog.FormattingEnabled = true;
-            this.lbLog.ItemHeight = 14;
-            this.lbLog.Location = new System.Drawing.Point(0, 495);
-            this.lbLog.Name = "lbLog";
-            this.lbLog.Size = new System.Drawing.Size(328, 32);
-            this.lbLog.TabIndex = 42;
             // 
             // btnNetConn
             // 
@@ -775,7 +761,7 @@
             this.tabsMessages.Location = new System.Drawing.Point(8, 213);
             this.tabsMessages.Name = "tabsMessages";
             this.tabsMessages.SelectedIndex = 0;
-            this.tabsMessages.Size = new System.Drawing.Size(313, 276);
+            this.tabsMessages.Size = new System.Drawing.Size(313, 307);
             this.tabsMessages.TabIndex = 54;
             // 
             // tabComm
@@ -784,7 +770,7 @@
             this.tabComm.Location = new System.Drawing.Point(4, 22);
             this.tabComm.Name = "tabComm";
             this.tabComm.Padding = new System.Windows.Forms.Padding(3);
-            this.tabComm.Size = new System.Drawing.Size(305, 250);
+            this.tabComm.Size = new System.Drawing.Size(305, 281);
             this.tabComm.TabIndex = 0;
             this.tabComm.Text = "Packets";
             this.tabComm.UseVisualStyleBackColor = true;
@@ -792,18 +778,24 @@
             // olvPacket
             // 
             this.olvPacket.AllColumns.Add(this.colTime);
+            this.olvPacket.AllColumns.Add(this.colDelay);
+            this.olvPacket.AllColumns.Add(this.colLength);
             this.olvPacket.AllColumns.Add(this.colPacket);
             this.olvPacket.CellEditUseWholeCell = false;
             this.olvPacket.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.colTime,
+            this.colDelay,
+            this.colLength,
             this.colPacket});
+            this.olvPacket.ContextMenuStrip = this.CntMnu;
             this.olvPacket.Cursor = System.Windows.Forms.Cursors.Default;
             this.olvPacket.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.olvPacket.FullRowSelect = true;
             this.olvPacket.HideSelection = false;
             this.olvPacket.Location = new System.Drawing.Point(3, 3);
             this.olvPacket.Name = "olvPacket";
             this.olvPacket.ShowGroups = false;
-            this.olvPacket.Size = new System.Drawing.Size(299, 244);
+            this.olvPacket.Size = new System.Drawing.Size(299, 275);
             this.olvPacket.TabIndex = 50;
             this.olvPacket.UseCompatibleStateImageBehavior = false;
             this.olvPacket.View = System.Windows.Forms.View.Details;
@@ -816,6 +808,15 @@
             this.colTime.Text = "Time";
             this.colTime.Width = 76;
             // 
+            // colDelay
+            // 
+            this.colDelay.Text = "Delay";
+            // 
+            // colLength
+            // 
+            this.colLength.Text = "Length";
+            this.colLength.Width = 35;
+            // 
             // colPacket
             // 
             this.colPacket.Text = "Packet";
@@ -827,9 +828,9 @@
             this.tabProcessLog.Location = new System.Drawing.Point(4, 22);
             this.tabProcessLog.Name = "tabProcessLog";
             this.tabProcessLog.Padding = new System.Windows.Forms.Padding(3);
-            this.tabProcessLog.Size = new System.Drawing.Size(305, 250);
+            this.tabProcessLog.Size = new System.Drawing.Size(305, 281);
             this.tabProcessLog.TabIndex = 1;
-            this.tabProcessLog.Text = "Log";
+            this.tabProcessLog.Text = "Text";
             this.tabProcessLog.UseVisualStyleBackColor = true;
             // 
             // txtLog
@@ -840,7 +841,7 @@
             this.txtLog.Location = new System.Drawing.Point(3, 3);
             this.txtLog.Name = "txtLog";
             this.txtLog.ReadOnly = true;
-            this.txtLog.Size = new System.Drawing.Size(299, 244);
+            this.txtLog.Size = new System.Drawing.Size(299, 275);
             this.txtLog.TabIndex = 50;
             this.txtLog.Text = "";
             // 
@@ -854,7 +855,6 @@
             this.Controls.Add(this.button2);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.chbEndChar);
-            this.Controls.Add(this.lbLog);
             this.Controls.Add(this.StatusStrip1);
             this.Controls.Add(this.txtEndCMD);
             this.Controls.Add(this.chbClear);
@@ -920,7 +920,6 @@
         private System.Windows.Forms.ToolStripMenuItem clearToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem mnuAddSend;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem3;
-        internal System.Windows.Forms.ListBox lbLog;
         private System.Windows.Forms.Button btnNetConn;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabCOM;
@@ -965,5 +964,7 @@
         private BrightIdeasSoftware.FastObjectListView olvPacket;
         private BrightIdeasSoftware.OLVColumn colTime;
         private BrightIdeasSoftware.OLVColumn colPacket;
+        private BrightIdeasSoftware.OLVColumn colLength;
+        private BrightIdeasSoftware.OLVColumn colDelay;
     }
 }

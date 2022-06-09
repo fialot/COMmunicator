@@ -9,7 +9,7 @@ using System.Net.Sockets;
 using TCPClient;
 using myFunctions;
 using COMunicator.Protocol;
-
+using Fx.IO;
 
 namespace COMunicator
 {

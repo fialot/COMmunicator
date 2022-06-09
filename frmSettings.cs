@@ -8,6 +8,8 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO.Ports;
 using myFunctions;
+using AppSettings;
+using Fx.IO;
 
 namespace COMunicator
 {
@@ -27,29 +29,29 @@ namespace COMunicator
 
         private void btnOk_Click(object sender, EventArgs e)
         {
-            settings.SP.bits = Convert.ToInt32(cbDataBits.Text);
-            settings.SP.parity = cbParity.Text;
-            settings.SP.DTR = chbDTR.Checked;
-            settings.SP.RTS = chbRTS.Checked;
-            settings.SP.stopbits = cbStopBits.Text;
+
+            Settings.Connection.DataBits = Convert.ToInt32(cbDataBits.Text);
+            Settings.Connection.Parity = Conv.ToEnum<Parity>(cbParity.Text, Parity.None);
+            Settings.Connection.DTR = chbDTR.Checked;
+            Settings.Connection.RTS = chbRTS.Checked;
+            Settings.Connection.StopBits = Conv.ToEnum<StopBits>(cbStopBits.Text, StopBits.One);
 
             try
             {
-                settings.Fun.AutoSendDelay = Convert.ToInt32(txtAutoSendDelay.Text);
+                Settings.Messages.AutoSendingPeriod = Convert.ToInt32(txtAutoSendDelay.Text);
             } catch (Exception) {}
 
-            settings.Paths.SendingFile = txtSendingFile.Text;
-            settings.Paths.EnableSendingFile = chbEnableSendFromFile.Checked;
-            settings.Paths.BeginAfterEoF = chbEoF.Checked;
+            Settings.Messages.SendingFile = txtSendingFile.Text;
+            Settings.Messages.EnableSendingFile = chbEnableSendFromFile.Checked;
+            Settings.Messages.SendingFileRepeating = chbEoF.Checked;
 
-            settings.Paths.ReplyFile = txtReplyFile.Text;
-            settings.Fun.AutoReply = chbEnableReply.Checked;
-            settings.Fun.WaitForReply = chbEnableReplyWait.Checked;
-            settings.Fun.ReplyTimeout = Conv.ToIntDef(txtReplyTimeout.Text, 1000);
+            Settings.Messages.ReplyFile = txtReplyFile.Text;
+            Settings.Messages.EnableReplyFile = chbEnableReply.Checked;
+            Settings.Messages.WaitForReply = chbEnableReplyWait.Checked;
+            Settings.Messages.WaitForReplyTimeout = Conv.ToIntDef(txtReplyTimeout.Text, 1000);
 
-            settings.Paths.logFile = txtLogFile.Text;
-            settings.Paths.logEnable = chbEnableLog.Checked;
-            settings.Paths.logNewFile = chbNewLog.Checked;
+            Settings.Messages.LogFileDirectory = txtLogFile.Text;
+            Settings.Messages.SaveToFile = chbEnableLog.Checked;
 
             settings.Paths.dataFolder = txtDataFolder.Text;
 
@@ -62,7 +64,7 @@ namespace COMunicator
                     {
                         if (EncIfo[i].DisplayName == cbCoding.Text)
                         {
-                            settings.encoding = Encoding.GetEncoding(EncIfo[i].CodePage);
+                            Settings.Messages.UsedEncoding = Encoding.GetEncoding(EncIfo[i].CodePage);
                             break;
                         }
                             
@@ -70,7 +72,7 @@ namespace COMunicator
                 }
                 catch (Exception)
                 {
-                    settings.encoding = System.Text.Encoding.Default;
+                    Settings.Messages.UsedEncoding = System.Text.Encoding.Default;
                 }
                 
             }
@@ -88,7 +90,7 @@ namespace COMunicator
             {
                 cbCoding.Items.Add(EncIfo[i].DisplayName);
             }
-            cbCoding.Text = settings.encoding.EncodingName;
+            cbCoding.Text = Settings.Messages.UsedEncoding.EncodingName;
 
             cbParity.Items.Clear();
             cbParity.Items.Add(Parity.None.ToString());
@@ -108,25 +110,26 @@ namespace COMunicator
             cbStopBits.Items.Add(StopBits.Two.ToString());
             cbStopBits.Items.Add(StopBits.None.ToString());
 
-            cbDataBits.Text = settings.SP.bits.ToString();
-            cbStopBits.Text = settings.SP.stopbits.ToString();
-            cbParity.Text = settings.SP.parity;
-            chbDTR.Checked = settings.SP.DTR;
-            chbRTS.Checked = settings.SP.RTS;
+            cbDataBits.Text = Settings.Connection.DataBits.ToString();
+            cbStopBits.Text = Settings.Connection.StopBits.ToString();
+            cbParity.Text = Settings.Connection.Parity.ToString();
+            chbDTR.Checked = Settings.Connection.DTR;
+            chbRTS.Checked = Settings.Connection.RTS;
 
-            txtAutoSendDelay.Text = settings.Fun.AutoSendDelay.ToString();
-            chbEnableReplyWait.Checked = settings.Fun.WaitForReply;
-            txtReplyTimeout.Text = settings.Fun.ReplyTimeout.ToString();
-            txtSendingFile.Text = settings.Paths.SendingFile;
-            chbEnableSendFromFile.Checked = settings.Paths.EnableSendingFile;
-            chbEoF.Checked = settings.Paths.BeginAfterEoF;
+            
 
-            txtReplyFile.Text = settings.Paths.ReplyFile;
-            chbEnableReply.Checked = settings.Fun.AutoReply;
+            txtAutoSendDelay.Text = Settings.Messages.AutoSendingPeriod.ToString();
+            chbEnableReplyWait.Checked = Settings.Messages.WaitForReply;
+            txtReplyTimeout.Text = Settings.Messages.WaitForReplyTimeout.ToString();
+            txtSendingFile.Text = Settings.Messages.SendingFile;
+            chbEnableSendFromFile.Checked = Settings.Messages.EnableSendingFile;
+            chbEoF.Checked = Settings.Messages.SendingFileRepeating;
 
-            txtLogFile.Text = settings.Paths.logFile;
-            chbEnableLog.Checked = settings.Paths.logEnable;
-            chbNewLog.Checked = settings.Paths.logNewFile;
+            txtReplyFile.Text = Settings.Messages.ReplyFile;
+            chbEnableReply.Checked = Settings.Messages.EnableReplyFile;
+
+            txtLogFile.Text = Settings.Messages.LogFileDirectory;
+            chbEnableLog.Checked = Settings.Messages.SaveToFile;
 
             txtDataFolder.Text = settings.Paths.dataFolder;
         }
