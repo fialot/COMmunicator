@@ -16,7 +16,7 @@ namespace TCPClient
     /// <summary>
     /// Communication status (commands in TCP/IP received data - Close connection)
     /// </summary>
-    public enum comStatus { OK, Open, Close, OpenError };
+    public enum comStatus { OK, Open, Close, OpenError, Started, Stopped };
 
     /// <summary>
     /// Received data handler delegate
@@ -98,9 +98,9 @@ namespace TCPClient
             _connType = ConnType.Udp;
             if (listenPort >= 0)
             {
-                
                 IPEndPoint ep = new IPEndPoint(IPAddress.Any, listenPort);
                 _udpClientLisener = new UdpClient(ep);
+
                 _udpClientLisener.BeginReceive(new AsyncCallback(ReadCallbackUdp), ep);
             }
             else
@@ -129,19 +129,18 @@ namespace TCPClient
                     ReceivedData(receiveBytes, comStatus.OK);
                     _udpClientLisener.BeginReceive(new AsyncCallback(ReadCallbackUdp), ep);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    if (_udpClientLisener != null)  // If closing -> no reconnect
+					if (_udpClientLisener != null)  // If closing -> no reconnect
                     {
                         Close();
                         ConnectUdp(_hostIP, _hostPort, _localPort, true);
                     }
-                    //MessageBox.Show(ex.Message);
-                    
 
                     //ReceivedData(new byte[0], comStatus.Close);
                 }
 
+                
             }
         }
 
@@ -156,6 +155,8 @@ namespace TCPClient
 
             _connType = ConnType.TcpClient;
             _tcpClient = new TcpClient();
+            _tcpClient.SendBufferSize = 8192;
+            _tcpClient.NoDelay = true;
             if (async)
             {
                 _tcpClient.BeginConnect(hostName, portNumber, new AsyncCallback(ConnectCallback), _tcpClient);
@@ -191,7 +192,7 @@ namespace TCPClient
                     ReceivedData(data, comStatus.OpenError);
                 }
             }
-            catch (Exception ex)
+            catch
             {
 
             }
@@ -199,44 +200,43 @@ namespace TCPClient
 
         private static void ReadCallback(IAsyncResult result)
         {
-            try
+			try
             {
-                if (_tcpClient != null)
+            if (_tcpClient != null)
+            {
+                NetworkStream networkStream = _tcpClient.GetStream();
+
+                byte[] buffer = new byte[_tcpClient.ReceiveBufferSize];
+                try
                 {
-                    NetworkStream networkStream = _tcpClient.GetStream();
+                    int length = networkStream.Read(buffer, 0, buffer.Length);
 
-                    byte[] buffer = new byte[_tcpClient.ReceiveBufferSize];
-                    try
+                    if (length > 0)
                     {
-                        int length = networkStream.Read(buffer, 0, buffer.Length);
+                        byte[] buffer2 = new byte[length];
+                        for (int i = 0; i < buffer2.Length; i++) { buffer2[i] = buffer[i]; }
+                        ReceivedData(buffer2, comStatus.OK);
+                        networkStream.BeginRead(buffer, 0, 0, ReadCallback, buffer);
 
-                        if (length > 0)
-                        {
-                            byte[] buffer2 = new byte[length];
-                            for (int i = 0; i < buffer2.Length; i++) { buffer2[i] = buffer[i]; }
-                            ReceivedData(buffer2, comStatus.OK);
-                            networkStream.BeginRead(buffer, 0, 0, ReadCallback, buffer);
-
-                        }
-                        else
-                        {
-                            buffer = new byte[0];
-                            ReceivedData(buffer, comStatus.Close);
-                            if (_connType == ConnType.TcpServer)
-                                _tcpServer.BeginAcceptTcpClient(new AsyncCallback(ConnectCallbackServer), _tcpServer);
-                        }
                     }
-                    catch (Exception)
+                    else
                     {
                         buffer = new byte[0];
                         ReceivedData(buffer, comStatus.Close);
                         if (_connType == ConnType.TcpServer)
                             _tcpServer.BeginAcceptTcpClient(new AsyncCallback(ConnectCallbackServer), _tcpServer);
                     }
-
                 }
-            } catch { }
-            
+                catch (Exception)
+                {
+                    buffer = new byte[0];
+                    ReceivedData(buffer, comStatus.Close);
+                    if (_connType == ConnType.TcpServer)
+                        _tcpServer.BeginAcceptTcpClient(new AsyncCallback(ConnectCallbackServer), _tcpServer);
+                }
+                
+            }
+			} catch { }
         }
 
         /// <summary>
@@ -287,7 +287,7 @@ namespace TCPClient
                     //ReceivedData(data, comStatus.OpenError);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -306,6 +306,7 @@ namespace TCPClient
                 {
                     NetworkStream stream = _tcpClient.GetStream();
                     stream.WriteTimeout = _timeOutMs;
+                    
                     stream.Write(data, 0, data.Length);
                 }
             }
@@ -402,7 +403,5 @@ namespace TCPClient
 
             //if (_clientDone != null) _clientDone.Close();
         }
-
-
     }
 }

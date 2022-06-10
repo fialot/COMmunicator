@@ -8,11 +8,11 @@ using System.IO;
 using System.Net.Sockets;
 using TCPClient;
 using myFunctions;
-using COMunicator.Protocol;
-using Fx.IO;
+using Fx.IO.Protocol;
 
-namespace COMunicator
+namespace Fx.IO
 {
+    
     /// <summary>
     /// Namespace for Serial port / TCP/IP communication class
     /// </summary>

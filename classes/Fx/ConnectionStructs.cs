@@ -9,7 +9,7 @@ using System.Xml.Linq;
 using Fx.IO;
 using Fx.Security;
 
-namespace Fx.Connection
+namespace Fx.IO
 {
     public enum ConnectionType
     {
@@ -33,31 +33,34 @@ namespace Fx.Connection
         public string Group { get; set; } = "";
 
         // ----- Device -----
-        public DeviceType Device = DeviceType.General;
-        public ComProtocolType Protocol = ComProtocolType.General;
-        public int Address = 0;
+        public DeviceType Device { get; set; } = DeviceType.General;
+        public ComProtocolType Protocol { get; set; } = ComProtocolType.General;
+        public int Address { get; set; } = 0;
 
         // ----- Connection type -----
-        public ConnectionType Type = ConnectionType.Serial;
+        public ConnectionType Type { get; set; } = ConnectionType.Serial;
 
         // ----- Serial port -----
-        public string SerialPort = "COM1";
-        public int BaudRate = 15200;
-        public Parity Parity = Parity.None;
-        public int DataBits = 8;
-        public StopBits StopBits = StopBits.One;
-        public bool DTR = false;
-        public bool RTS = false;
+        public string SerialPort { get; set; } = "COM1";
+        public int BaudRate { get; set; } = 15200;
+        public Parity Parity { get; set; } = Parity.None;
+        public int DataBits { get; set; } = 8;
+        public StopBits StopBits { get; set; } = StopBits.One;
+        public bool DTR { get; set; } = false;
+        public bool RTS { get; set; } = false;
 
         // ----- Ethernet -----
-        public string IP = "";
-        public int Port = 0;
-        public int LocalPort = 0;
+        public string IP { get; set; } = "";
+        public int Port { get; set; } = 0;
+        public int LocalPort { get; set; } = 0;
 
         // ----- SSH Login -----
-        public string Login = "";
-        public string Password = "";
-        public string PrivateKeyPath = "";
+        public string Login { get; set; } = "";
+        public string Password { get; set; } = "";
+        public string PrivateKeyPath { get; set; } = "";
+
+        // ----- Encoding -----
+        public Encoding UsedEncoding { get; set; } = Encoding.UTF8;
 
         /// <summary>
         /// Default constructor
@@ -167,6 +170,13 @@ namespace Fx.Connection
             if (element != null)
             {
                 this.Type = Conv.ToEnum<ConnectionType>(element.Value, ConnectionType.Serial);
+            }
+
+            // ----- Encoding -----
+            element = xml.Element("encoding");
+            if (element != null)
+            {
+                this.UsedEncoding = Conv.ToEncoding(element.Value, Encoding.UTF8);
             }
 
             // ----- Serial port settings -----
@@ -308,6 +318,7 @@ namespace Fx.Connection
             connElement.Add(new XElement("dev_type", this.Device.ToString()));
             connElement.Add(new XElement("protocol", this.Protocol.ToString()));
             connElement.Add(new XElement("conn_type", (int)this.Type));
+            connElement.Add(new XElement("encoding", this.UsedEncoding.HeaderName));
 
             bool saveSerial = (this.Device == DeviceType.General);
             if (this.Type == ConnectionType.Serial) saveSerial = true;

@@ -473,12 +473,16 @@ namespace Fx.Logging
         {
             RichTextBox rtf = new RichTextBox();
 
-            foreach (var item in Recods)
+            try
             {
-                rtf.Select(rtf.TextLength, 0);
-                rtf.SelectionColor = item.color;
-                rtf.AppendText(item.text + Environment.NewLine);
+                foreach (var item in Recods)
+                {
+                    rtf.Select(rtf.TextLength, 0);
+                    rtf.SelectionColor = item.color;
+                    rtf.AppendText(item.text + Environment.NewLine);
+                }
             }
+            catch { }
 
             return rtf.Rtf;
         }

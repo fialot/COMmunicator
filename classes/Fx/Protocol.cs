@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Fx.IO;
 using myFunctions;
 
-namespace COMunicator.Protocol
+namespace Fx.IO.Protocol
 {
     static class Protocol
     {

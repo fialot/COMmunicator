@@ -1,184 +1,21 @@
-﻿using System;
+﻿using Fx.IO;
+using Fx.Logging;
+using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Fx.Connection;
-using Fx.IO;
-using Fx.Logging;
-using myFunctions;
 
 namespace AppSettings
 {
-    public static class Settings
-    {
-        
-        /// <summary>
-        /// Connection settings
-        /// </summary>
-        public static ConnectionSetting Connection = new ConnectionSetting();
-        public static MsgSettings Messages = new MsgSettings();
-        /// <summary>
-        /// Path to xml settings file
-        /// </summary>
-        static string xmlPath = "";
-
-
-        /// <summary>
-        /// Load settings from XML file
-        /// </summary>
-        public static void LoadXml()
-        {
-            // ----- Get xml file path -----
-            if (xmlPath == "")
-                xmlPath = GetXmlPath();
-
-            // ----- Load settings from XML -----
-            LoadXml(xmlPath);
-        }
-
-        /// <summary>
-        /// Load settings from XML file
-        /// </summary>
-        /// <param name="path">Xml file path</param>
-        public static void LoadXml(string path)
-        {
-            string XMLtext = Files.LoadFile(path);
-
-            try
-            {
-                bool save = false;
-                // ----- Parse XML to Structure -----
-                var xml = XDocument.Parse(XMLtext);
-                XElement settings;
-                XElement mainGroup;
-                XElement group;
-                XElement element;
-                XAttribute attrib;
-
-                settings = xml.Element("settings");
-
-                // ----- Connection section -----
-                mainGroup = settings.Element("connection");
-                if (mainGroup != null)
-                {
-                    if (Connection.Load(mainGroup))
-                    {
-                        mainGroup = Connection.GetXmlElement();
-                        save = true;
-                    }    
-                }
-
-                // ----- Messages section -----
-                mainGroup = settings.Element("messages");
-                if (mainGroup != null)
-                {
-                    Messages.Load(mainGroup);
-                }
-
-
-                if (save)
-                {
-                    xml.Save(path);
-                }
-
-            }
-            catch (Exception)
-            {
-
-            }
-
-        }
-
-        /// <summary>
-        /// Save settings to XML
-        /// </summary>
-        /// <returns>Return true if succesfully saved</returns>
-        public static bool SaveXml()
-        {
-            // ----- Get xml file path -----
-            if (xmlPath == "")
-                xmlPath = GetXmlPath();
-
-            // ----- Save XML -----
-            return SaveXml(xmlPath);
-        }
-
-        /// <summary>
-        /// Save settings to XML
-        /// </summary>
-        /// <param name="path">XML file path</param>
-        /// <returns>Return true if succesfully saved</returns>
-        public static bool SaveXml(string path)
-        {
-            try
-            {
-                // ----- Parse XML to Structure -----
-                var xml = new XDocument(new XDeclaration("1.0", "utf-8", null));
-                var mainElement = new XElement("settings");
-                xml.Add(mainElement);
-
-
-
-                // ----- Write connection settings -----
-                var element = Connection.GetXmlElement();
-                mainElement.Add(element);
-
-                // ----- Write messages settings -----
-                element = Messages.GetXmlElement();
-                mainElement.Add(element);
-
-                // ---- Save to XML -----
-                xml.Save(path);
-
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Get default XML file path
-        /// </summary>
-        /// <returns>XML file path</returns>
-        static string GetXmlPath()
-        {
-            string xmlPath = Paths.GetAppPath() + "config" + Path.DirectorySeparatorChar + "settings.xml";
-
-            // ----- If not local file -----
-            if (!File.Exists(xmlPath))
-            {
-                // ----- Change to AppData folder -----
-                xmlPath = Paths.GetAppDataPath() + "COMunicator";
-                // ----- Create AppData folder -----
-                try
-                {
-                    if (!Directory.Exists(xmlPath))
-                        Directory.CreateDirectory(xmlPath);
-                }
-                catch { }
-
-                xmlPath = xmlPath + Path.DirectorySeparatorChar + "settings.xml";
-            }
-
-            return xmlPath;
-        }
-    }
-
-
-    
 
     /// <summary>
     /// File settings class
     /// </summary>
     public class MsgSettings
     {
-        public Encoding UsedEncoding { get; set; } = Encoding.UTF8;
+        
         public ePacketView PacketView { get; set; } = ePacketView.StringReplaceCommandChars;
         public bool UseLineSeparatingChar { get; set; } = false;
         public string LineSeparatingChar { get; set; } = "";
@@ -195,6 +32,7 @@ namespace AppSettings
         public bool AddEndChar { get; set; } = false;
         public string EndChar { get; set; } = "";
 
+        public int LastCharTimeout { get; set; } = 10;
         public bool EnableAutoSending { get; set; } = false;
         public int AutoSendingPeriod { get; set; } = 1000;
         public bool WaitForReply { get; set; } = true;
@@ -240,12 +78,6 @@ namespace AppSettings
 
             bool needSave = false;
 
-            // ----- Encoding -----
-            element = xml.Element("encoding");
-            if (element != null)
-            {
-                this.UsedEncoding = Conv.ToEncoding(element.Value, Encoding.UTF8);
-            }
 
             // ----- Format settings -----
             group = xml.Element("format");
@@ -377,18 +209,30 @@ namespace AppSettings
 
                 }
 
-                // ----- Reply file -----
-                element = mainGroup.Element("reply_file");
-                if (element != null)
+                // ----- Data reception -----
+                group = mainGroup.Element("reception");
+                if (group != null)
                 {
-                    attribute = element.Attribute("enable");
-                    if (attribute != null)
+                    // ----- Reply file -----
+                    element = group.Element("lastCharTimeout");
+                    if (element != null)
                     {
-                        this.EnableReplyFile = Conv.ToBoolDef(attribute.Value, false);
+                        this.LastCharTimeout = Conv.ToIntDef(element.Value, 15);
                     }
 
-                    this.ReplyFile = element.Value;
-                }
+                    // ----- Reply file -----
+                    element = group.Element("reply_file");
+                    if (element != null)
+                    {
+                        attribute = element.Attribute("enable");
+                        if (attribute != null)
+                        {
+                            this.EnableReplyFile = Conv.ToBoolDef(attribute.Value, false);
+                        }
+
+                        this.ReplyFile = element.Value;
+                    }
+                }   
             }
 
 
@@ -396,7 +240,7 @@ namespace AppSettings
             group = xml.Element("file");
             if (group != null)
             {
-                attribute = element.Attribute("enable");
+                attribute = group.Attribute("enable");
                 if (attribute != null)
                 {
                     this.SaveToFile = Conv.ToBoolDef(attribute.Value, false);
@@ -419,13 +263,11 @@ namespace AppSettings
         /// <returns>XML element</returns>
         public XElement GetXmlElement()
         {
-            
+
 
             // ----- Write device settings -----
-            var connElement = new XElement("messages");
-
-            connElement.Add(new XElement("encoding", this.UsedEncoding.HeaderName));
-
+            var msgElement = new XElement("messages");
+            
             var formatElement = new XElement("format");
             formatElement.Add(new XElement("view_type", this.PacketView.ToString()));
             var lineSepChar = new XElement("line_separator", this.LineSeparatingChar);
@@ -436,7 +278,7 @@ namespace AppSettings
             show.Add(new XAttribute("time", Conv.ToString(this.ShowTime)));
             show.Add(new XAttribute("baudrate", Conv.ToString(this.ShowBaudRate)));
             formatElement.Add(show);
-            connElement.Add(formatElement);
+            msgElement.Add(formatElement);
 
 
             var sendElement = new XElement("sending");
@@ -462,19 +304,23 @@ namespace AppSettings
 
             sendElement.Add(autoSending);
 
+            var reception = new XElement("reception");
+            reception.Add(new XElement("lastCharTimeout", this.LastCharTimeout));
             var replyFile = new XElement("reply_file", this.ReplyFile);
             replyFile.Add(new XAttribute("enable", Conv.ToString(this.EnableReplyFile)));
-            sendElement.Add(replyFile);
+            reception.Add(replyFile);
+            sendElement.Add(reception);
 
-            connElement.Add(sendElement);
+            msgElement.Add(sendElement);
 
 
             var fileElement = new XElement("file");
             fileElement.Add(new XAttribute("enable", Conv.ToString(this.SaveToFile)));
             fileElement.Add(new XElement("path", this.LogFileDirectory));
-            connElement.Add(fileElement);
+            msgElement.Add(fileElement);
 
-            return connElement;
+            return msgElement;
         }
     }
+
 }

@@ -18,7 +18,6 @@ namespace COMunicator
 
         public static TPaths Paths;
                 
-        public static int tab = 0;
 
 
         public static void LoadSettings()
@@ -31,8 +30,6 @@ namespace COMunicator
             // ----- PATHS -----
             Paths.dataFolder = ini.Read("Path", "dataFolder", @"%AppData%" + System.IO.Path.DirectorySeparatorChar + "COMunicator");
             
-
-            tab = ini.ReadInt("GUI", "Tab", 0);
             
             /*string enc = ini.Read("Send", "Encoding", Encoding.Default.HeaderName);
 
@@ -72,9 +69,6 @@ namespace COMunicator
             // ----- PATHS -----
             ini.Write("Path", "dataFolder", Paths.dataFolder);
 
-
-
-            ini.Write("GUI", "Tab", tab);
 
             ini.SaveFile();
 

@@ -64,7 +64,7 @@ namespace COMunicator
                     {
                         if (EncIfo[i].DisplayName == cbCoding.Text)
                         {
-                            Settings.Messages.UsedEncoding = Encoding.GetEncoding(EncIfo[i].CodePage);
+                            Settings.Connection.UsedEncoding = Encoding.GetEncoding(EncIfo[i].CodePage);
                             break;
                         }
                             
@@ -72,7 +72,7 @@ namespace COMunicator
                 }
                 catch (Exception)
                 {
-                    Settings.Messages.UsedEncoding = System.Text.Encoding.Default;
+                    Settings.Connection.UsedEncoding = System.Text.Encoding.Default;
                 }
                 
             }
@@ -90,7 +90,7 @@ namespace COMunicator
             {
                 cbCoding.Items.Add(EncIfo[i].DisplayName);
             }
-            cbCoding.Text = Settings.Messages.UsedEncoding.EncodingName;
+            cbCoding.Text = Settings.Connection.UsedEncoding.EncodingName;
 
             cbParity.Items.Clear();
             cbParity.Items.Add(Parity.None.ToString());
@@ -142,7 +142,12 @@ namespace COMunicator
         private void btnSendingFile_Click(object sender, EventArgs e)
         {
             OpenFileDialog dialog = new OpenFileDialog();
-            dialog.InitialDirectory = System.IO.Path.GetDirectoryName(Files.ReplaceVarPaths(txtSendingFile.Text));
+            try
+            {
+                dialog.InitialDirectory = System.IO.Path.GetDirectoryName(Files.ReplaceVarPaths(txtSendingFile.Text));
+            }
+            catch { }
+            
             if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 txtSendingFile.Text = dialog.FileName;
@@ -152,7 +157,12 @@ namespace COMunicator
         private void btnReplyFile_Click(object sender, EventArgs e)
         {
             OpenFileDialog dialog = new OpenFileDialog();
-            dialog.InitialDirectory = System.IO.Path.GetDirectoryName(Files.ReplaceVarPaths(txtReplyFile.Text));
+            try
+            {
+                dialog.InitialDirectory = System.IO.Path.GetDirectoryName(Files.ReplaceVarPaths(txtReplyFile.Text));
+            }
+            catch { }
+
             if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 txtReplyFile.Text = dialog.FileName;
@@ -162,7 +172,12 @@ namespace COMunicator
         private void btnLogFile_Click(object sender, EventArgs e)
         {
             OpenFileDialog dialog = new OpenFileDialog();
-            dialog.InitialDirectory = System.IO.Path.GetDirectoryName(Files.ReplaceVarPaths(txtLogFile.Text));
+            try
+            {
+                dialog.InitialDirectory = System.IO.Path.GetDirectoryName(Files.ReplaceVarPaths(txtLogFile.Text));
+            }
+            catch { }
+
             if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 txtLogFile.Text = dialog.FileName;
@@ -172,7 +187,12 @@ namespace COMunicator
         private void btnDataFolder_Click(object sender, EventArgs e)
         {
             OpenFileDialog dialog = new OpenFileDialog();
-            dialog.InitialDirectory = System.IO.Path.GetDirectoryName(Files.ReplaceVarPaths(txtDataFolder.Text));
+            try
+            {
+                dialog.InitialDirectory = System.IO.Path.GetDirectoryName(Files.ReplaceVarPaths(txtDataFolder.Text));
+            }
+            catch { }
+
             if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 txtDataFolder.Text = dialog.FileName;

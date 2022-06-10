@@ -10,12 +10,11 @@ using System.IO.Ports;
 using System.IO;
 using TCPClient;
 using myFunctions;
-using COMunicator.Protocol;
+using Fx.IO.Protocol;
 using GlobalClasses;
 
 using System.Net.Sockets;
 using System.Threading;
-using Fx.Connection;
 using Fx.Logging;
 using AppSettings;
 using Fx.IO;
@@ -24,21 +23,10 @@ namespace COMunicator
 {
     public partial class frmMain : Form
     {
-        // ----- Reply data -----
-        static Dictionary<string, string> ReplyData = new Dictionary<string, string>();
-
-        // ----- Auto send from file data ---
-        string[] AutoSendData;
-        int AutoSendDataIndex;
-        bool ReplyCome = true;
+        
 
 
         static frmSettings formSet;
-
-        byte[] PrevData;
-
-        
-        byte[] comBuffer;
 
         //string[] history;
         //int historyIndex;
@@ -46,11 +34,148 @@ namespace COMunicator
         public delegate void MyDelegate(comStatus status);
         public delegate void NewLogDelegate(LogRecord record);
 
-        public Comm com;
+        //public Comm com;
+
+        Sender conn = new Sender();
+
+
         public History history;
         public History historyIP;
         public History historyPort;
         public History historyPortServer;
+
+        #region Connection Changes
+
+        /// <summary>
+        /// Incomming connection change
+        /// </summary>
+        /// <param name="state">State change</param>
+        private void ConnChangedState(StateChange state)
+        {
+            Invoke(new Action(() =>
+            {
+                switch (state)
+                {
+                    case StateChange.Connected:
+                        Connected();
+                        break;
+                    case StateChange.Disconnected:
+                        Disconnected();
+                        break;
+                    case StateChange.ConnectionError:
+                        Disconnected();
+                        MessageBox.Show("Connection error!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        break;
+                    case StateChange.Started:
+                        Started();
+                        break;
+                    case StateChange.Stopped:
+                        Stopped();
+                        break;
+                    case StateChange.NewData:
+
+                        break;
+                }
+            }));
+        }
+
+        /// <summary>
+        /// Procedure if connected
+        /// </summary>
+        private void Connected()
+        {
+            statusImg.Image = Properties.Resources.circ_green24;
+
+            switch (Settings.Connection.Type)
+            {
+                case ConnectionType.Serial:
+                    btnConnect.Enabled = true;
+                    btnNetConn.Enabled = false;
+                    btnNetSConn.Enabled = false;
+                    btnConnect.Text = "Disconnect";
+                    lblStatus.Text = "Connected to: " + Settings.Connection.SerialPort;
+                    break;
+
+                case ConnectionType.TCP:
+                case ConnectionType.UDP:
+                    btnConnect.Enabled = false;
+                    btnNetConn.Enabled = true;
+                    btnNetSConn.Enabled = false;
+                    btnNetConn.Text = "Disconnect";
+                    lblStatus.Text = "Connected to: " + Settings.Connection.IP + ":" + Settings.Connection.Port.ToString();
+                    historyIP.Add(cbIP.Text);
+                    historyPort.Add(cbPort.Text);
+                    RefreshHistNet();
+                    Global.LogPacket.SaveHeader("Net " + Settings.Connection.IP + ":" + Settings.Connection.Port.ToString());
+                    break;
+
+                case ConnectionType.TCPServer:
+                    lblStatus.Text = "Connected client.";
+                    break;
+            }
+
+            Global.LogPacket.SaveHeader(cbbCOMPorts.Text);
+        }
+
+        /// <summary>
+        /// Procedure if disconnected
+        /// </summary>
+        private void Disconnected()
+        {
+            btnConnect.Enabled = true;
+            btnNetConn.Enabled = true;
+            btnNetSConn.Enabled = true;
+            btnConnect.Text = "Connect";
+            btnNetConn.Text = "Connect";
+            if (Settings.Connection.Type == ConnectionType.TCPServer)
+            {
+                lblStatus.Text = "Created server on port: " + Settings.Connection.LocalPort.ToString();
+            }
+            else
+            {
+                lblStatus.Text = "Disconnected.";
+                statusImg.Image = Properties.Resources.circ_red24;
+            }
+            
+            
+        }
+
+        private void Started()
+        {
+            statusImg.Image = Properties.Resources.circ_green24;
+
+            switch (Settings.Connection.Type)
+            {
+                case ConnectionType.TCPServer:
+                    btnConnect.Enabled = false;
+                    btnNetConn.Enabled = false;
+                    btnNetSConn.Enabled = true;
+                    btnNetSConn.Text = "Stop";
+                    lblStatus.Text = "Created server on port: " + Settings.Connection.LocalPort.ToString();
+                    historyPortServer.Add(cbSPort.Text);
+                    RefreshHistNet();
+                    Global.LogPacket.SaveHeader("TCP Server port:" + Settings.Connection.LocalPort.ToString());
+                    break;
+            }
+        }
+
+        private void Stopped()
+        {
+            statusImg.Image = Properties.Resources.circ_red24;
+
+            switch (Settings.Connection.Type)
+            {
+                case ConnectionType.TCPServer:
+                    btnConnect.Enabled = true;
+                    btnNetConn.Enabled = true;
+                    btnNetSConn.Enabled = true;
+                    btnNetSConn.Text = "Start";
+                    lblStatus.Text = "Disconnected.";
+                    break;
+            }
+        }
+
+        #endregion
 
         public void ShowLog(LogRecord record)
         {
@@ -76,54 +201,7 @@ namespace COMunicator
             txtLog.SelectionStart = txtLog.Text.Length;
             txtLog.ScrollToCaret();
         }
-
-        public void updateLog(comStatus status)
-        {
-            if (comBuffer == null) comBuffer = new byte[0];
-            if (status == comStatus.Close)
-            {
-                if (com.OpenInterface == Comm.interfaces.TCPClient || com.OpenInterface == Comm.interfaces.None)
-                    btnNetConn_Click(new object(), new EventArgs());
-                else if (com.OpenInterface == Comm.interfaces.TCPServer) 
-                {
-                    lblStatus.Text = "Server: Client disconnected";
-                    //Global.Log.Add("Client disconnected.");
-                } else if (com.OpenInterface == Comm.interfaces.COM)
-                {
-                    btnConnect_Click(new object(), new EventArgs());
-                }
-
-            }
-            else if (status == comStatus.OK)
-            {
-
-                TimeOut.Enabled = false;
-                TimeOut.Enabled = true;
-
-                byte[] newBytes = com.Read();
-                if (newBytes.Length > 0)
-                {
-                    PrevData = com.AddArray(PrevData, newBytes);
-                    comBuffer = PrevData;
-                }
-            }
-            else if (status == comStatus.Open)
-            {
-                if (com.OpenInterface == Comm.interfaces.TCPClient)
-                    NetConnected();
-                else if (com.OpenInterface == Comm.interfaces.TCPServer)
-                {
-                    lblStatus.Text = "Server: Client connected";
-                    //Global.Log.Add("Client connected.");
-                }
-                
-            }
-            else if (status == comStatus.OpenError)
-            {
-                Dialogs.ShowErr("Connection Timeout","Error");
-            }
-        }
-
+        
         #region Form
 
         public frmMain()
@@ -131,11 +209,11 @@ namespace COMunicator
             InitializeComponent();
         }
 
-        private void DataReceive(object source, comStatus status)
+        /*private void DataReceive(object source, comStatus status)
         {
             olvPacket.Invoke(new MyDelegate(updateLog), new Object[] { status }); //BeginInvoke
             
-        }
+        }*/
 
         private void NewLogRecord(LogRecord record)
         {
@@ -147,6 +225,8 @@ namespace COMunicator
 
         private void frmMain_Load(object sender, EventArgs e)
         {
+            conn.ChangedState += new ChangedStateEventHandler(ConnChangedState);
+
             // ----- GET APPLICATION VERSION -> TO CAPTION -----
             this.Text = this.Text + " v" + Application.ProductVersion.Substring(0,Application.ProductVersion.Length-2);
 
@@ -161,14 +241,6 @@ namespace COMunicator
             Global.LogPacket.LogFileDirectory = Files.ReplaceVarPaths(Settings.Messages.LogFileDirectory);
             Global.LogPacket.SaveToFile = Settings.Messages.SaveToFile;
 ;
-            Encoding enc = Settings.Messages.UsedEncoding;
-
-            // ----- CREATE NEW COMMUNICATION INSTANCE -----
-            com = new Comm(enc);
-            com.SetParamsSP(Settings.Connection.Parity, Settings.Connection.DataBits, Settings.Connection.StopBits, Settings.Connection.DTR, Settings.Connection.RTS);
-            com.ReceivedData += new ReceivedEventHandler(DataReceive);
-
-
             // ----- APPLY SETTINGS TO FORM -----
             ApplySettingsToForm();
 
@@ -178,12 +250,8 @@ namespace COMunicator
             // ----- LOAD COMMAND MENU -----
             LoadMenu();
 
-            // ----- READ REPLY FILE -----
-            ReplyData = LoadReplyFile(Files.ReplaceVarPaths(Settings.Messages.ReplyFile));
-
-            // ----- READ AUTO SEND FILE -----
-            LoadAutoSendData();
-
+            
+            
             if (chkString.Checked)
             {
                 Global.LogPacket.SetPacketView(ePacketView.StringReplaceCommandChars);
@@ -206,10 +274,6 @@ namespace COMunicator
 
             formSet = new frmSettings();
 
-            PrevData = new byte[0];
-
-            AutoSendDataIndex = -1;
-
             olvPacket.UpdateObjects(Global.LogPacket.Recods); //SetObjects
 
             colTime.AspectGetter = delegate (object x) {
@@ -230,26 +294,7 @@ namespace COMunicator
 
         }
 
-        void LoadAutoSendData()
-        {
-            AutoSendData = Files.LoadFileLines(Files.ReplaceVarPaths(Settings.Messages.SendingFile), true);
-            AutoSendDataIndex = 0;
-        }
-
-        Dictionary<string,string> LoadReplyFile(string fileName)
-        {
-            Dictionary<string, string> dict = new Dictionary<string,string>();
-            string[] lines = Files.LoadFileLines(fileName, true);
-            string[] item;
-            for (int i = 0; i < lines.Length; i++)
-            {
-                item = lines[i].Split(new string[] { @"\->" }, StringSplitOptions.RemoveEmptyEntries);
-                if (item.Length == 2)
-                    dict.Add(byteToFormat(com.FormatMsg(item[0])), item[1]);
-            }
-
-            return dict;
-        }
+        
 
         void ReadHistory()
         {
@@ -298,8 +343,6 @@ namespace COMunicator
                 cbbCOMPorts.Text = cbbCOMPorts.Items[0].ToString();
             }
 
-            Timer1.Interval = Settings.Messages.AutoSendingPeriod;                   // auto sending interval
-
             cbBaud.Text = Settings.Connection.BaudRate.ToString();
             cbIP.Text = Settings.Connection.IP;
             cbPort.Text = Settings.Connection.Port.ToString();
@@ -308,8 +351,8 @@ namespace COMunicator
             cbProtocol.SelectedIndex = 0;
             if (Settings.Connection.Type == ConnectionType.UDP) cbProtocol.SelectedIndex = 1;
 
-            if (settings.tab >= tabControl1.TabPages.Count) settings.tab = 0;
-            tabControl1.SelectedIndex = settings.tab;
+            if (Settings.GUI.TabIndex >= tabControl1.TabPages.Count) Settings.GUI.TabIndex = 0;
+            tabControl1.SelectedIndex = Settings.GUI.TabIndex;
 
             switch (Settings.Messages.PacketView)
             {
@@ -354,7 +397,7 @@ namespace COMunicator
             if (cbProtocol.SelectedIndex == 1) Settings.Connection.Type = ConnectionType.UDP;
             else Settings.Connection.Type = ConnectionType.Serial;
 
-            settings.tab = tabControl1.SelectedIndex;
+            Settings.GUI.TabIndex = tabControl1.SelectedIndex;
 
             //settings.SP.bits = SP.DataBits;
             //settings.SP.parity = SP.Parity.ToString();
@@ -398,8 +441,8 @@ namespace COMunicator
             historyPort.Save();
             historyPortServer.Save();
 
-            if (com.IsOpen()) com.Close();
-            com = null;
+            conn.Disconnect();
+            conn = null;
 
             //if (btnConnect.Tag == "1") btnConnect_Click(sender, e);
 
@@ -513,63 +556,36 @@ namespace COMunicator
 
         private void btnConnect_Click(object sender, EventArgs e)
         {
-            if (!(btnConnect.Tag == "1"))
+
+            if (!conn.Status.IsConnected)
             {
+                btnConnect.Enabled = false;
+                Settings.Connection.Type = ConnectionType.Serial;
+                Settings.Connection.SerialPort = cbbCOMPorts.Text;
+                Settings.Connection.BaudRate = Conv.ToIntDef(cbBaud.Text, 115200);
 
-                if (com.IsOpen()) com.Close();
-
-                try
-                {
-                    com.Open(cbbCOMPorts.Text, Convert.ToInt32(cbBaud.Text));
-                    
-
-                    lblStatus.Text = "Connected to: " + cbbCOMPorts.Text;
-
-                    btnConnect.Tag = "1";
-                    btnConnect.Text = "Disconnect";
-                    statusImg.Image = COMunicator.Properties.Resources.circ_green24;
-                    btnNetConn.Enabled = false;
-                    btnNetSConn.Enabled = false;
-                    Global.LogPacket.SaveHeader(cbbCOMPorts.Text);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                conn.Connect(Settings.Connection);
             }
             else
             {
-                btnConnect.Tag = "0";
-                btnConnect.Text = "Connect";
-                try
-                {
-                    com.Close();
-                    lblStatus.Text = "Disconnected.";
-                    btnNetConn.Enabled = true;
-                    btnNetSConn.Enabled = true;
-                    statusImg.Image = COMunicator.Properties.Resources.circ_red24;
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                conn.Disconnect();
             }
         }
 
 
         private void btnBaudRate_Click(object sender, EventArgs e)
         {
-            com.SetBaudRate(Convert.ToInt32(cbBaud.Text));
+            conn.SetBaudRate(Conv.ToIntDef(cbBaud.Text, 115200));
         }
 
         private void btnSend_Click(object sender, EventArgs e)
         {
             string text = tbSend.Text;
             if (chbEndChar.Checked) text += txtEndCMD.Text;
-            if (com.IsOpen())
+            if (conn.Status.IsConnected && (tbSend.Text != ""))
             {
-                Send(text);
-                if (tbSend.Text != "") history.Add(tbSend.Text);
+                conn.Send(text);
+                history.Add(tbSend.Text);
                 if (chbClear.Checked == false) { tbSend.Text = ""; };
                 history.SetTemporary(tbSend.Text);
             }
@@ -658,118 +674,6 @@ namespace COMunicator
         }
 
         
-        
-        void Send(string msg)
-        {
-            byte[] b = com.FormatMsg(msg);
-            byte[] chr = new byte[1];
-
-            if (com.IsOpen() & b.Length > 0)
-            {
-                com.Send(b);
-
-                ShowData(b, false);
-
-            }
-        }
-
-        private string ShowData(byte[] message, bool input)
-        {
-            string description = "";
-
-            // ----- Status log packets -----
-            if (input) {
-                //var delay = DateTime.Now - Global.Log.LastLogTime;
-                //Global.Log.Add("Input message length: " + message.Length + ", delay: " + delay.TotalSeconds, Color.Blue);
-                ReplyCome = true;
-            }
-            else
-            {
-                //Global.Log.Add("Send message length: " + message.Length.ToString(), Color.Black, true, false);
-                ReplyCome = false;
-            }
-
-             if (chkMarsA.Checked)
-             {
-                if (message.Length > 2)
-                {
-                    int frameNum = 0;
-                    try
-                    {
-                        int frame = Conv.SwapBytes(BitConverter.ToUInt16(message, 0));
-                        int length = (frame & 2047) - 6; // dala length
-                        frameNum = (frame & 12288) + 6 + (128 << 8) + +(1 << 8);
-                    }
-                    catch (Exception){}
-
-                    Send(@"\s" + frameNum.ToString());
-                }
-            }
-
-            var endChar = Settings.Messages.UsedEncoding.GetString(com.FormatMsg(mnutxtLine.Text));
-
-            if (chkLine.Checked && endChar != "")
-            {
-                Global.LogPacket.LineSeparatingChar = endChar;
-            }
-            else
-            {
-                Global.LogPacket.LineSeparatingChar = "";
-            }
-
-
-            if (chkBaudRate.Checked)
-            {
-                description = cbBaud.Text + "[Bd]";
-            }
-
-            string text = "";
-            if (input)
-                text = Global.LogPacket.Add(description, message, Color.Blue, chkTime.Checked, input);
-            else
-                text = Global.LogPacket.Add(description, message, Color.Black, chkTime.Checked, input);
-
-
-            /*if (text.Length > 0)
-            {
-                lbLog.Items.Add(text);
-            }
-
-            if (lbLog.Items.Count > 100)
-                lbLog.Items.RemoveAt(0);
-
-            
-            lbLog.SelectedIndex = lbLog.Items.Count - 1;*/
-
-            // ----- Show Packet list -----
-            /*txtPackets.Rtf = Global.LogPacket.TextRTF();
-            txtPackets.SelectionStart = txtPackets.Text.Length;
-            txtPackets.ScrollToCaret();*/
-
-            // ----- Show communication log -----
-            /*txtLog.Rtf = Global.LogPacket.TextRTF();
-            txtLog.SelectionStart = txtLog.Text.Length;
-            txtLog.ScrollToCaret();*/
-
-            //olvPacket.UpdateObjects(Global.LogPacket.Recods);
-            /*if (olvPacket.GetItemCount() > 0)
-                olvPacket.EnsureVisible(olvPacket.GetItemCount() - 1);*/
-
-            return text;
-        }
-
-        
-
-
-        private void SP_DataReceived(object sender, SerialDataReceivedEventArgs e)
-        {
-            olvPacket.Invoke(new MyDelegate(updateLog), new Object[] { }); //BeginInvoke
-            //TimeOut.Enabled = true;
-            //TimeOut_Tick(sender, e);
-    
-        }
-
-
         private void chkString_Click(object sender, EventArgs e)
         {
             chkFormat.Checked = false;
@@ -803,64 +707,14 @@ namespace COMunicator
             olvPacket.SetObjects(Global.LogPacket.Recods);
             txtLog.Rtf = Global.LogPacket.TextRTF();
 
-            if (chkMarsA.Checked) TimeOut.Interval = 80;
-            else TimeOut.Interval = 20;
-        }
-
-        private void Timer1_Tick(object sender, EventArgs e)
-        {
-            string text;
-            if (com.IsOpen())
-            {
-                if (chbSendFromFile.Checked)
-                {
-                    if (AutoSendDataIndex >= 0 && AutoSendData.Length > 0)
-                    {
-                        tbSend.Text = AutoSendData[AutoSendDataIndex];
-                        AutoSendDataIndex += 1;
-                        if (AutoSendDataIndex == AutoSendData.Length)
-                        {
-                            if (Settings.Messages.SendingFileRepeating)
-                                AutoSendDataIndex = 0;
-                            else
-                                AutoSendDataIndex--;
-                        }
-                    }
-                }
-                if (chbBaudTest.Checked)
-                {
-                    int baud = Conv.ToIntDef(cbBaud.Text, 2350) + 50;
-                    if (baud < 1200) baud = 1200;
-                    if (baud > 115200) baud = 115200;
-                    cbBaud.Text = baud.ToString();
-
-                    btnBaudRate_Click(sender, e);
-                }
-                text = tbSend.Text;
-                if (chbEndChar.Checked) text += txtEndCMD.Text;
-
-                if (text != "")
-                {
-                    if (!Settings.Messages.WaitForReply || (Settings.Messages.WaitForReply && ReplyCome))
-                    Send(text);
-                }
-            }
-            
-        }
-
-        private void Timer2_Tick(object sender, EventArgs e)
-        {
-            cbBaud.Text = cbBaud.Text + 50;
-            btnBaudRate_Click(sender, e);
         }
 
         private void chbAutoSend_CheckedChanged(object sender, EventArgs e)
         {
+            Settings.Messages.EnableAutoSending = chbAutoSend.Checked;
             if (chbAutoSend.Checked)
-                Timer1.Enabled = true;
-            else
-                Timer1.Enabled = false;
-        
+                conn.Send(tbSend.Text);
+            conn.RefreshAutoSend();
         }
 
         private void CntText_Click(object sender, EventArgs e)
@@ -898,7 +752,7 @@ namespace COMunicator
 
         private void TimeOut_Tick(object sender, EventArgs e)
         {
-            TimeOut.Enabled = false;
+            /*TimeOut.Enabled = false;
 
             string dataS = ShowData(comBuffer, true);
 
@@ -917,13 +771,12 @@ namespace COMunicator
                     string value = ReplyData[key];
                     Send(value);
                 }
-            }
+            }*/
 
 
             //lbLog.SelectedIndex = lbLog.Items.Count - 1;
             //lbLog.Invoke(new MyDelegate(updateLog), new Object[] { });
             //txt = "";
-            PrevData = new byte[0];
         }
 
         private void clearToolStripMenuItem_Click(object sender, EventArgs e)
@@ -946,22 +799,10 @@ namespace COMunicator
             Settings.Messages.EnableSendingFile = chbSendFromFile.Checked;
             formSet.ShowDialog(tab);
 
-            try
-            {
-                if (com != null)
-                {
-                    com.SetParamsSP(Settings.Connection.Parity, Settings.Connection.DataBits, Settings.Connection.StopBits, Settings.Connection.DTR, Settings.Connection.RTS);
-                    com.SetEncoding(Settings.Messages.UsedEncoding);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            Timer1.Interval = Settings.Messages.AutoSendingPeriod;
             chbAutoReply.Checked = Settings.Messages.EnableReplyFile;
             chbSendFromFile.Checked = Settings.Messages.EnableSendingFile;
-            LoadAutoSendData();
+
+            conn.RefreshAutoSend();
         }
 
         private Parity ToParity(string name)
@@ -1013,17 +854,7 @@ namespace COMunicator
         }
 
 
-        private string byteToFormat(byte[] bytes)
-        {
-            string msg = "";
-
-            for (int i = 0; i < bytes.Length; i++)
-            {
-                msg += '\\' + bytes[i].ToString();
-            }
-
-            return msg;
-        }
+        
 
         private void tbSend_KeyDown(object sender, KeyEventArgs e)
         {
@@ -1046,67 +877,39 @@ namespace COMunicator
 
         private void chbAutoReply_CheckedChanged(object sender, EventArgs e)
         {
-           
+            Settings.Messages.EnableReplyFile = chbAutoReply.Checked;
+            conn.RefreshReply();
         }
 
         private void btnNetConn_Click(object sender, EventArgs e)
         {
-            if (btnNetConn.Tag != "run")
+            if (!conn.Status.IsConnected)
             {
                 try
                 {
-                    ProtocolType protocol = ProtocolType.Tcp;
-                    if (cbProtocol.SelectedIndex == 1) protocol = ProtocolType.Udp;
-                    if (protocol == ProtocolType.Tcp)
-                        com.ConnectTcp(cbIP.Text, Convert.ToInt32(cbPort.Text));
+                    btnNetConn.Enabled = false;
+                    if (cbProtocol.SelectedIndex == 1)
+                        Settings.Connection.Type = ConnectionType.UDP;
                     else
-                    {
-                        int localPort = Conv.ToIntDef(txtLocalPort.Text, -1);
-                        com.ConnectUdp(cbIP.Text, Convert.ToInt32(cbPort.Text), localPort);
-                        NetConnected();
-                    }
-                        
+                        Settings.Connection.Type = ConnectionType.TCP;
+                    Settings.Connection.IP = cbIP.Text;
+                    Settings.Connection.Port = Convert.ToInt32(cbPort.Text);
+                    Settings.Connection.LocalPort = Convert.ToInt32(txtLocalPort.Text);
+
+                    conn.Connect(Settings.Connection);
 
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
-
             }
             else
             {
-                try
-                {
-                    com.Close();
-                }
-                catch (Exception)
-                {
-
-                }
-
-                btnNetConn.Tag = "stop";
-                btnNetConn.Text = "Connect";
-                lblStatus.Text = "Disconnected";
-                btnConnect.Enabled = true;
-                btnNetSConn.Enabled = true;
-                statusImg.Image = COMunicator.Properties.Resources.circ_red24;
+                conn.Disconnect();
             }
         }
 
-        private void NetConnected()
-        {
-            btnNetConn.Tag = "run";
-            btnNetConn.Text = "Disconnect";
-            lblStatus.Text = "Connected to: " + cbIP.Text + ":" + cbPort.Text;
-            statusImg.Image = COMunicator.Properties.Resources.circ_green24;
-            btnConnect.Enabled = false;
-            btnNetSConn.Enabled = false;
-            historyIP.Add(cbIP.Text);
-            historyPort.Add(cbPort.Text);
-            RefreshHistNet();
-            Global.LogPacket.SaveHeader("Net " + cbIP.Text + ":" + cbPort.Text);
-        }
 
         private void btnSPRefresh_Click(object sender, EventArgs e)
         {
@@ -1115,51 +918,27 @@ namespace COMunicator
 
         private void btnNetSConn_Click(object sender, EventArgs e)
         {
-            if (btnNetSConn.Tag != "run")
+            if (!conn.Status.IsConnected)
             {
                 try
                 {
-                    com.CreateTCPServer(Convert.ToInt32(cbSPort.Text));
-                    serverConnected();
+                    btnNetSConn.Enabled = false;
+                    Settings.Connection.Type = ConnectionType.TCPServer;
+                    Settings.Connection.LocalPort = Convert.ToInt32(cbSPort.Text);
+
+                    conn.Connect(Settings.Connection);
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
-
             }
             else
             {
-                try
-                {
-                    com.Close();
-                }
-                catch (Exception)
-                {
-
-                }
-
-                btnNetSConn.Tag = "stop";
-                btnNetSConn.Text = "Connect";
-                lblStatus.Text = "Disconnected";
-                btnConnect.Enabled = true;
-                btnNetConn.Enabled = true;
-                statusImg.Image = COMunicator.Properties.Resources.circ_red24;
+                conn.Disconnect();
             }
         }
 
-        private void serverConnected()
-        {
-            btnNetSConn.Tag = "run";
-            btnNetSConn.Text = "Disconnect";
-            lblStatus.Text = "Server start on port: " + cbSPort.Text;
-            statusImg.Image = COMunicator.Properties.Resources.circ_green24;
-            btnConnect.Enabled = false;
-            btnNetConn.Enabled = false;
-            historyPortServer.Add(cbSPort.Text);
-            RefreshHistNet();
-            Global.LogPacket.SaveHeader("Net TCP Server port: " + cbSPort.Text);
-        }
 
         private void cbProtocol_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -1188,10 +967,8 @@ namespace COMunicator
 
         private void chbSendFromFile_CheckedChanged(object sender, EventArgs e)
         {
-            if (chbSendFromFile.Checked)
-            {
-                LoadAutoSendData();
-            }
+            Settings.Messages.EnableSendingFile = chbSendFromFile.Checked;
+            conn.RefreshAutoSend();
         }
 
         private void mnuEditSend_Click(object sender, EventArgs e)
@@ -1222,6 +999,7 @@ namespace COMunicator
                 e.Item.ForeColor = Color.Black;
             }
         }
+
     }
 
 }

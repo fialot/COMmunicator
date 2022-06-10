@@ -30,7 +30,6 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
-            this.chbBaudTest = new System.Windows.Forms.CheckBox();
             this.btnBaudRate = new System.Windows.Forms.Button();
             this.CntMnu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.CntText = new System.Windows.Forms.ToolStripMenuItem();
@@ -56,7 +55,6 @@
             this.chkBaudRate = new System.Windows.Forms.ToolStripMenuItem();
             this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.txtEndCMD = new System.Windows.Forms.TextBox();
-            this.chbClear = new System.Windows.Forms.CheckBox();
             this.chbAutoSend = new System.Windows.Forms.CheckBox();
             this.lblSPBaud = new System.Windows.Forms.Label();
             this.cbBaud = new System.Windows.Forms.ComboBox();
@@ -71,10 +69,7 @@
             this.cbbCOMPorts = new System.Windows.Forms.ComboBox();
             this.btnConnect = new System.Windows.Forms.Button();
             this.lblConnection = new System.Windows.Forms.Label();
-            this.Timer2 = new System.Windows.Forms.Timer(this.components);
-            this.Timer1 = new System.Windows.Forms.Timer(this.components);
             this.chbEndChar = new System.Windows.Forms.CheckBox();
-            this.TimeOut = new System.Windows.Forms.Timer(this.components);
             this.btnNetConn = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabCOM = new System.Windows.Forms.TabPage();
@@ -96,7 +91,6 @@
             this.lblServerPort = new System.Windows.Forms.Label();
             this.btnNetSConn = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
-            this.chbSendFromFile = new System.Windows.Forms.CheckBox();
             this.tabsMessages = new System.Windows.Forms.TabControl();
             this.tabComm = new System.Windows.Forms.TabPage();
             this.olvPacket = new BrightIdeasSoftware.FastObjectListView();
@@ -106,6 +100,8 @@
             this.colPacket = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.tabProcessLog = new System.Windows.Forms.TabPage();
             this.txtLog = new System.Windows.Forms.RichTextBox();
+            this.chbSendFromFile = new System.Windows.Forms.CheckBox();
+            this.chbClear = new System.Windows.Forms.CheckBox();
             this.CntMnu.SuspendLayout();
             this.StatusStrip1.SuspendLayout();
             this.CntSend.SuspendLayout();
@@ -118,16 +114,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.olvPacket)).BeginInit();
             this.tabProcessLog.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // chbBaudTest
-            // 
-            this.chbBaudTest.AutoSize = true;
-            this.chbBaudTest.Location = new System.Drawing.Point(242, 35);
-            this.chbBaudTest.Name = "chbBaudTest";
-            this.chbBaudTest.Size = new System.Drawing.Size(75, 17);
-            this.chbBaudTest.TabIndex = 44;
-            this.chbBaudTest.Text = "Baud Test";
-            this.chbBaudTest.UseVisualStyleBackColor = true;
             // 
             // btnBaudRate
             // 
@@ -226,7 +212,7 @@
             this.toolStripMenuItem5,
             this.chkMarsA});
             this.mnuShowType.Name = "mnuShowType";
-            this.mnuShowType.Size = new System.Drawing.Size(180, 22);
+            this.mnuShowType.Size = new System.Drawing.Size(130, 22);
             this.mnuShowType.Text = "Show Type";
             // 
             // chkString
@@ -234,7 +220,7 @@
             this.chkString.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.chkLine});
             this.chkString.Name = "chkString";
-            this.chkString.Size = new System.Drawing.Size(180, 22);
+            this.chkString.Size = new System.Drawing.Size(125, 22);
             this.chkString.Text = "String";
             this.chkString.Click += new System.EventHandler(this.chkString_Click);
             // 
@@ -243,7 +229,7 @@
             this.chkLine.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.mnutxtLine});
             this.chkLine.Name = "chkLine";
-            this.chkLine.Size = new System.Drawing.Size(180, 22);
+            this.chkLine.Size = new System.Drawing.Size(148, 22);
             this.chkLine.Text = "Line separator";
             this.chkLine.Click += new System.EventHandler(this.chkTime_Click);
             // 
@@ -255,40 +241,40 @@
             // chkByte
             // 
             this.chkByte.Name = "chkByte";
-            this.chkByte.Size = new System.Drawing.Size(180, 22);
+            this.chkByte.Size = new System.Drawing.Size(125, 22);
             this.chkByte.Text = "Byte";
             this.chkByte.Click += new System.EventHandler(this.chkString_Click);
             // 
             // chkHex
             // 
             this.chkHex.Name = "chkHex";
-            this.chkHex.Size = new System.Drawing.Size(180, 22);
+            this.chkHex.Size = new System.Drawing.Size(125, 22);
             this.chkHex.Text = "Hex Num";
             this.chkHex.Click += new System.EventHandler(this.chkString_Click);
             // 
             // chkFormat
             // 
             this.chkFormat.Name = "chkFormat";
-            this.chkFormat.Size = new System.Drawing.Size(180, 22);
+            this.chkFormat.Size = new System.Drawing.Size(125, 22);
             this.chkFormat.Text = "Format";
             this.chkFormat.Click += new System.EventHandler(this.chkString_Click);
             // 
             // toolStripMenuItem5
             // 
             this.toolStripMenuItem5.Name = "toolStripMenuItem5";
-            this.toolStripMenuItem5.Size = new System.Drawing.Size(177, 6);
+            this.toolStripMenuItem5.Size = new System.Drawing.Size(122, 6);
             // 
             // chkMarsA
             // 
             this.chkMarsA.Name = "chkMarsA";
-            this.chkMarsA.Size = new System.Drawing.Size(180, 22);
+            this.chkMarsA.Size = new System.Drawing.Size(125, 22);
             this.chkMarsA.Text = "MARS-A";
             this.chkMarsA.Click += new System.EventHandler(this.chkString_Click);
             // 
             // ToolStripMenuItem4
             // 
             this.ToolStripMenuItem4.Name = "ToolStripMenuItem4";
-            this.ToolStripMenuItem4.Size = new System.Drawing.Size(177, 6);
+            this.ToolStripMenuItem4.Size = new System.Drawing.Size(127, 6);
             // 
             // mnuShow
             // 
@@ -296,7 +282,7 @@
             this.chkTime,
             this.chkBaudRate});
             this.mnuShow.Name = "mnuShow";
-            this.mnuShow.Size = new System.Drawing.Size(180, 22);
+            this.mnuShow.Size = new System.Drawing.Size(130, 22);
             this.mnuShow.Text = "Show";
             // 
             // chkTime
@@ -324,16 +310,6 @@
             this.txtEndCMD.Name = "txtEndCMD";
             this.txtEndCMD.Size = new System.Drawing.Size(39, 20);
             this.txtEndCMD.TabIndex = 39;
-            // 
-            // chbClear
-            // 
-            this.chbClear.AutoSize = true;
-            this.chbClear.Location = new System.Drawing.Point(11, 129);
-            this.chbClear.Name = "chbClear";
-            this.chbClear.Size = new System.Drawing.Size(66, 17);
-            this.chbClear.TabIndex = 41;
-            this.chbClear.Text = "No clear";
-            this.chbClear.UseVisualStyleBackColor = true;
             // 
             // chbAutoSend
             // 
@@ -471,15 +447,6 @@
             this.lblConnection.Size = new System.Drawing.Size(0, 13);
             this.lblConnection.TabIndex = 27;
             // 
-            // Timer2
-            // 
-            this.Timer2.Interval = 2000;
-            this.Timer2.Tick += new System.EventHandler(this.Timer2_Tick);
-            // 
-            // Timer1
-            // 
-            this.Timer1.Tick += new System.EventHandler(this.Timer1_Tick);
-            // 
             // chbEndChar
             // 
             this.chbEndChar.AutoSize = true;
@@ -489,11 +456,6 @@
             this.chbEndChar.TabIndex = 46;
             this.chbEndChar.Text = "End char:";
             this.chbEndChar.UseVisualStyleBackColor = true;
-            // 
-            // TimeOut
-            // 
-            this.TimeOut.Interval = 20;
-            this.TimeOut.Tick += new System.EventHandler(this.TimeOut_Tick);
             // 
             // btnNetConn
             // 
@@ -528,7 +490,6 @@
             this.tabCOM.Controls.Add(this.btnSettings);
             this.tabCOM.Controls.Add(this.cbBaud);
             this.tabCOM.Controls.Add(this.lblSPBaud);
-            this.tabCOM.Controls.Add(this.chbBaudTest);
             this.tabCOM.Controls.Add(this.btnBaudRate);
             this.tabCOM.Location = new System.Drawing.Point(4, 22);
             this.tabCOM.Name = "tabCOM";
@@ -725,7 +686,7 @@
             this.btnNetSConn.Name = "btnNetSConn";
             this.btnNetSConn.Size = new System.Drawing.Size(82, 23);
             this.btnNetSConn.TabIndex = 55;
-            this.btnNetSConn.Text = "Connect";
+            this.btnNetSConn.Text = "Start";
             this.btnNetSConn.UseVisualStyleBackColor = true;
             this.btnNetSConn.Click += new System.EventHandler(this.btnNetSConn_Click);
             // 
@@ -739,17 +700,6 @@
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Visible = false;
             this.button2.Click += new System.EventHandler(this.button2_Click);
-            // 
-            // chbSendFromFile
-            // 
-            this.chbSendFromFile.AutoSize = true;
-            this.chbSendFromFile.Location = new System.Drawing.Point(107, 129);
-            this.chbSendFromFile.Name = "chbSendFromFile";
-            this.chbSendFromFile.Size = new System.Drawing.Size(104, 17);
-            this.chbSendFromFile.TabIndex = 53;
-            this.chbSendFromFile.Text = "Sending from file";
-            this.chbSendFromFile.UseVisualStyleBackColor = true;
-            this.chbSendFromFile.CheckedChanged += new System.EventHandler(this.chbSendFromFile_CheckedChanged);
             // 
             // tabsMessages
             // 
@@ -845,6 +795,27 @@
             this.txtLog.TabIndex = 50;
             this.txtLog.Text = "";
             // 
+            // chbSendFromFile
+            // 
+            this.chbSendFromFile.AutoSize = true;
+            this.chbSendFromFile.Location = new System.Drawing.Point(107, 129);
+            this.chbSendFromFile.Name = "chbSendFromFile";
+            this.chbSendFromFile.Size = new System.Drawing.Size(104, 17);
+            this.chbSendFromFile.TabIndex = 53;
+            this.chbSendFromFile.Text = "Sending from file";
+            this.chbSendFromFile.UseVisualStyleBackColor = true;
+            this.chbSendFromFile.CheckedChanged += new System.EventHandler(this.chbSendFromFile_CheckedChanged);
+            // 
+            // chbClear
+            // 
+            this.chbClear.AutoSize = true;
+            this.chbClear.Location = new System.Drawing.Point(11, 129);
+            this.chbClear.Name = "chbClear";
+            this.chbClear.Size = new System.Drawing.Size(66, 17);
+            this.chbClear.TabIndex = 41;
+            this.chbClear.Text = "No clear";
+            this.chbClear.UseVisualStyleBackColor = true;
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -889,14 +860,11 @@
         }
 
         #endregion
-
-        internal System.Windows.Forms.CheckBox chbBaudTest;
         internal System.Windows.Forms.Button btnBaudRate;
         internal System.Windows.Forms.StatusStrip StatusStrip1;
         internal System.Windows.Forms.ToolStripDropDownButton ToolStripDropDownButton1;
         internal System.Windows.Forms.ToolStripSeparator ToolStripMenuItem4;
         internal System.Windows.Forms.TextBox txtEndCMD;
-        internal System.Windows.Forms.CheckBox chbClear;
         internal System.Windows.Forms.CheckBox chbAutoSend;
         internal System.Windows.Forms.Label lblSPBaud;
         internal System.Windows.Forms.ComboBox cbBaud;
@@ -913,10 +881,7 @@
         internal System.Windows.Forms.ToolStripMenuItem CntCopy;
         internal System.Windows.Forms.ToolStripMenuItem CntSaveAs;
         internal System.Windows.Forms.ContextMenuStrip CntSend;
-        internal System.Windows.Forms.Timer Timer2;
-        internal System.Windows.Forms.Timer Timer1;
         private System.Windows.Forms.CheckBox chbEndChar;
-        internal System.Windows.Forms.Timer TimeOut;
         private System.Windows.Forms.ToolStripMenuItem clearToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem mnuAddSend;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem3;
@@ -955,7 +920,6 @@
         private System.Windows.Forms.ToolStripStatusLabel statusImg;
         internal System.Windows.Forms.Button btnSettings2;
         internal System.Windows.Forms.Button btnSettings3;
-        internal System.Windows.Forms.CheckBox chbSendFromFile;
         private System.Windows.Forms.ToolStripMenuItem mnuEditSend;
         private System.Windows.Forms.TabControl tabsMessages;
         private System.Windows.Forms.TabPage tabComm;
@@ -966,5 +930,7 @@
         private BrightIdeasSoftware.OLVColumn colPacket;
         private BrightIdeasSoftware.OLVColumn colLength;
         private BrightIdeasSoftware.OLVColumn colDelay;
+        internal System.Windows.Forms.CheckBox chbSendFromFile;
+        internal System.Windows.Forms.CheckBox chbClear;
     }
 }
