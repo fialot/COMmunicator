@@ -102,6 +102,8 @@
             this.txtLog = new System.Windows.Forms.RichTextBox();
             this.chbSendFromFile = new System.Windows.Forms.CheckBox();
             this.chbClear = new System.Windows.Forms.CheckBox();
+            this.tabStatistic = new System.Windows.Forms.TabPage();
+            this.txtStatistic = new System.Windows.Forms.RichTextBox();
             this.CntMnu.SuspendLayout();
             this.StatusStrip1.SuspendLayout();
             this.CntSend.SuspendLayout();
@@ -113,6 +115,7 @@
             this.tabComm.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.olvPacket)).BeginInit();
             this.tabProcessLog.SuspendLayout();
+            this.tabStatistic.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnBaudRate
@@ -708,6 +711,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tabsMessages.Controls.Add(this.tabComm);
             this.tabsMessages.Controls.Add(this.tabProcessLog);
+            this.tabsMessages.Controls.Add(this.tabStatistic);
             this.tabsMessages.Location = new System.Drawing.Point(8, 213);
             this.tabsMessages.Name = "tabsMessages";
             this.tabsMessages.SelectedIndex = 0;
@@ -816,6 +820,28 @@
             this.chbClear.Text = "No clear";
             this.chbClear.UseVisualStyleBackColor = true;
             // 
+            // tabStatistic
+            // 
+            this.tabStatistic.Controls.Add(this.txtStatistic);
+            this.tabStatistic.Location = new System.Drawing.Point(4, 22);
+            this.tabStatistic.Name = "tabStatistic";
+            this.tabStatistic.Size = new System.Drawing.Size(305, 281);
+            this.tabStatistic.TabIndex = 2;
+            this.tabStatistic.Text = "Statistic";
+            this.tabStatistic.UseVisualStyleBackColor = true;
+            // 
+            // txtStatistic
+            // 
+            this.txtStatistic.BackColor = System.Drawing.SystemColors.Window;
+            this.txtStatistic.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txtStatistic.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.txtStatistic.Location = new System.Drawing.Point(0, 0);
+            this.txtStatistic.Name = "txtStatistic";
+            this.txtStatistic.ReadOnly = true;
+            this.txtStatistic.Size = new System.Drawing.Size(305, 281);
+            this.txtStatistic.TabIndex = 51;
+            this.txtStatistic.Text = "";
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -854,6 +880,7 @@
             this.tabComm.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.olvPacket)).EndInit();
             this.tabProcessLog.ResumeLayout(false);
+            this.tabStatistic.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -932,5 +959,7 @@
         private BrightIdeasSoftware.OLVColumn colDelay;
         internal System.Windows.Forms.CheckBox chbSendFromFile;
         internal System.Windows.Forms.CheckBox chbClear;
+        private System.Windows.Forms.TabPage tabStatistic;
+        private System.Windows.Forms.RichTextBox txtStatistic;
     }
 }

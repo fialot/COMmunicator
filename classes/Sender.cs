@@ -19,6 +19,42 @@ namespace COMunicator
         public bool IsConnected = false;
     }
 
+    public class SenderReplyCounter
+    {
+        public int All;
+        public int Over100ms;
+        public int Over250ms;
+        public int Over500ms;
+        public int Over1s;
+        public int Over2s;
+        public int TimeOut;
+
+        public void Clear()
+        {
+            All = 0;
+            Over100ms = 0;
+            Over250ms = 0;
+            Over500ms = 0;
+            Over1s = 0;
+            Over2s = 0;
+            TimeOut = 0;
+        }
+    }
+
+    public class SenderStatistic
+    {
+        public DateTime StartTime = DateTime.Now;
+        public int RequestCounter = 0;
+        public SenderReplyCounter ReplyCounter = new SenderReplyCounter();
+
+        public void Clear()
+        {
+            StartTime = DateTime.Now;
+            RequestCounter = 0;
+            ReplyCounter.Clear();
+        }
+    }
+
     public enum StateChange
     {
         Connected, Disconnected, ConnectionError, NewData, Started, Stopped
@@ -29,7 +65,7 @@ namespace COMunicator
     public class Sender
     {
         public SenderStatus Status { get; private set; } = new SenderStatus();
-
+        public SenderStatistic Statistic { get; private set; } = new SenderStatistic();
 
         public event ChangedStateEventHandler ChangedState;
 
@@ -48,6 +84,8 @@ namespace COMunicator
         Timer autoSendingTimer = new Timer();
         Timer replyTimer = new Timer();
         bool AutoSendingLock = false;
+
+        DateTime SendTime = DateTime.MinValue;
 
 
         public Sender()
@@ -94,6 +132,7 @@ namespace COMunicator
         {
             if (message.Length == 0) return false;
 
+            Statistic.RequestCounter++;
             conn.Send(message);
 
             ReplyCome = false;
@@ -107,6 +146,11 @@ namespace COMunicator
                 replyTimer.Enabled = true;
             }
             return true;
+        }
+
+        public void Clear()
+        {
+            Statistic.Clear();
         }
 
         public void SetBaudRate(int baud)
@@ -255,6 +299,30 @@ namespace COMunicator
             string text = "";
             if (input)
             {
+                // ----- Reply statistics -----
+                Statistic.ReplyCounter.All++;
+                var diff = DateTime.Now - SendTime;
+                if (diff.TotalMilliseconds > 2000)
+                {
+                    Statistic.ReplyCounter.Over2s++;
+                } else if (diff.TotalMilliseconds > 1000)
+                {
+                    Statistic.ReplyCounter.Over1s++;
+                }
+                else if (diff.TotalMilliseconds > 500)
+                {
+                    Statistic.ReplyCounter.Over500ms++;
+                }
+                else if (diff.TotalMilliseconds > 250)
+                {
+                    Statistic.ReplyCounter.Over250ms++;
+                }
+                else if (diff.TotalMilliseconds > 100)
+                {
+                    Statistic.ReplyCounter.Over100ms++;
+                }
+
+                // ----- Log message -----
                 text = Global.LogPacket.Add(description, message, Color.Blue, Settings.Messages.ShowTime, input);
 
                 // ----- Send auto-reply -----
@@ -269,7 +337,11 @@ namespace COMunicator
                 }
             }
             else
+            {
+                SendTime = DateTime.Now;
                 text = Global.LogPacket.Add(description, message, Color.Black, Settings.Messages.ShowTime, input);
+            }
+                
 
             return text;
         }
@@ -326,6 +398,7 @@ namespace COMunicator
 
         private void ReplyTimeOutEvent(object sender, ElapsedEventArgs e)
         {
+            Statistic.ReplyCounter.TimeOut++;
             replyTimer.Enabled = false;
             ReplyCome = true;
         }

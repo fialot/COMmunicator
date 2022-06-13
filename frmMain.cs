@@ -179,27 +179,45 @@ namespace COMunicator
 
         public void ShowLog(LogRecord record)
         {
-            olvPacket.SetObjects(Global.LogPacket.Recods);
-
-            if (olvPacket.GetItemCount() > 0)
+            try
             {
-                olvPacket.EnsureVisible(olvPacket.GetItemCount() - 1);
+                olvPacket.SetObjects(Global.LogPacket.Recods);
+
+                if (olvPacket.GetItemCount() > 0)
+                {
+                    olvPacket.EnsureVisible(olvPacket.GetItemCount() - 1);
+                }
+
+                // ----- Add to rtf text -----
+                txtLog.Select(txtLog.TextLength, 0);
+                txtLog.SelectionColor = record.color;
+                txtLog.AppendText(record.text + Environment.NewLine);
+
+                if (txtLog.Lines.Length > 100)
+                {
+                    int index = txtLog.GetFirstCharIndexFromLine(txtLog.Lines.Length - 100);
+                    txtLog.Select(0, index);
+                    txtLog.SelectedText = " ";
+                }
+
+                txtLog.SelectionStart = txtLog.Text.Length;
+                txtLog.ScrollToCaret();
+
+                var elapsed = DateTime.Now - conn.Statistic.StartTime;
+                string stat = "Elapsed time: " + elapsed.Days.ToString() + "d " + elapsed.Hours.ToString() + ":" + elapsed.Minutes.ToString("00") + ":" + elapsed.Seconds.ToString("00") + Environment.NewLine;
+                stat += "Sended messages: " + conn.Statistic.RequestCounter.ToString() + Environment.NewLine;
+                stat += "Incomming messages: " + conn.Statistic.ReplyCounter.All.ToString() + Environment.NewLine;
+                stat += "   - Over 100ms: " + conn.Statistic.ReplyCounter.Over100ms.ToString() + Environment.NewLine;
+                stat += "   - Over 250ms: " + conn.Statistic.ReplyCounter.Over250ms.ToString() + Environment.NewLine;
+                stat += "   - Over 500ms: " + conn.Statistic.ReplyCounter.Over500ms.ToString() + Environment.NewLine;
+                stat += "   - Over 1s: " + conn.Statistic.ReplyCounter.Over1s.ToString() + Environment.NewLine;
+                stat += "   - Over 2s: " + conn.Statistic.ReplyCounter.Over2s.ToString() + Environment.NewLine;
+                stat += "Incomming time outs: " + conn.Statistic.ReplyCounter.TimeOut.ToString() + Environment.NewLine;
+
+                txtStatistic.Text = stat;
             }
-
-            // ----- Add to rtf text -----
-            txtLog.Select(txtLog.TextLength, 0);
-            txtLog.SelectionColor = record.color;
-            txtLog.AppendText(record.text + Environment.NewLine);
-
-            if (txtLog.Lines.Length > 100)
-            {
-                int index = txtLog.GetFirstCharIndexFromLine(txtLog.Lines.Length - 100);
-                txtLog.Select(0, index);
-                txtLog.SelectedText = " ";
-            }
-
-            txtLog.SelectionStart = txtLog.Text.Length;
-            txtLog.ScrollToCaret();
+            catch { }
+            
         }
         
         #region Form
@@ -785,7 +803,7 @@ namespace COMunicator
             Global.LogPacket.ClearLog();
             olvPacket.SetObjects(Global.LogPacket.Recods);
             txtLog.Text = "";
-
+            conn.Clear();
         }
 
         private void btnSettings_Click(object sender, EventArgs e)
