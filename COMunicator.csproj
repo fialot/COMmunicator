@@ -60,6 +60,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="classes\Fx\AbortableBackgroundWorker.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="classes\Fx\Communication.cs" />
     <Compile Include="classes\Fx\ConnectionStructs.cs" />
     <Compile Include="classes\Fx\EncryptPassword.cs" />

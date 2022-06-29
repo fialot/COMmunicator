@@ -54,11 +54,8 @@
             this.chkTime = new System.Windows.Forms.ToolStripMenuItem();
             this.chkBaudRate = new System.Windows.Forms.ToolStripMenuItem();
             this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
-            this.txtEndCMD = new System.Windows.Forms.TextBox();
-            this.chbAutoSend = new System.Windows.Forms.CheckBox();
             this.lblSPBaud = new System.Windows.Forms.Label();
             this.cbBaud = new System.Windows.Forms.ComboBox();
-            this.chbAutoReply = new System.Windows.Forms.CheckBox();
             this.btnSend = new System.Windows.Forms.Button();
             this.tbSend = new System.Windows.Forms.TextBox();
             this.CntSend = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -69,7 +66,6 @@
             this.cbbCOMPorts = new System.Windows.Forms.ComboBox();
             this.btnConnect = new System.Windows.Forms.Button();
             this.lblConnection = new System.Windows.Forms.Label();
-            this.chbEndChar = new System.Windows.Forms.CheckBox();
             this.btnNetConn = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabCOM = new System.Windows.Forms.TabPage();
@@ -90,7 +86,6 @@
             this.cbSPort = new System.Windows.Forms.ComboBox();
             this.lblServerPort = new System.Windows.Forms.Label();
             this.btnNetSConn = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
             this.tabsMessages = new System.Windows.Forms.TabControl();
             this.tabComm = new System.Windows.Forms.TabPage();
             this.olvPacket = new BrightIdeasSoftware.FastObjectListView();
@@ -100,10 +95,20 @@
             this.colPacket = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.tabProcessLog = new System.Windows.Forms.TabPage();
             this.txtLog = new System.Windows.Forms.RichTextBox();
-            this.chbSendFromFile = new System.Windows.Forms.CheckBox();
-            this.chbClear = new System.Windows.Forms.CheckBox();
             this.tabStatistic = new System.Windows.Forms.TabPage();
             this.txtStatistic = new System.Windows.Forms.RichTextBox();
+            this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
+            this.toolMessages = new System.Windows.Forms.ToolStrip();
+            this.btnNoClear = new System.Windows.Forms.ToolStripButton();
+            this.btnUseEndChar = new System.Windows.Forms.ToolStripButton();
+            this.txtEndCMD = new System.Windows.Forms.ToolStripTextBox();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.btnEnableAutoSending = new System.Windows.Forms.ToolStripButton();
+            this.btnSendFromFile = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.btnEnableAutoReply = new System.Windows.Forms.ToolStripButton();
+            this.btnAutoScroll = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.CntMnu.SuspendLayout();
             this.StatusStrip1.SuspendLayout();
             this.CntSend.SuspendLayout();
@@ -116,6 +121,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.olvPacket)).BeginInit();
             this.tabProcessLog.SuspendLayout();
             this.tabStatistic.SuspendLayout();
+            this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
+            this.toolStripContainer1.ContentPanel.SuspendLayout();
+            this.toolStripContainer1.SuspendLayout();
+            this.toolMessages.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnBaudRate
@@ -180,7 +189,7 @@
             this.statusImg,
             this.ToolStripDropDownButton1,
             this.lblStatus});
-            this.StatusStrip1.Location = new System.Drawing.Point(0, 523);
+            this.StatusStrip1.Location = new System.Drawing.Point(0, 506);
             this.StatusStrip1.Name = "StatusStrip1";
             this.StatusStrip1.Size = new System.Drawing.Size(328, 26);
             this.StatusStrip1.TabIndex = 40;
@@ -307,24 +316,6 @@
             this.lblStatus.Name = "lblStatus";
             this.lblStatus.Size = new System.Drawing.Size(0, 21);
             // 
-            // txtEndCMD
-            // 
-            this.txtEndCMD.Location = new System.Drawing.Point(201, 162);
-            this.txtEndCMD.Name = "txtEndCMD";
-            this.txtEndCMD.Size = new System.Drawing.Size(39, 20);
-            this.txtEndCMD.TabIndex = 39;
-            // 
-            // chbAutoSend
-            // 
-            this.chbAutoSend.AutoSize = true;
-            this.chbAutoSend.Location = new System.Drawing.Point(11, 164);
-            this.chbAutoSend.Name = "chbAutoSend";
-            this.chbAutoSend.Size = new System.Drawing.Size(90, 17);
-            this.chbAutoSend.TabIndex = 36;
-            this.chbAutoSend.Text = "Auto Sending";
-            this.chbAutoSend.UseVisualStyleBackColor = true;
-            this.chbAutoSend.CheckedChanged += new System.EventHandler(this.chbAutoSend_CheckedChanged);
-            // 
             // lblSPBaud
             // 
             this.lblSPBaud.AutoSize = true;
@@ -352,21 +343,11 @@
             this.cbBaud.Size = new System.Drawing.Size(127, 21);
             this.cbBaud.TabIndex = 34;
             // 
-            // chbAutoReply
-            // 
-            this.chbAutoReply.AutoSize = true;
-            this.chbAutoReply.Location = new System.Drawing.Point(11, 147);
-            this.chbAutoReply.Name = "chbAutoReply";
-            this.chbAutoReply.Size = new System.Drawing.Size(78, 17);
-            this.chbAutoReply.TabIndex = 32;
-            this.chbAutoReply.Text = "Auto Reply";
-            this.chbAutoReply.UseVisualStyleBackColor = true;
-            this.chbAutoReply.CheckedChanged += new System.EventHandler(this.chbAutoReply_CheckedChanged);
-            // 
             // btnSend
             // 
             this.btnSend.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSend.Location = new System.Drawing.Point(246, 186);
+            this.btnSend.Enabled = false;
+            this.btnSend.Location = new System.Drawing.Point(246, 2);
             this.btnSend.Name = "btnSend";
             this.btnSend.Size = new System.Drawing.Size(75, 21);
             this.btnSend.TabIndex = 30;
@@ -379,9 +360,9 @@
             this.tbSend.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbSend.ContextMenuStrip = this.CntSend;
-            this.tbSend.Location = new System.Drawing.Point(8, 187);
+            this.tbSend.Location = new System.Drawing.Point(4, 3);
             this.tbSend.Name = "tbSend";
-            this.tbSend.Size = new System.Drawing.Size(232, 20);
+            this.tbSend.Size = new System.Drawing.Size(236, 20);
             this.tbSend.TabIndex = 29;
             this.tbSend.KeyDown += new System.Windows.Forms.KeyEventHandler(this.tbSend_KeyDown);
             // 
@@ -450,16 +431,6 @@
             this.lblConnection.Size = new System.Drawing.Size(0, 13);
             this.lblConnection.TabIndex = 27;
             // 
-            // chbEndChar
-            // 
-            this.chbEndChar.AutoSize = true;
-            this.chbEndChar.Location = new System.Drawing.Point(107, 164);
-            this.chbEndChar.Name = "chbEndChar";
-            this.chbEndChar.Size = new System.Drawing.Size(72, 17);
-            this.chbEndChar.TabIndex = 46;
-            this.chbEndChar.Text = "End char:";
-            this.chbEndChar.UseVisualStyleBackColor = true;
-            // 
             // btnNetConn
             // 
             this.btnNetConn.Location = new System.Drawing.Point(68, 60);
@@ -477,7 +448,7 @@
             this.tabControl1.Controls.Add(this.tabCOM);
             this.tabControl1.Controls.Add(this.tabTCPClient);
             this.tabControl1.Controls.Add(this.tabTCPServer);
-            this.tabControl1.Location = new System.Drawing.Point(0, 3);
+            this.tabControl1.Location = new System.Drawing.Point(0, 7);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(328, 116);
@@ -693,17 +664,6 @@
             this.btnNetSConn.UseVisualStyleBackColor = true;
             this.btnNetSConn.Click += new System.EventHandler(this.btnNetSConn_Click);
             // 
-            // button2
-            // 
-            this.button2.Location = new System.Drawing.Point(253, 141);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
-            this.button2.TabIndex = 52;
-            this.button2.Text = "button2";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Visible = false;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
-            // 
             // tabsMessages
             // 
             this.tabsMessages.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -712,11 +672,12 @@
             this.tabsMessages.Controls.Add(this.tabComm);
             this.tabsMessages.Controls.Add(this.tabProcessLog);
             this.tabsMessages.Controls.Add(this.tabStatistic);
-            this.tabsMessages.Location = new System.Drawing.Point(8, 213);
+            this.tabsMessages.Location = new System.Drawing.Point(4, 29);
             this.tabsMessages.Name = "tabsMessages";
             this.tabsMessages.SelectedIndex = 0;
-            this.tabsMessages.Size = new System.Drawing.Size(313, 307);
+            this.tabsMessages.Size = new System.Drawing.Size(321, 294);
             this.tabsMessages.TabIndex = 54;
+            this.tabsMessages.SelectedIndexChanged += new System.EventHandler(this.tabsMessages_SelectedIndexChanged);
             // 
             // tabComm
             // 
@@ -724,7 +685,7 @@
             this.tabComm.Location = new System.Drawing.Point(4, 22);
             this.tabComm.Name = "tabComm";
             this.tabComm.Padding = new System.Windows.Forms.Padding(3);
-            this.tabComm.Size = new System.Drawing.Size(305, 281);
+            this.tabComm.Size = new System.Drawing.Size(313, 268);
             this.tabComm.TabIndex = 0;
             this.tabComm.Text = "Packets";
             this.tabComm.UseVisualStyleBackColor = true;
@@ -749,7 +710,7 @@
             this.olvPacket.Location = new System.Drawing.Point(3, 3);
             this.olvPacket.Name = "olvPacket";
             this.olvPacket.ShowGroups = false;
-            this.olvPacket.Size = new System.Drawing.Size(299, 275);
+            this.olvPacket.Size = new System.Drawing.Size(307, 262);
             this.olvPacket.TabIndex = 50;
             this.olvPacket.UseCompatibleStateImageBehavior = false;
             this.olvPacket.View = System.Windows.Forms.View.Details;
@@ -782,7 +743,7 @@
             this.tabProcessLog.Location = new System.Drawing.Point(4, 22);
             this.tabProcessLog.Name = "tabProcessLog";
             this.tabProcessLog.Padding = new System.Windows.Forms.Padding(3);
-            this.tabProcessLog.Size = new System.Drawing.Size(305, 281);
+            this.tabProcessLog.Size = new System.Drawing.Size(313, 268);
             this.tabProcessLog.TabIndex = 1;
             this.tabProcessLog.Text = "Text";
             this.tabProcessLog.UseVisualStyleBackColor = true;
@@ -795,37 +756,16 @@
             this.txtLog.Location = new System.Drawing.Point(3, 3);
             this.txtLog.Name = "txtLog";
             this.txtLog.ReadOnly = true;
-            this.txtLog.Size = new System.Drawing.Size(299, 275);
+            this.txtLog.Size = new System.Drawing.Size(307, 262);
             this.txtLog.TabIndex = 50;
             this.txtLog.Text = "";
-            // 
-            // chbSendFromFile
-            // 
-            this.chbSendFromFile.AutoSize = true;
-            this.chbSendFromFile.Location = new System.Drawing.Point(107, 129);
-            this.chbSendFromFile.Name = "chbSendFromFile";
-            this.chbSendFromFile.Size = new System.Drawing.Size(104, 17);
-            this.chbSendFromFile.TabIndex = 53;
-            this.chbSendFromFile.Text = "Sending from file";
-            this.chbSendFromFile.UseVisualStyleBackColor = true;
-            this.chbSendFromFile.CheckedChanged += new System.EventHandler(this.chbSendFromFile_CheckedChanged);
-            // 
-            // chbClear
-            // 
-            this.chbClear.AutoSize = true;
-            this.chbClear.Location = new System.Drawing.Point(11, 129);
-            this.chbClear.Name = "chbClear";
-            this.chbClear.Size = new System.Drawing.Size(66, 17);
-            this.chbClear.TabIndex = 41;
-            this.chbClear.Text = "No clear";
-            this.chbClear.UseVisualStyleBackColor = true;
             // 
             // tabStatistic
             // 
             this.tabStatistic.Controls.Add(this.txtStatistic);
             this.tabStatistic.Location = new System.Drawing.Point(4, 22);
             this.tabStatistic.Name = "tabStatistic";
-            this.tabStatistic.Size = new System.Drawing.Size(305, 281);
+            this.tabStatistic.Size = new System.Drawing.Size(313, 268);
             this.tabStatistic.TabIndex = 2;
             this.tabStatistic.Text = "Statistic";
             this.tabStatistic.UseVisualStyleBackColor = true;
@@ -838,27 +778,142 @@
             this.txtStatistic.Location = new System.Drawing.Point(0, 0);
             this.txtStatistic.Name = "txtStatistic";
             this.txtStatistic.ReadOnly = true;
-            this.txtStatistic.Size = new System.Drawing.Size(305, 281);
+            this.txtStatistic.Size = new System.Drawing.Size(313, 268);
             this.txtStatistic.TabIndex = 51;
             this.txtStatistic.Text = "";
+            // 
+            // toolStripContainer1
+            // 
+            this.toolStripContainer1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            // 
+            // toolStripContainer1.BottomToolStripPanel
+            // 
+            this.toolStripContainer1.BottomToolStripPanel.Controls.Add(this.toolMessages);
+            // 
+            // toolStripContainer1.ContentPanel
+            // 
+            this.toolStripContainer1.ContentPanel.Controls.Add(this.tbSend);
+            this.toolStripContainer1.ContentPanel.Controls.Add(this.tabsMessages);
+            this.toolStripContainer1.ContentPanel.Controls.Add(this.btnSend);
+            this.toolStripContainer1.ContentPanel.Size = new System.Drawing.Size(328, 326);
+            this.toolStripContainer1.Location = new System.Drawing.Point(0, 125);
+            this.toolStripContainer1.Name = "toolStripContainer1";
+            this.toolStripContainer1.Size = new System.Drawing.Size(328, 378);
+            this.toolStripContainer1.TabIndex = 55;
+            this.toolStripContainer1.Text = "toolStripContainer1";
+            // 
+            // toolMessages
+            // 
+            this.toolMessages.Dock = System.Windows.Forms.DockStyle.None;
+            this.toolMessages.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.toolMessages.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.btnNoClear,
+            this.btnUseEndChar,
+            this.txtEndCMD,
+            this.toolStripSeparator1,
+            this.btnAutoScroll,
+            this.toolStripSeparator3,
+            this.btnEnableAutoSending,
+            this.btnSendFromFile,
+            this.toolStripSeparator2,
+            this.btnEnableAutoReply});
+            this.toolMessages.Location = new System.Drawing.Point(3, 0);
+            this.toolMessages.Name = "toolMessages";
+            this.toolMessages.Size = new System.Drawing.Size(276, 27);
+            this.toolMessages.TabIndex = 0;
+            // 
+            // btnNoClear
+            // 
+            this.btnNoClear.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnNoClear.Image = ((System.Drawing.Image)(resources.GetObject("btnNoClear.Image")));
+            this.btnNoClear.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnNoClear.Name = "btnNoClear";
+            this.btnNoClear.Size = new System.Drawing.Size(24, 24);
+            this.btnNoClear.Text = "No Clear";
+            this.btnNoClear.ToolTipText = "No clear input box";
+            this.btnNoClear.Click += new System.EventHandler(this.btnBoolan_Click);
+            // 
+            // btnUseEndChar
+            // 
+            this.btnUseEndChar.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnUseEndChar.Image = ((System.Drawing.Image)(resources.GetObject("btnUseEndChar.Image")));
+            this.btnUseEndChar.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnUseEndChar.Name = "btnUseEndChar";
+            this.btnUseEndChar.Size = new System.Drawing.Size(24, 24);
+            this.btnUseEndChar.Text = "Use end char";
+            this.btnUseEndChar.Click += new System.EventHandler(this.btnBoolan_Click);
+            // 
+            // txtEndCMD
+            // 
+            this.txtEndCMD.Name = "txtEndCMD";
+            this.txtEndCMD.Size = new System.Drawing.Size(100, 27);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 27);
+            // 
+            // btnEnableAutoSending
+            // 
+            this.btnEnableAutoSending.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnEnableAutoSending.Image = ((System.Drawing.Image)(resources.GetObject("btnEnableAutoSending.Image")));
+            this.btnEnableAutoSending.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnEnableAutoSending.Name = "btnEnableAutoSending";
+            this.btnEnableAutoSending.Size = new System.Drawing.Size(24, 24);
+            this.btnEnableAutoSending.Text = "Enable auto sending";
+            this.btnEnableAutoSending.Click += new System.EventHandler(this.btnEnableAutoSending_Click);
+            // 
+            // btnSendFromFile
+            // 
+            this.btnSendFromFile.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnSendFromFile.Image = ((System.Drawing.Image)(resources.GetObject("btnSendFromFile.Image")));
+            this.btnSendFromFile.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnSendFromFile.Name = "btnSendFromFile";
+            this.btnSendFromFile.Size = new System.Drawing.Size(24, 24);
+            this.btnSendFromFile.Text = "Send messages from file";
+            this.btnSendFromFile.Click += new System.EventHandler(this.btnSendFromFile_Click);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 27);
+            // 
+            // btnEnableAutoReply
+            // 
+            this.btnEnableAutoReply.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnEnableAutoReply.Image = ((System.Drawing.Image)(resources.GetObject("btnEnableAutoReply.Image")));
+            this.btnEnableAutoReply.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnEnableAutoReply.Name = "btnEnableAutoReply";
+            this.btnEnableAutoReply.Size = new System.Drawing.Size(24, 24);
+            this.btnEnableAutoReply.Text = "Enable auto reply";
+            this.btnEnableAutoReply.Click += new System.EventHandler(this.btnEnableAutoReply_Click);
+            // 
+            // btnAutoScroll
+            // 
+            this.btnAutoScroll.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnAutoScroll.Image = ((System.Drawing.Image)(resources.GetObject("btnAutoScroll.Image")));
+            this.btnAutoScroll.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnAutoScroll.Name = "btnAutoScroll";
+            this.btnAutoScroll.Size = new System.Drawing.Size(24, 24);
+            this.btnAutoScroll.Text = "Auto Scroll";
+            this.btnAutoScroll.ToolTipText = "Enable Auto Scroll";
+            this.btnAutoScroll.Click += new System.EventHandler(this.btnBoolan_Click);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 27);
             // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(328, 549);
-            this.Controls.Add(this.tabsMessages);
-            this.Controls.Add(this.chbSendFromFile);
-            this.Controls.Add(this.button2);
+            this.ClientSize = new System.Drawing.Size(328, 532);
+            this.Controls.Add(this.toolStripContainer1);
             this.Controls.Add(this.tabControl1);
-            this.Controls.Add(this.chbEndChar);
             this.Controls.Add(this.StatusStrip1);
-            this.Controls.Add(this.txtEndCMD);
-            this.Controls.Add(this.chbClear);
-            this.Controls.Add(this.chbAutoSend);
-            this.Controls.Add(this.chbAutoReply);
-            this.Controls.Add(this.btnSend);
-            this.Controls.Add(this.tbSend);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(344, 344);
             this.Name = "frmMain";
@@ -881,6 +936,14 @@
             ((System.ComponentModel.ISupportInitialize)(this.olvPacket)).EndInit();
             this.tabProcessLog.ResumeLayout(false);
             this.tabStatistic.ResumeLayout(false);
+            this.toolStripContainer1.BottomToolStripPanel.ResumeLayout(false);
+            this.toolStripContainer1.BottomToolStripPanel.PerformLayout();
+            this.toolStripContainer1.ContentPanel.ResumeLayout(false);
+            this.toolStripContainer1.ContentPanel.PerformLayout();
+            this.toolStripContainer1.ResumeLayout(false);
+            this.toolStripContainer1.PerformLayout();
+            this.toolMessages.ResumeLayout(false);
+            this.toolMessages.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -891,11 +954,8 @@
         internal System.Windows.Forms.StatusStrip StatusStrip1;
         internal System.Windows.Forms.ToolStripDropDownButton ToolStripDropDownButton1;
         internal System.Windows.Forms.ToolStripSeparator ToolStripMenuItem4;
-        internal System.Windows.Forms.TextBox txtEndCMD;
-        internal System.Windows.Forms.CheckBox chbAutoSend;
         internal System.Windows.Forms.Label lblSPBaud;
         internal System.Windows.Forms.ComboBox cbBaud;
-        internal System.Windows.Forms.CheckBox chbAutoReply;
         internal System.Windows.Forms.Button btnSend;
         internal System.Windows.Forms.TextBox tbSend;
         internal System.Windows.Forms.Button btnSettings;
@@ -908,7 +968,6 @@
         internal System.Windows.Forms.ToolStripMenuItem CntCopy;
         internal System.Windows.Forms.ToolStripMenuItem CntSaveAs;
         internal System.Windows.Forms.ContextMenuStrip CntSend;
-        private System.Windows.Forms.CheckBox chbEndChar;
         private System.Windows.Forms.ToolStripMenuItem clearToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem mnuAddSend;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem3;
@@ -931,7 +990,6 @@
         internal System.Windows.Forms.Label lblProtocol;
         internal System.Windows.Forms.TextBox txtLocalPort;
         internal System.Windows.Forms.Label lblLocalPort;
-        private System.Windows.Forms.Button button2;
         private System.Windows.Forms.ToolStripMenuItem mnuShowType;
         private System.Windows.Forms.ToolStripMenuItem chkString;
         private System.Windows.Forms.ToolStripMenuItem chkLine;
@@ -957,9 +1015,19 @@
         private BrightIdeasSoftware.OLVColumn colPacket;
         private BrightIdeasSoftware.OLVColumn colLength;
         private BrightIdeasSoftware.OLVColumn colDelay;
-        internal System.Windows.Forms.CheckBox chbSendFromFile;
-        internal System.Windows.Forms.CheckBox chbClear;
         private System.Windows.Forms.TabPage tabStatistic;
         private System.Windows.Forms.RichTextBox txtStatistic;
+        private System.Windows.Forms.ToolStripContainer toolStripContainer1;
+        private System.Windows.Forms.ToolStrip toolMessages;
+        private System.Windows.Forms.ToolStripButton btnNoClear;
+        private System.Windows.Forms.ToolStripButton btnUseEndChar;
+        private System.Windows.Forms.ToolStripButton btnEnableAutoSending;
+        private System.Windows.Forms.ToolStripTextBox txtEndCMD;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripButton btnSendFromFile;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripButton btnEnableAutoReply;
+        private System.Windows.Forms.ToolStripButton btnAutoScroll;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
     }
 }

@@ -8,9 +8,11 @@ using System.Timers;
 using AppSettings;
 using Fx.IO;
 using Fx.IO.Protocol;
+using Fx.Components;
 using GlobalClasses;
 using myFunctions;
 using TCPClient;
+using System.ComponentModel;
 
 namespace COMunicator
 {
@@ -60,17 +62,32 @@ namespace COMunicator
         Connected, Disconnected, ConnectionError, NewData, Started, Stopped
     }
 
+    public enum BackgroundState
+    {
+        Wait, Connect, SendString, SendArray
+    }
+
     public delegate void ChangedStateEventHandler(StateChange state);
 
     public class Sender
     {
+        // ===== PUBLIC VARIABLES =====
         public SenderStatus Status { get; private set; } = new SenderStatus();
         public SenderStatistic Statistic { get; private set; } = new SenderStatistic();
 
         public event ChangedStateEventHandler ChangedState;
 
-        Communication conn = new Communication();
-        byte[] comBuffer = new byte[0];
+        // ===== PRIVATE VARIABLES =====
+        // ----- Backgropund Worker -----
+        AbortableBackgroundWorker work = new AbortableBackgroundWorker();   // Backgound Worker for communication
+        bool IsRunning = false;
+        BackgroundState workState = BackgroundState.Wait;
+        string newStringMessage = "";
+        byte[] newMessage = new byte[0];
+
+
+        Communication conn = new Communication();                           // Communication class
+        byte[] comBuffer = new byte[0];                                     // Incomming buffer
 
         // ----- Reply data -----
         static Dictionary<string, string> ReplyData = new Dictionary<string, string>();
@@ -124,27 +141,21 @@ namespace COMunicator
 
         public bool Send(string message)
         {
-            var byteMsg = ProtocolCom.FormatMsg(message, Settings.Connection.UsedEncoding);
-            return Send(byteMsg);
+            if (message == "") return false;
+
+            newStringMessage = message;
+            workState = BackgroundState.SendString;
+
+            return true;
         }
 
         public bool Send(byte[] message)
         {
             if (message.Length == 0) return false;
 
-            Statistic.RequestCounter++;
-            conn.Send(message);
+            newMessage = message;
+            workState = BackgroundState.SendArray;
 
-            ReplyCome = false;
-            LastSendedMessage = message;
-
-            ProcessData(message, false);
-
-            if (Settings.Messages.EnableAutoSending && Settings.Messages.WaitForReply)
-            {
-                replyTimer.Interval = Settings.Messages.WaitForReplyTimeout;
-                replyTimer.Enabled = true;
-            }
             return true;
         }
 
@@ -206,6 +217,11 @@ namespace COMunicator
             conn.ReceivedData += new ReceivedEventHandler(DataReceive);
             autoSendingTimer.Elapsed += new ElapsedEventHandler(AutoSendingEvent);
             replyTimer.Elapsed += new ElapsedEventHandler(ReplyTimeOutEvent);
+
+            work.DoWork += WorkProcess;                                     // Select Update Job
+            work.RunWorkerCompleted += WorkComplete;                     // Select Done Job
+            work.RunWorkerAsync();                                       // Start Job
+            work.WorkerSupportsCancellation = true;
         }
 
         private void DataReceive(object source, comStatus status)
@@ -402,6 +418,118 @@ namespace COMunicator
             replyTimer.Enabled = false;
             ReplyCome = true;
         }
+
+
+
+
+
+        #region Background worker
+
+        /// <summary>
+        /// Device reading Process 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void WorkProcess(object sender, DoWorkEventArgs e)
+        {
+
+            workState = BackgroundState.Wait;
+            IsRunning = true;
+
+            while (IsRunning)
+            {
+                try
+                {
+                    switch (workState)
+                    {
+                        case BackgroundState.Wait:
+
+                            break;
+
+                        case BackgroundState.Connect:
+
+                            break;
+
+                        case BackgroundState.SendString:
+                            SendMsg(newStringMessage);
+                            workState = BackgroundState.Wait;
+                            break;
+
+                        case BackgroundState.SendArray:
+                            SendMsg(newMessage);
+                            workState = BackgroundState.Wait;
+                            break;
+                    }
+                }
+                catch {}
+
+                System.Threading.Thread.Sleep(1);
+            }
+
+            /*isMeasuring = true;
+            
+            dev.Disconnect();*/
+        }
+
+        private void SendMsg(string message)
+        {
+            var byteMsg = ProtocolCom.FormatMsg(message, Settings.Connection.UsedEncoding);
+            SendMsg(byteMsg);
+        }
+
+        private void SendMsg(byte[] message)
+        {
+            Statistic.RequestCounter++;
+            conn.Send(message);
+
+            ReplyCome = false;
+            LastSendedMessage = message.ToArray();
+            //LastSendedMessage = message;
+
+            ProcessData(message, false);
+
+            if (Settings.Messages.EnableAutoSending && Settings.Messages.WaitForReply)
+            {
+                replyTimer.Interval = Settings.Messages.WaitForReplyTimeout;
+                replyTimer.Enabled = true;
+            }
+        }
+
+        /// <summary>
+        /// Updating Complete
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void WorkComplete(object sender, RunWorkerCompletedEventArgs e)
+        {
+            //isMeasuring = false;
+            /*
+            // ----- Log Done work -----
+            LogAdd(Environment.NewLine, Color.Black);
+            if (e.Cancelled)
+                Log("----- ABORTED -----" + Environment.NewLine, Color.Black);
+            else
+                Log("----- WORK DONE -----" + Environment.NewLine, Color.Black);
+
+
+            // ----- Refresh Start button -----
+            Invoke(new Action(() =>
+            {
+                btnStart.Tag = "";
+                btnStart.Text = "Start";
+            }));
+
+            // ----- End Message -----
+            if (e.Cancelled)
+                MessageBox.Show("Update Aborted!");
+            else
+                MessageBox.Show("Update Complete");
+                */
+
+        }
+
+
+        #endregion
 
 
     }

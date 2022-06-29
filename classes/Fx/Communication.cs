@@ -361,7 +361,12 @@ namespace Fx.IO
         {
             if (ReceivedData == null) asynch = false;
             else asynch = true;
-            bool res = SocketClient.ConnectUdp(hostName, hostPort, lisenPort, asynch);
+            bool res = false;
+            try
+            {
+                res = SocketClient.ConnectUdp(hostName, hostPort, lisenPort, asynch);
+            } catch {  }
+            
             if (res == true)
             {
                 OpenedInterface = interfaces.Udp;
@@ -375,8 +380,7 @@ namespace Fx.IO
                 if (ReceivedData != null)
                     ReceivedData(this, comStatus.OpenError);
                 throw new System.IO.IOException("Connect Error");
-            }
-                
+            }  
         }
 
         /// <summary>

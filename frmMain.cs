@@ -89,6 +89,7 @@ namespace COMunicator
             switch (Settings.Connection.Type)
             {
                 case ConnectionType.Serial:
+                    btnSend.Enabled = true;
                     btnConnect.Enabled = true;
                     btnNetConn.Enabled = false;
                     btnNetSConn.Enabled = false;
@@ -98,6 +99,7 @@ namespace COMunicator
 
                 case ConnectionType.TCP:
                 case ConnectionType.UDP:
+                    btnSend.Enabled = true;
                     btnConnect.Enabled = false;
                     btnNetConn.Enabled = true;
                     btnNetSConn.Enabled = false;
@@ -110,6 +112,7 @@ namespace COMunicator
                     break;
 
                 case ConnectionType.TCPServer:
+                    btnSend.Enabled = true;
                     lblStatus.Text = "Connected client.";
                     break;
             }
@@ -122,6 +125,7 @@ namespace COMunicator
         /// </summary>
         private void Disconnected()
         {
+            btnSend.Enabled = false;
             btnConnect.Enabled = true;
             btnNetConn.Enabled = true;
             btnNetSConn.Enabled = true;
@@ -181,40 +185,80 @@ namespace COMunicator
         {
             try
             {
-                olvPacket.SetObjects(Global.LogPacket.Recods);
-
-                if (olvPacket.GetItemCount() > 0)
+                if (tabsMessages.SelectedIndex == 0)
                 {
-                    olvPacket.EnsureVisible(olvPacket.GetItemCount() - 1);
+                    //olvPacket.SetObjects(Global.LogPacket.Recods);
+                    olvPacket.BeginUpdate();
+                    olvPacket.AddObject(record);
+                    olvPacket.EndUpdate();
+
+                    if (btnAutoScroll.Checked)
+                    {
+                        if (olvPacket.GetItemCount() > 0)
+                        {
+                            olvPacket.EnsureVisible(olvPacket.GetItemCount() - 1);
+                        }
+                    }
+                    
                 }
-
-                // ----- Add to rtf text -----
-                txtLog.Select(txtLog.TextLength, 0);
-                txtLog.SelectionColor = record.color;
-                txtLog.AppendText(record.text + Environment.NewLine);
-
-                if (txtLog.Lines.Length > 100)
+                else if (tabsMessages.SelectedIndex == 1)
                 {
-                    int index = txtLog.GetFirstCharIndexFromLine(txtLog.Lines.Length - 100);
-                    txtLog.Select(0, index);
-                    txtLog.SelectedText = " ";
+                    // ----- Add to rtf text -----
+                    txtLog.Select(txtLog.TextLength, 0);
+                    txtLog.SelectionColor = record.color;
+                    string appText = record.text + Environment.NewLine;
+                    txtLog.AppendText(appText);
+
+                    if (txtLog.Text.Length > 10000)
+                    {
+                        txtLog.Select(0, appText.Length);
+                        txtLog.SelectedText = " ";
+                    }
+
+                    /*if (txtLog.Lines.Length > 100)
+                    {
+                        int index = txtLog.GetFirstCharIndexFromLine(txtLog.Lines.Length - 100);
+                        txtLog.Select(0, index);
+                        txtLog.SelectedText = " ";
+                    }*/
+
+                    if (btnAutoScroll.Checked)
+                    {
+                        txtLog.SelectionStart = txtLog.Text.Length;
+                        txtLog.ScrollToCaret();
+                    }
+
+                    /*new System.Threading.Thread(() =>
+                {
+                    RichTextBox rtb = new RichTextBox();
+                    rtb.Rtf = txtLog.Rtf;
+                    rtb.Select(rtb.TextLength, 0);
+                    rtb.SelectionColor = record.color;
+                    rtb.AppendText(record.text + Environment.NewLine);
+
+                    Invoke((Action)(() =>
+                    {
+                        txtLog.Rtf = rtb.Rtf;
+                        txtLog.SelectionStart = txtLog.Text.Length;
+                        txtLog.ScrollToCaret();
+                    }));
+                }).Start();*/
                 }
+                else if (tabsMessages.SelectedIndex == 2)
+                {
+                    var elapsed = DateTime.Now - conn.Statistic.StartTime;
+                    string stat = "Elapsed time: " + elapsed.Days.ToString() + "d " + elapsed.Hours.ToString() + ":" + elapsed.Minutes.ToString("00") + ":" + elapsed.Seconds.ToString("00") + Environment.NewLine;
+                    stat += "Sended messages: " + conn.Statistic.RequestCounter.ToString() + Environment.NewLine;
+                    stat += "Incomming messages: " + conn.Statistic.ReplyCounter.All.ToString() + Environment.NewLine;
+                    stat += "   - Over 100ms: " + conn.Statistic.ReplyCounter.Over100ms.ToString() + Environment.NewLine;
+                    stat += "   - Over 250ms: " + conn.Statistic.ReplyCounter.Over250ms.ToString() + Environment.NewLine;
+                    stat += "   - Over 500ms: " + conn.Statistic.ReplyCounter.Over500ms.ToString() + Environment.NewLine;
+                    stat += "   - Over 1s: " + conn.Statistic.ReplyCounter.Over1s.ToString() + Environment.NewLine;
+                    stat += "   - Over 2s: " + conn.Statistic.ReplyCounter.Over2s.ToString() + Environment.NewLine;
+                    stat += "Incomming time outs: " + conn.Statistic.ReplyCounter.TimeOut.ToString() + Environment.NewLine;
 
-                txtLog.SelectionStart = txtLog.Text.Length;
-                txtLog.ScrollToCaret();
-
-                var elapsed = DateTime.Now - conn.Statistic.StartTime;
-                string stat = "Elapsed time: " + elapsed.Days.ToString() + "d " + elapsed.Hours.ToString() + ":" + elapsed.Minutes.ToString("00") + ":" + elapsed.Seconds.ToString("00") + Environment.NewLine;
-                stat += "Sended messages: " + conn.Statistic.RequestCounter.ToString() + Environment.NewLine;
-                stat += "Incomming messages: " + conn.Statistic.ReplyCounter.All.ToString() + Environment.NewLine;
-                stat += "   - Over 100ms: " + conn.Statistic.ReplyCounter.Over100ms.ToString() + Environment.NewLine;
-                stat += "   - Over 250ms: " + conn.Statistic.ReplyCounter.Over250ms.ToString() + Environment.NewLine;
-                stat += "   - Over 500ms: " + conn.Statistic.ReplyCounter.Over500ms.ToString() + Environment.NewLine;
-                stat += "   - Over 1s: " + conn.Statistic.ReplyCounter.Over1s.ToString() + Environment.NewLine;
-                stat += "   - Over 2s: " + conn.Statistic.ReplyCounter.Over2s.ToString() + Environment.NewLine;
-                stat += "Incomming time outs: " + conn.Statistic.ReplyCounter.TimeOut.ToString() + Environment.NewLine;
-
-                txtStatistic.Text = stat;
+                    txtStatistic.Text = stat;
+                }
             }
             catch { }
             
@@ -235,8 +279,11 @@ namespace COMunicator
 
         private void NewLogRecord(LogRecord record)
         {
-            olvPacket.Invoke(new NewLogDelegate(ShowLog), new Object[] { record }); //BeginInvoke
-
+            try
+            {
+                olvPacket.Invoke(new NewLogDelegate(ShowLog), new Object[] { record }); //BeginInvoke
+            }
+            catch { }
         }
 
         #region LoadForm
@@ -392,10 +439,11 @@ namespace COMunicator
             chkTime.Checked = Settings.Messages.ShowTime;
             chkBaudRate.Checked = Settings.Messages.ShowBaudRate;
 
-            chbClear.Checked = Settings.Messages.ClearEditbox;
-            chbAutoReply.Checked = Settings.Messages.EnableReplyFile;
-            chbAutoSend.Checked = Settings.Messages.EnableAutoSending;
-            chbEndChar.Checked = Settings.Messages.AddEndChar;
+            btnNoClear.Checked = Settings.Messages.ClearEditbox;
+            btnAutoScroll.Checked = Settings.GUI.AutoScroll;
+            btnEnableAutoReply.Checked = Settings.Messages.EnableReplyFile;
+            btnEnableAutoSending.Checked = Settings.Messages.EnableAutoSending;
+            btnUseEndChar.Checked = Settings.Messages.AddEndChar;
             txtEndCMD.Text = Settings.Messages.EndChar;
         }
 
@@ -443,10 +491,11 @@ namespace COMunicator
 
 
 
-            Settings.Messages.ClearEditbox = chbClear.Checked;
-            Settings.Messages.EnableReplyFile = chbAutoReply.Checked;
-            Settings.Messages.EnableAutoSending = chbAutoSend.Checked;
-            Settings.Messages.AddEndChar = chbEndChar.Checked;
+            Settings.Messages.ClearEditbox = btnNoClear.Checked;
+            Settings.GUI.AutoScroll = btnAutoScroll.Checked;
+            Settings.Messages.EnableReplyFile = btnEnableAutoReply.Checked;
+            Settings.Messages.EnableAutoSending = btnEnableAutoSending.Checked;
+            Settings.Messages.AddEndChar = btnUseEndChar.Checked;
             Settings.Messages.EndChar = txtEndCMD.Text;
             settings.SaveSettings();
 
@@ -578,6 +627,8 @@ namespace COMunicator
             if (!conn.Status.IsConnected)
             {
                 btnConnect.Enabled = false;
+                btnNetConn.Enabled = false;
+                btnNetSConn.Enabled = false;
                 Settings.Connection.Type = ConnectionType.Serial;
                 Settings.Connection.SerialPort = cbbCOMPorts.Text;
                 Settings.Connection.BaudRate = Conv.ToIntDef(cbBaud.Text, 115200);
@@ -599,12 +650,12 @@ namespace COMunicator
         private void btnSend_Click(object sender, EventArgs e)
         {
             string text = tbSend.Text;
-            if (chbEndChar.Checked) text += txtEndCMD.Text;
+            if (btnUseEndChar.Checked) text += txtEndCMD.Text;
             if (conn.Status.IsConnected && (tbSend.Text != ""))
             {
                 conn.Send(text);
                 history.Add(tbSend.Text);
-                if (chbClear.Checked == false) { tbSend.Text = ""; };
+                if (btnNoClear.Checked == false) { tbSend.Text = ""; };
                 history.SetTemporary(tbSend.Text);
             }
             tbSend.Focus();
@@ -701,39 +752,9 @@ namespace COMunicator
             chkMarsA.Checked = false;
             ((ToolStripMenuItem)sender).Checked = true;
 
-            if (chkString.Checked)
-            {
-                Global.LogPacket.SetPacketView(ePacketView.StringReplaceCommandChars);
-            }
-            else if (chkByte.Checked)
-            {
-                Global.LogPacket.SetPacketView(ePacketView.Bytes);
-            }
-            else if (chkHex.Checked)
-            {
-                Global.LogPacket.SetPacketView(ePacketView.Hex);
-            }
-            else if (chkMarsA.Checked)
-            {
-                Global.LogPacket.SetPacketView(ePacketView.MARS_A);
-            }
-
-            /*txtPackets.Rtf = Global.LogPacket.TextRTF();
-            txtPackets.SelectionStart = txtPackets.Text.Length;
-            txtPackets.ScrollToCaret();*/
-
-            olvPacket.SetObjects(Global.LogPacket.Recods);
-            txtLog.Rtf = Global.LogPacket.TextRTF();
-
+            RefreshMessages();
         }
 
-        private void chbAutoSend_CheckedChanged(object sender, EventArgs e)
-        {
-            Settings.Messages.EnableAutoSending = chbAutoSend.Checked;
-            if (chbAutoSend.Checked)
-                conn.Send(tbSend.Text);
-            conn.RefreshAutoSend();
-        }
 
         private void CntText_Click(object sender, EventArgs e)
         {
@@ -813,12 +834,12 @@ namespace COMunicator
 
         private void ChangeSettings(int tab) 
         {
-            Settings.Messages.EnableReplyFile = chbAutoReply.Checked;
-            Settings.Messages.EnableSendingFile = chbSendFromFile.Checked;
+            Settings.Messages.EnableReplyFile = btnEnableAutoReply.Checked;
+            Settings.Messages.EnableSendingFile = btnSendFromFile.Checked;
             formSet.ShowDialog(tab);
 
-            chbAutoReply.Checked = Settings.Messages.EnableReplyFile;
-            chbSendFromFile.Checked = Settings.Messages.EnableSendingFile;
+            btnEnableAutoReply.Checked = Settings.Messages.EnableReplyFile;
+            btnSendFromFile.Checked = Settings.Messages.EnableSendingFile;
 
             conn.RefreshAutoSend();
         }
@@ -893,11 +914,6 @@ namespace COMunicator
 
         }
 
-        private void chbAutoReply_CheckedChanged(object sender, EventArgs e)
-        {
-            Settings.Messages.EnableReplyFile = chbAutoReply.Checked;
-            conn.RefreshReply();
-        }
 
         private void btnNetConn_Click(object sender, EventArgs e)
         {
@@ -905,7 +921,9 @@ namespace COMunicator
             {
                 try
                 {
+                    btnConnect.Enabled = false;
                     btnNetConn.Enabled = false;
+                    btnNetSConn.Enabled = false;
                     if (cbProtocol.SelectedIndex == 1)
                         Settings.Connection.Type = ConnectionType.UDP;
                     else
@@ -940,6 +958,8 @@ namespace COMunicator
             {
                 try
                 {
+                    btnConnect.Enabled = false;
+                    btnNetConn.Enabled = false;
                     btnNetSConn.Enabled = false;
                     Settings.Connection.Type = ConnectionType.TCPServer;
                     Settings.Connection.LocalPort = Convert.ToInt32(cbSPort.Text);
@@ -973,21 +993,12 @@ namespace COMunicator
 
         }
 
-        private void button2_Click(object sender, EventArgs e)
-        {
-            //string x = Protocol.Protocol.MarsA(Conv.HexToUInt("6AEB012A"), com.FormatMsg( "bb"));
-        }
 
         private void btnSettings2_Click(object sender, EventArgs e)
         {
             ChangeSettings(1);
         }
 
-        private void chbSendFromFile_CheckedChanged(object sender, EventArgs e)
-        {
-            Settings.Messages.EnableSendingFile = chbSendFromFile.Checked;
-            conn.RefreshAutoSend();
-        }
 
         private void mnuEditSend_Click(object sender, EventArgs e)
         {
@@ -1018,6 +1029,78 @@ namespace COMunicator
             }
         }
 
+        private void tabsMessages_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            RefreshMessages();
+        }
+
+        private void RefreshMessages()
+        {
+            if (chkString.Checked)
+            {
+                Global.LogPacket.SetPacketView(ePacketView.StringReplaceCommandChars);
+            }
+            else if (chkByte.Checked)
+            {
+                Global.LogPacket.SetPacketView(ePacketView.Bytes);
+            }
+            else if (chkHex.Checked)
+            {
+                Global.LogPacket.SetPacketView(ePacketView.Hex);
+            }
+            else if (chkMarsA.Checked)
+            {
+                Global.LogPacket.SetPacketView(ePacketView.MARS_A);
+            }
+
+            /*txtPackets.Rtf = Global.LogPacket.TextRTF();
+            txtPackets.SelectionStart = txtPackets.Text.Length;
+            txtPackets.ScrollToCaret();*/
+
+            olvPacket.SetObjects(Global.LogPacket.Recods);
+            txtLog.Rtf = Global.LogPacket.TextRTF();
+
+            var elapsed = DateTime.Now - conn.Statistic.StartTime;
+            string stat = "Elapsed time: " + elapsed.Days.ToString() + "d " + elapsed.Hours.ToString() + ":" + elapsed.Minutes.ToString("00") + ":" + elapsed.Seconds.ToString("00") + Environment.NewLine;
+            stat += "Sended messages: " + conn.Statistic.RequestCounter.ToString() + Environment.NewLine;
+            stat += "Incomming messages: " + conn.Statistic.ReplyCounter.All.ToString() + Environment.NewLine;
+            stat += "   - Over 100ms: " + conn.Statistic.ReplyCounter.Over100ms.ToString() + Environment.NewLine;
+            stat += "   - Over 250ms: " + conn.Statistic.ReplyCounter.Over250ms.ToString() + Environment.NewLine;
+            stat += "   - Over 500ms: " + conn.Statistic.ReplyCounter.Over500ms.ToString() + Environment.NewLine;
+            stat += "   - Over 1s: " + conn.Statistic.ReplyCounter.Over1s.ToString() + Environment.NewLine;
+            stat += "   - Over 2s: " + conn.Statistic.ReplyCounter.Over2s.ToString() + Environment.NewLine;
+            stat += "Incomming time outs: " + conn.Statistic.ReplyCounter.TimeOut.ToString() + Environment.NewLine;
+
+            txtStatistic.Text = stat;
+        }
+
+        private void btnBoolan_Click(object sender, EventArgs e)
+        {
+            ((ToolStripButton)sender).Checked = !((ToolStripButton)sender).Checked;
+        }
+
+        private void btnEnableAutoSending_Click(object sender, EventArgs e)
+        {
+            btnEnableAutoSending.Checked = !btnEnableAutoSending.Checked;
+            Settings.Messages.EnableAutoSending = btnEnableAutoSending.Checked;
+            if (btnEnableAutoSending.Checked)
+                conn.Send(tbSend.Text);
+            conn.RefreshAutoSend();
+        }
+
+        private void btnSendFromFile_Click(object sender, EventArgs e)
+        {
+            btnSendFromFile.Checked = !btnSendFromFile.Checked;
+            Settings.Messages.EnableSendingFile = btnSendFromFile.Checked;
+            conn.RefreshAutoSend();
+        }
+
+        private void btnEnableAutoReply_Click(object sender, EventArgs e)
+        {
+            btnEnableAutoReply.Checked = !btnEnableAutoReply.Checked;
+            Settings.Messages.EnableReplyFile = btnEnableAutoReply.Checked;
+            conn.RefreshReply();
+        }
     }
 
 }

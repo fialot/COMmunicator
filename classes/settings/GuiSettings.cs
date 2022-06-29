@@ -16,7 +16,7 @@ namespace AppSettings
     public class GuiSettings
     {
         public int TabIndex { get; set; } = 0;
-
+        public bool AutoScroll { get; set; } = true;
 
 
         /// <summary>
@@ -51,11 +51,18 @@ namespace AppSettings
 
             bool needSave = false;
 
-            // ----- Encoding -----
+            // ----- Tabs -----
             element = xml.Element("tab");
             if (element != null)
             {
                 this.TabIndex = Conv.ToIntDef(element.Value, 0);
+            }
+
+            // ----- Scroll -----
+            element = xml.Element("scroll");
+            if (element != null)
+            {
+                this.AutoScroll = Conv.ToBoolDef(element.Value, true);
             }
 
             return needSave;
@@ -67,12 +74,11 @@ namespace AppSettings
         /// <returns>XML element</returns>
         public XElement GetXmlElement()
         {
-
-
             // ----- Write GUI settings -----
             var connElement = new XElement("GUI");
 
             connElement.Add(new XElement("tab", this.TabIndex.ToString()));
+            connElement.Add(new XElement("scroll", this.AutoScroll.ToString()));
 
             return connElement;
         }
