@@ -20,6 +20,7 @@ namespace AppSettings
         public static ConnectionSetting Connection = new ConnectionSetting();
         public static MsgSettings Messages = new MsgSettings();
         public static GuiSettings GUI = new GuiSettings();
+        public static AppSettings App = new AppSettings();
 
         /// <summary>
         /// Path to xml settings file
@@ -83,6 +84,13 @@ namespace AppSettings
                     GUI.Load(mainGroup);
                 }
 
+                // ----- GUI section -----
+                mainGroup = settings.Element("app");
+                if (mainGroup != null)
+                {
+                    App.Load(mainGroup);
+                }
+
 
                 if (save)
                 {
@@ -137,6 +145,10 @@ namespace AppSettings
 
                 // ----- Write GUI settings -----
                 element = GUI.GetXmlElement();
+                mainElement.Add(element);
+
+                // ----- Write App settings -----
+                element = App.GetXmlElement();
                 mainElement.Add(element);
 
                 // ---- Save to XML -----

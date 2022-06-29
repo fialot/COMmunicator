@@ -297,11 +297,9 @@ namespace COMunicator
 
             // ----- LOAD SETTINGS -----
             Settings.LoadXml();
-            settings.LoadSettings();
-
 
             // ----- Creating data folder -----
-            if (!Directory.Exists(Files.ReplaceVarPaths(settings.Paths.dataFolder))) Directory.CreateDirectory(Files.ReplaceVarPaths(settings.Paths.dataFolder));
+            if (!Directory.Exists(Files.ReplaceVarPaths(Settings.App.DataFolder))) Directory.CreateDirectory(Files.ReplaceVarPaths(Settings.App.DataFolder));
 
             Global.LogPacket.LogFileDirectory = Files.ReplaceVarPaths(Settings.Messages.LogFileDirectory);
             Global.LogPacket.SaveToFile = Settings.Messages.SaveToFile;
@@ -363,11 +361,11 @@ namespace COMunicator
 
         void ReadHistory()
         {
-            history = new History(settings.Paths.dataFolder + Path.DirectorySeparatorChar + "history_cmd.txt");
+            history = new History(Settings.App.DataFolder + Path.DirectorySeparatorChar + "history_cmd.txt");
             tbSend.Text = history.Get();
-            historyIP = new History(settings.Paths.dataFolder + Path.DirectorySeparatorChar + "history_IP.txt", 5);
-            historyPort = new History(settings.Paths.dataFolder + Path.DirectorySeparatorChar + "history_port.txt", 5);
-            historyPortServer = new History(settings.Paths.dataFolder + Path.DirectorySeparatorChar + "history_port_server.txt", 5);
+            historyIP = new History(Settings.App.DataFolder + Path.DirectorySeparatorChar + "history_IP.txt", 5);
+            historyPort = new History(Settings.App.DataFolder + Path.DirectorySeparatorChar + "history_port.txt", 5);
+            historyPortServer = new History(Settings.App.DataFolder + Path.DirectorySeparatorChar + "history_port_server.txt", 5);
             RefreshHistNet();
             
         }
@@ -497,7 +495,6 @@ namespace COMunicator
             Settings.Messages.EnableAutoSending = btnEnableAutoSending.Checked;
             Settings.Messages.AddEndChar = btnUseEndChar.Checked;
             Settings.Messages.EndChar = txtEndCMD.Text;
-            settings.SaveSettings();
 
             Settings.SaveXml();
 
@@ -531,11 +528,11 @@ namespace COMunicator
             // ----- Add default items -----
             
 
-            string[] items = Files.LoadFileLines(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + Path.DirectorySeparatorChar + "menu_items.txt", true);
+            string[] items = Files.LoadFileLines(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + Path.DirectorySeparatorChar + "data" + Path.DirectorySeparatorChar + "menu_items.txt", true);
             AddMenuItems(items);
 
             // ----- Add User defined items -----
-            items = Files.LoadFileLines(Files.ReplaceVarPaths(settings.Paths.dataFolder + Path.DirectorySeparatorChar + "menu_items.txt"), true);
+            items = Files.LoadFileLines(Files.ReplaceVarPaths(Settings.App.DataFolder + Path.DirectorySeparatorChar + "menu_items.txt"), true);
             AddMenuItems(items);
 
 
@@ -886,7 +883,7 @@ namespace COMunicator
             
             if (Dialogs.InputBox("Add packet to list", "Name of packet:", ref txt) == DialogResult.OK)
             {
-                Files.SaveFile(Files.ReplaceVarPaths(settings.Paths.dataFolder + Path.DirectorySeparatorChar + "menu_items.txt"), "\n" + txt + @"\:" + tbSend.Text, true);
+                Files.SaveFile(Files.ReplaceVarPaths(Settings.App.DataFolder + Path.DirectorySeparatorChar + "menu_items.txt"), "\n" + txt + @"\:" + tbSend.Text, true);
                 //AddToFile("polozky.txt", txt + @"\:" + tbSend.Text);
                 LoadMenu();
             }
@@ -1002,7 +999,7 @@ namespace COMunicator
 
         private void mnuEditSend_Click(object sender, EventArgs e)
         {
-            System.Diagnostics.Process.Start(Files.ReplaceVarPaths(settings.Paths.dataFolder + Path.DirectorySeparatorChar + "menu_items.txt"));
+            System.Diagnostics.Process.Start(Files.ReplaceVarPaths(Settings.App.DataFolder + Path.DirectorySeparatorChar + "menu_items.txt"));
         }
 
         private void chkTime_Click(object sender, EventArgs e)

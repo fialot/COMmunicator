@@ -53,7 +53,7 @@ namespace COMunicator
             Settings.Messages.LogFileDirectory = txtLogFile.Text;
             Settings.Messages.SaveToFile = chbEnableLog.Checked;
 
-            settings.Paths.dataFolder = txtDataFolder.Text;
+            Settings.App.DataFolder = txtDataFolder.Text;
 
             if (cbCoding.Text != "")
             {
@@ -131,7 +131,7 @@ namespace COMunicator
             txtLogFile.Text = Settings.Messages.LogFileDirectory;
             chbEnableLog.Checked = Settings.Messages.SaveToFile;
 
-            txtDataFolder.Text = settings.Paths.dataFolder;
+            txtDataFolder.Text = Settings.App.DataFolder;
         }
 
         private void btnCancel_Click(object sender, EventArgs e)

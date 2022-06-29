@@ -73,6 +73,7 @@
     <Compile Include="classes\Fx\Paths.cs" />
     <Compile Include="classes\Fx\ProcessLog.cs" />
     <Compile Include="classes\Sender.cs" />
+    <Compile Include="classes\settings\AppSettings.cs" />
     <Compile Include="classes\settings\GuiSettings.cs" />
     <Compile Include="classes\settings\MsgSettings.cs" />
     <Compile Include="classes\settings\Settings.cs" />
@@ -97,7 +98,6 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="classes\propGrid.cs" />
-    <Compile Include="settings.cs" />
     <Compile Include="classes\SocketClient.cs" />
     <EmbeddedResource Include="frmMain.resx">
       <DependentUpon>frmMain.cs</DependentUpon>
