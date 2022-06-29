@@ -103,12 +103,12 @@
             this.btnUseEndChar = new System.Windows.Forms.ToolStripButton();
             this.txtEndCMD = new System.Windows.Forms.ToolStripTextBox();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.btnAutoScroll = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.btnEnableAutoSending = new System.Windows.Forms.ToolStripButton();
             this.btnSendFromFile = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.btnEnableAutoReply = new System.Windows.Forms.ToolStripButton();
-            this.btnAutoScroll = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.CntMnu.SuspendLayout();
             this.StatusStrip1.SuspendLayout();
             this.CntSend.SuspendLayout();
@@ -153,7 +153,7 @@
             // 
             this.CntText.Name = "CntText";
             this.CntText.Size = new System.Drawing.Size(141, 22);
-            this.CntText.Text = "To Textbox";
+            this.CntText.Text = "To input box";
             this.CntText.Click += new System.EventHandler(this.CntText_Click);
             // 
             // ToolStripMenuItem1
@@ -345,11 +345,11 @@
             // 
             // btnSend
             // 
-            this.btnSend.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSend.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnSend.Enabled = false;
-            this.btnSend.Location = new System.Drawing.Point(246, 2);
+            this.btnSend.Location = new System.Drawing.Point(243, 302);
             this.btnSend.Name = "btnSend";
-            this.btnSend.Size = new System.Drawing.Size(75, 21);
+            this.btnSend.Size = new System.Drawing.Size(81, 22);
             this.btnSend.TabIndex = 30;
             this.btnSend.Text = "Send";
             this.btnSend.UseVisualStyleBackColor = true;
@@ -357,10 +357,10 @@
             // 
             // tbSend
             // 
-            this.tbSend.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.tbSend.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbSend.ContextMenuStrip = this.CntSend;
-            this.tbSend.Location = new System.Drawing.Point(4, 3);
+            this.tbSend.Location = new System.Drawing.Point(4, 303);
             this.tbSend.Name = "tbSend";
             this.tbSend.Size = new System.Drawing.Size(236, 20);
             this.tbSend.TabIndex = 29;
@@ -672,7 +672,7 @@
             this.tabsMessages.Controls.Add(this.tabComm);
             this.tabsMessages.Controls.Add(this.tabProcessLog);
             this.tabsMessages.Controls.Add(this.tabStatistic);
-            this.tabsMessages.Location = new System.Drawing.Point(4, 29);
+            this.tabsMessages.Location = new System.Drawing.Point(4, 3);
             this.tabsMessages.Name = "tabsMessages";
             this.tabsMessages.SelectedIndex = 0;
             this.tabsMessages.Size = new System.Drawing.Size(321, 294);
@@ -794,9 +794,9 @@
             // 
             // toolStripContainer1.ContentPanel
             // 
+            this.toolStripContainer1.ContentPanel.Controls.Add(this.btnSend);
             this.toolStripContainer1.ContentPanel.Controls.Add(this.tbSend);
             this.toolStripContainer1.ContentPanel.Controls.Add(this.tabsMessages);
-            this.toolStripContainer1.ContentPanel.Controls.Add(this.btnSend);
             this.toolStripContainer1.ContentPanel.Size = new System.Drawing.Size(328, 326);
             this.toolStripContainer1.Location = new System.Drawing.Point(0, 125);
             this.toolStripContainer1.Name = "toolStripContainer1";
@@ -855,6 +855,22 @@
             this.toolStripSeparator1.Name = "toolStripSeparator1";
             this.toolStripSeparator1.Size = new System.Drawing.Size(6, 27);
             // 
+            // btnAutoScroll
+            // 
+            this.btnAutoScroll.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnAutoScroll.Image = ((System.Drawing.Image)(resources.GetObject("btnAutoScroll.Image")));
+            this.btnAutoScroll.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnAutoScroll.Name = "btnAutoScroll";
+            this.btnAutoScroll.Size = new System.Drawing.Size(24, 24);
+            this.btnAutoScroll.Text = "Auto Scroll";
+            this.btnAutoScroll.ToolTipText = "Enable Auto Scroll";
+            this.btnAutoScroll.Click += new System.EventHandler(this.btnBoolan_Click);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 27);
+            // 
             // btnEnableAutoSending
             // 
             this.btnEnableAutoSending.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -889,22 +905,6 @@
             this.btnEnableAutoReply.Size = new System.Drawing.Size(24, 24);
             this.btnEnableAutoReply.Text = "Enable auto reply";
             this.btnEnableAutoReply.Click += new System.EventHandler(this.btnEnableAutoReply_Click);
-            // 
-            // btnAutoScroll
-            // 
-            this.btnAutoScroll.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.btnAutoScroll.Image = ((System.Drawing.Image)(resources.GetObject("btnAutoScroll.Image")));
-            this.btnAutoScroll.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnAutoScroll.Name = "btnAutoScroll";
-            this.btnAutoScroll.Size = new System.Drawing.Size(24, 24);
-            this.btnAutoScroll.Text = "Auto Scroll";
-            this.btnAutoScroll.ToolTipText = "Enable Auto Scroll";
-            this.btnAutoScroll.Click += new System.EventHandler(this.btnBoolan_Click);
-            // 
-            // toolStripSeparator3
-            // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 27);
             // 
             // frmMain
             // 

@@ -760,7 +760,7 @@ namespace COMunicator
         {
             if (olvPacket.SelectedIndex >= 0)
             {
-                tbSend.Text = ((LogRecord)olvPacket.SelectedItem.RowObject).text;
+                tbSend.Text = "\\x" + BitConverter.ToString(((LogRecord)olvPacket.SelectedItem.RowObject).data).Replace("-", "");
             }
         }
 
@@ -780,7 +780,7 @@ namespace COMunicator
                 dialog.Filter = "Log File *.log|*.log|All Files (*.*)|*.*";
                 if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
-                    //Files.SaveFile(dialog.FileName, txtPackets.Text);
+                    Files.SaveFile(dialog.FileName, Global.LogPacket.Text());
                 }
             }
             catch (Exception err)

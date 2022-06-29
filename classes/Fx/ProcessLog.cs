@@ -242,7 +242,6 @@ namespace Fx.Logging
         private string ConvertToText(byte[] message)
         {
             string text = "";
-            
 
             switch (PacketView)
             {
@@ -253,8 +252,8 @@ namespace Fx.Logging
                     {
                         if (messageList[i] == 0) messageList.RemoveAt(i);
                     }
-                    message = messageList.ToArray();
-                    text = UsedEncoding.GetString(message);
+                    var newMessage = messageList.ToArray();
+                    text = UsedEncoding.GetString(newMessage);
 
                     // ----- Split message if defined separator char -----
                     if (LineSeparatingChar != "")
@@ -268,18 +267,18 @@ namespace Fx.Logging
 
                 case ePacketView.StringReplaceCommandChars:
                     // ----- Create zero mask -----
-                    byte[] zeroMask = new byte[message.Length];
-                    Array.Copy(message, zeroMask, message.Length);
+                    byte[] newMsg = new byte[message.Length];
+                    Array.Copy(message, newMsg, message.Length);
 
                     // ----- Replace zero chars -----
-                    for (int i = 0; i < message.Length; i++)
+                    for (int i = 0; i < newMsg.Length; i++)
                     {
-                        if (message[i] == 0) message[i] = 1;
+                        if (newMsg[i] == 0) newMsg[i] = 1;
                     }
-                    text = UsedEncoding.GetString(message);
+                    text = UsedEncoding.GetString(newMsg);
                     var byteText = UsedEncoding.GetBytes(text);
 
-                    if (text.Length == zeroMask.Length)
+                    if (text.Length == newMsg.Length)
                     {
                         // ----- Replace special chars -----
                         for (int i = text.Length - 1; i >= 0; i--)
@@ -291,7 +290,7 @@ namespace Fx.Logging
                                 if (byteText[i] != 10 && byteText[i] != 10 && byteText[i] != 13)
                                 {
                                     text = text.Remove(i, 1);
-                                    if (zeroMask[i] == 0)
+                                    if (message[i] == 0)
                                     {
                                         text = text.Insert(i, "{0}");
                                     }
