@@ -27,8 +27,9 @@ namespace Fx.Logging
     {
         public DateTime time = DateTime.MinValue;
         public TimeSpan delay;
-        public string description = "";
+        public string header = "";
         public string text = "";
+        public string dataText = "";
         public byte[] data = new byte[0];
         public Color color = Color.Black;
         public bool withTime = true;
@@ -38,7 +39,8 @@ namespace Fx.Logging
         public LogRecord(DateTime time, string text, Color color)
         {
             this.time = time;
-            this.description = text;
+            this.header = "";
+            this.dataText = text;
             this.text = text;
             this.color = color;
 
@@ -47,17 +49,19 @@ namespace Fx.Logging
         public LogRecord(DateTime time, byte[] bytes, Color color)
         {
             this.time = time;
-            this.description = "";
+            this.header = "";
             this.data = bytes;
             this.text = Encoding.UTF8.GetString(bytes);
+            this.dataText = text;
             this.color = color;
         }
 
-        public LogRecord(DateTime time, string description, string text, byte[] data, Color color, bool withTime, bool input, TimeSpan delay)
+        public LogRecord(DateTime time, string header, string text, byte[] data, Color color, bool withTime, bool input, TimeSpan delay)
         {
             this.color = color;
-            this.description = description;
-            this.text = text;
+            this.header = header;
+            this.text = header + text;
+            this.dataText = text;
             this.time = time;
             this.data = data;
             this.withTime = withTime;
@@ -121,8 +125,8 @@ namespace Fx.Logging
                 for (int i = 0; i < Recods.Count; i++)
                 {
                     var item = Recods[i];
-                    item.text = ConvertToText(item.data, !item.input);
-                    item.text = CreateLogText(item.description, item.text, item.withTime, item.input);
+                    item.dataText = ConvertToText(item.data, !item.input);
+                    item.text = item.header + item.dataText;
                     Recods.RemoveAt(i);
                     Recods.Insert(i, item);
                 }
@@ -162,10 +166,10 @@ namespace Fx.Logging
             LastLogTime = now;
             
             text = ConvertToText(data, !input);
-            text = CreateLogText(description, text, withTime, input);
+            string header = CreateHeader(description, text, withTime, input);
 
             // ----- Add message -----
-            var record = new LogRecord(LastLogTime, description, text, data, color, withTime, input, delay);
+            var record = new LogRecord(LastLogTime, header, text, data, color, withTime, input, delay);
             Recods.Add(record);
 
             // ----- Event -----
@@ -208,7 +212,7 @@ namespace Fx.Logging
             return Add(description, new byte[0], color, withTime, input);
         }
 
-        private string CreateLogText(string description, string data, bool withTime, bool input)
+        private string CreateHeader(string description, string data, bool withTime, bool input)
         {
             string text = "";
 
@@ -241,7 +245,7 @@ namespace Fx.Logging
             }
             
             // ----- Add data ------
-            text += data;
+            //text += data;
 
             return text;
         }

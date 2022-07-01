@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using Fx.IO;
 using Fx.Logging;
-using myFunctions;
 
 namespace AppSettings
 {

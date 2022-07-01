@@ -10,7 +10,6 @@ using Fx.IO;
 using Fx.IO.Protocol;
 using Fx.Components;
 using GlobalClasses;
-using myFunctions;
 using TCPClient;
 using System.ComponentModel;
 
@@ -204,7 +203,7 @@ namespace COMunicator
             {
                 item = lines[i].Split(new string[] { @"\->" }, StringSplitOptions.RemoveEmptyEntries);
                 if (item.Length == 2)
-                    dict.Add(BitConverter.ToString(ProtocolCom.FormatMsg(item[0], Settings.Connection.UsedEncoding)), item[1]);
+                    dict.Add(BitConverter.ToString(ProtocolFormat.Format(item[0], Settings.Connection.UsedEncoding)), item[1]);
             }
 
             return dict;
@@ -295,7 +294,7 @@ namespace COMunicator
                 }
             }
 
-            var endChar = Settings.Connection.UsedEncoding.GetString(ProtocolCom.FormatMsg(Settings.Messages.LineSeparatingChar, Settings.Connection.UsedEncoding));
+            var endChar = Settings.Connection.UsedEncoding.GetString(ProtocolFormat.Format(Settings.Messages.LineSeparatingChar, Settings.Connection.UsedEncoding));
 
             if (Settings.Messages.UseLineSeparatingChar && endChar != "")
             {
@@ -473,7 +472,7 @@ namespace COMunicator
 
         private void SendMsg(string message)
         {
-            var byteMsg = ProtocolCom.FormatMsg(message, Settings.Connection.UsedEncoding);
+            var byteMsg = ProtocolFormat.Format(message, Settings.Connection.UsedEncoding);
             SendMsg(byteMsg);
         }
 

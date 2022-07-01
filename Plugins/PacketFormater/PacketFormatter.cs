@@ -1,23 +1,31 @@
-﻿using myFunctions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Fx.IO;
 using Fx.Plugins;
 
 namespace Fx.IO.Protocol
 {
-    public static class ProtocolCom
+    struct msgFunction
     {
-        public static List<IPluginProtocol> Plugins = null;
+        public string name;
+        public int length;
+        public string[] arguments;
+        public string argumentString;
+    }
 
-        /// <summary>
-        /// Format Message
-        /// </summary>
-        /// <param name="msg">Message string</param>
-        /// <returns>Data to send</returns>
-        static public byte[] FormatMsg(string msg, Encoding encoding)
+    public static class ProtocolFormat
+    {
+        private static List<IPluginProtocol> Plugins { get; set; } = new List<IPluginProtocol>();
+
+        public static void SetPlugins(List<IPluginProtocol> plugins)
+        {
+            Plugins = plugins;
+        }
+
+        public static byte[] Format(string msg, Encoding encoding)
         {
             int pos, lastpos, count = 0;
             string cmd, ins, prefix, prefix1;
@@ -69,14 +77,14 @@ namespace Fx.IO.Protocol
                                 ins = Files.LoadFile(fun.arguments[0]);
                             insBytes = encoding.GetBytes(ins);
                         }
-                        else if (fun.name == "marsa")
+                        /*else if (fun.name == "marsa")
                         {
                             if (fun.arguments.Length >= 2)
                             {
                                 insBytes = Protocol.MarsA(Conv.HexToUInt(fun.arguments[0]), FormatMsg(fun.arguments[1], encoding));
                                 lastpos = -1;
                             }
-                        }
+                        }*/
                         /*else if (fun.name == "nuvia")
                         {
                             if (fun.arguments.Length >= 1)
@@ -92,7 +100,7 @@ namespace Fx.IO.Protocol
                         }*/
                         else
                         {
-                            foreach(var item in Plugins)
+                            foreach (var item in Plugins)
                             {
                                 if (fun.name == item.GetFunctionName())
                                 {
@@ -210,7 +218,6 @@ namespace Fx.IO.Protocol
             return result;
         }
 
-
         static private string FindCmd(string msg, int pos, ref int count)
         {
             int len = msg.Length - pos - 1;
@@ -315,5 +322,7 @@ namespace Fx.IO.Protocol
             }
             return fun;
         }
+
+
     }
 }

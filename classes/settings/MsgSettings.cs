@@ -17,6 +17,7 @@ namespace AppSettings
     {
         
         public ePacketView PacketView { get; set; } = ePacketView.StringReplaceCommandChars;
+        public string PacketViewPlugin { get; set; } = "";
         public bool UseLineSeparatingChar { get; set; } = false;
         public string LineSeparatingChar { get; set; } = "";
         public bool ShowDirection { get; set; } = true;
@@ -87,6 +88,12 @@ namespace AppSettings
                 element = group.Element("view_type");
                 if (element != null)
                 {
+                    attribute = element.Attribute("plugin");
+                    if (attribute != null)
+                    {
+                        this.PacketViewPlugin = attribute.Value;
+                    }
+
                     this.PacketView = Conv.ToEnum<ePacketView>(element.Value, ePacketView.StringReplaceCommandChars);
                 }
 
@@ -269,7 +276,9 @@ namespace AppSettings
             var msgElement = new XElement("messages");
             
             var formatElement = new XElement("format");
-            formatElement.Add(new XElement("view_type", this.PacketView.ToString()));
+            var viewType = new XElement("view_type", this.PacketView.ToString());
+            viewType.Add(new XAttribute("plugin", this.PacketViewPlugin));
+            formatElement.Add(viewType);
             var lineSepChar = new XElement("line_separator", this.LineSeparatingChar);
             lineSepChar.Add(new XAttribute("enable", Conv.ToString(this.UseLineSeparatingChar)));
             formatElement.Add(lineSepChar);

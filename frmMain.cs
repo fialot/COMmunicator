@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using System.IO.Ports;
 using System.IO;
 using TCPClient;
-using myFunctions;
+//using myFunctions;
 using Fx.IO.Protocol;
 using GlobalClasses;
 
@@ -303,7 +303,7 @@ namespace COMunicator
 
             // ----- Load plug-ins -----
             Global.PL.LoadPlugins();
-            ProtocolCom.Plugins = Global.PL.PluginsProtocol;
+            ProtocolFormat.SetPlugins(Global.PL.PluginsProtocol);
             LoadPlugins();
 
             // ----- Creating data folder -----
@@ -323,23 +323,7 @@ namespace COMunicator
 
             
             
-            if (chkString.Checked)
-            {
-                Global.LogPacket.SetPacketView(ePacketView.StringReplaceCommandChars);
-            }
-            else if (chkByte.Checked)
-            {
-                Global.LogPacket.SetPacketView(ePacketView.Bytes);
-            }
-            else if (chkHex.Checked)
-            {
-                Global.LogPacket.SetPacketView(ePacketView.Hex);
-            }
-            else if (chkMarsA.Checked)
-            {
-                Global.LogPacket.SetPacketView(ePacketView.MARS_A);
-            }
-            Global.LogPacket.NewRecord += new NewRecordEventHandler(NewLogRecord);
+            
 
 
 
@@ -358,9 +342,16 @@ namespace COMunicator
             colLength.AspectGetter = delegate (object x) {
                 if (x == null) return ""; return ((LogRecord)x).data.Length;
             };
+            colIO.AspectGetter = delegate (object x) {
+                if (x == null) return "";
+                if (((LogRecord)x).input)
+                    return ">>";
+                else
+                    return "<<";
+            };
             colPacket.AspectGetter = delegate (object x) {
                 if (x == null) return "";
-                return ((LogRecord)x).text;
+                return ((LogRecord)x).dataText;
             };
 
         }
@@ -428,16 +419,39 @@ namespace COMunicator
             switch (Settings.Messages.PacketView)
             {
                 case ePacketView.Bytes:
-                    chkByte.Checked = true; break;
+                    Global.LogPacket.SetPacketView(ePacketView.Bytes);
+                    chkByte.Checked = true;
+                    break;
                 case ePacketView.Hex:
-                    chkHex.Checked = true; break;
+                    Global.LogPacket.SetPacketView(ePacketView.Hex);
+                    chkHex.Checked = true;
+                    break;
                 case ePacketView.String:
                 case ePacketView.StringReplaceCommandChars:
-                    chkString.Checked = true; break;
+                    Global.LogPacket.SetPacketView(ePacketView.StringReplaceCommandChars);
+                    chkString.Checked = true;
+                    break;
                 case ePacketView.MARS_A:
-                    chkMarsA.Checked = true; break;
+                    Global.LogPacket.SetPacketView(ePacketView.MARS_A);
+                    chkMarsA.Checked = true;
+                    break;
+                case ePacketView.Custom:
+                    foreach(var item in mnuShowType.DropDownItems)
+                    {
+                        if (item.GetType() == typeof(ToolStripMenuItem))
+                        {
+                            if (((ToolStripMenuItem)item).Text == Settings.Messages.PacketViewPlugin)
+                            {
+                                Global.LogPacket.SetCustomView((IPluginProtocol)Global.PL.GetPlugin(Settings.Messages.PacketViewPlugin));
+                                Global.LogPacket.SetPacketView(ePacketView.Custom);
+                                ((ToolStripMenuItem)item).Checked = true;
+                            }
+                        }
+                    }
+                    break;
             }
             
+            Global.LogPacket.NewRecord += new NewRecordEventHandler(NewLogRecord);
 
             chkLine.Checked = Settings.Messages.UseLineSeparatingChar;
             mnutxtLine.Text = Settings.Messages.LineSeparatingChar;
@@ -481,12 +495,25 @@ namespace COMunicator
 
             if (chkByte.Checked)
                 Settings.Messages.PacketView = ePacketView.Bytes;
-            if (chkHex.Checked)
+            else if (chkHex.Checked)
                 Settings.Messages.PacketView = ePacketView.Hex;
-            if (chkString.Checked)
+            else if (chkString.Checked)
                 Settings.Messages.PacketView = ePacketView.StringReplaceCommandChars;
-            if (chkMarsA.Checked)
+            else if (chkMarsA.Checked)
                 Settings.Messages.PacketView = ePacketView.MARS_A;
+            else
+            {
+                Settings.Messages.PacketView = ePacketView.Custom;
+
+                foreach (var item in mnuShowType.DropDownItems)
+                {
+                    if (item.GetType() == typeof(ToolStripMenuItem))
+                    {
+                        if (((ToolStripMenuItem)item).Checked)
+                            Settings.Messages.PacketViewPlugin = ((ToolStripMenuItem)item).Text;
+                    }
+                }
+            }
 
             Settings.Messages.UseLineSeparatingChar = chkLine.Checked;
             Settings.Messages.LineSeparatingChar = mnutxtLine.Text;
@@ -788,7 +815,7 @@ namespace COMunicator
         {
             if (olvPacket.SelectedIndex >= 0)
             {
-                System.Windows.Forms.Clipboard.SetText(((LogRecord)olvPacket.SelectedItem.RowObject).text);
+                System.Windows.Forms.Clipboard.SetText(((LogRecord)olvPacket.SelectedItem.RowObject).dataText);
             }
         }
 

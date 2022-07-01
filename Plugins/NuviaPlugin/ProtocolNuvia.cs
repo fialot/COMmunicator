@@ -1,5 +1,6 @@
 ﻿using Fx.Conversion;
 using Fx.IO;
+using Fx.IO.Protocol;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -95,9 +96,9 @@ namespace Fx.Plugins
             var arguments = input.Split(new string[] { ";" }, StringSplitOptions.None);
 
             if (arguments.Length >= 3)
-                return newPacket(Conv.ToIntDef(arguments[0], 0), Conv.HexToByte(arguments[1]), Conv.HexToBytes(arguments[2]));
+                return newPacket(Conv.ToIntDef(arguments[0], 0), Conv.HexToByte(arguments[1]), ProtocolFormat.Format(arguments[2], Encoding.UTF8));
             else if (arguments.Length >= 2)
-                return newPacket(0, Conv.HexToByte(arguments[0]), Conv.HexToBytes(arguments[1]));
+                return newPacket(0, Conv.HexToByte(arguments[0]), ProtocolFormat.Format(arguments[1], Encoding.UTF8));
             else if (arguments.Length >= 1)
                 return newPacket(0, Conv.HexToByte(arguments[0]), new byte[0]);
             else return new byte[0];

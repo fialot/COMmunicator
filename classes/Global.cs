@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Fx.IO;
+using Fx.IO.Protocol;
 using Fx.Logging;
 using Fx.Plugins;
 
@@ -18,6 +19,7 @@ namespace GlobalClasses
         public static ProcessLog LogPacket = new ProcessLog(showDate: false);
 
         public static PluginLoader PL = new PluginLoader();
+
     }
 
 }

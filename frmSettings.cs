@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.IO.Ports;
-using myFunctions;
 using AppSettings;
 using Fx.IO;
 

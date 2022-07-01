@@ -43,13 +43,7 @@ namespace Fx.IO
     }
 
 
-    struct msgFunction
-    {
-        public string name;
-        public int length;
-        public string[] arguments;
-        public string argumentString;
-    }
+    
 
     /// <summary>
     /// Type of communication intarface

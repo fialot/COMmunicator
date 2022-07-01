@@ -109,6 +109,7 @@
             this.btnSendFromFile = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.btnEnableAutoReply = new System.Windows.Forms.ToolStripButton();
+            this.colIO = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.CntMnu.SuspendLayout();
             this.StatusStrip1.SuspendLayout();
             this.CntSend.SuspendLayout();
@@ -224,7 +225,7 @@
             this.toolStripMenuItem5,
             this.chkMarsA});
             this.mnuShowType.Name = "mnuShowType";
-            this.mnuShowType.Size = new System.Drawing.Size(180, 22);
+            this.mnuShowType.Size = new System.Drawing.Size(130, 22);
             this.mnuShowType.Text = "Show Type";
             // 
             // chkString
@@ -232,7 +233,7 @@
             this.chkString.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.chkLine});
             this.chkString.Name = "chkString";
-            this.chkString.Size = new System.Drawing.Size(180, 22);
+            this.chkString.Size = new System.Drawing.Size(125, 22);
             this.chkString.Text = "String";
             this.chkString.Click += new System.EventHandler(this.mnuProtocolPlugin_Click);
             // 
@@ -241,7 +242,7 @@
             this.chkLine.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.mnutxtLine});
             this.chkLine.Name = "chkLine";
-            this.chkLine.Size = new System.Drawing.Size(180, 22);
+            this.chkLine.Size = new System.Drawing.Size(148, 22);
             this.chkLine.Text = "Line separator";
             this.chkLine.Click += new System.EventHandler(this.chkTime_Click);
             // 
@@ -253,40 +254,40 @@
             // chkByte
             // 
             this.chkByte.Name = "chkByte";
-            this.chkByte.Size = new System.Drawing.Size(180, 22);
+            this.chkByte.Size = new System.Drawing.Size(125, 22);
             this.chkByte.Text = "Byte";
             this.chkByte.Click += new System.EventHandler(this.mnuProtocolPlugin_Click);
             // 
             // chkHex
             // 
             this.chkHex.Name = "chkHex";
-            this.chkHex.Size = new System.Drawing.Size(180, 22);
+            this.chkHex.Size = new System.Drawing.Size(125, 22);
             this.chkHex.Text = "Hex Num";
             this.chkHex.Click += new System.EventHandler(this.mnuProtocolPlugin_Click);
             // 
             // chkFormat
             // 
             this.chkFormat.Name = "chkFormat";
-            this.chkFormat.Size = new System.Drawing.Size(180, 22);
+            this.chkFormat.Size = new System.Drawing.Size(125, 22);
             this.chkFormat.Text = "Format";
             this.chkFormat.Click += new System.EventHandler(this.mnuProtocolPlugin_Click);
             // 
             // toolStripMenuItem5
             // 
             this.toolStripMenuItem5.Name = "toolStripMenuItem5";
-            this.toolStripMenuItem5.Size = new System.Drawing.Size(177, 6);
+            this.toolStripMenuItem5.Size = new System.Drawing.Size(122, 6);
             // 
             // chkMarsA
             // 
             this.chkMarsA.Name = "chkMarsA";
-            this.chkMarsA.Size = new System.Drawing.Size(180, 22);
+            this.chkMarsA.Size = new System.Drawing.Size(125, 22);
             this.chkMarsA.Text = "MARS-A";
             this.chkMarsA.Click += new System.EventHandler(this.mnuProtocolPlugin_Click);
             // 
             // ToolStripMenuItem4
             // 
             this.ToolStripMenuItem4.Name = "ToolStripMenuItem4";
-            this.ToolStripMenuItem4.Size = new System.Drawing.Size(177, 6);
+            this.ToolStripMenuItem4.Size = new System.Drawing.Size(127, 6);
             // 
             // mnuShow
             // 
@@ -294,7 +295,7 @@
             this.chkTime,
             this.chkBaudRate});
             this.mnuShow.Name = "mnuShow";
-            this.mnuShow.Size = new System.Drawing.Size(180, 22);
+            this.mnuShow.Size = new System.Drawing.Size(130, 22);
             this.mnuShow.Text = "Show";
             // 
             // chkTime
@@ -695,12 +696,14 @@
             this.olvPacket.AllColumns.Add(this.colTime);
             this.olvPacket.AllColumns.Add(this.colDelay);
             this.olvPacket.AllColumns.Add(this.colLength);
+            this.olvPacket.AllColumns.Add(this.colIO);
             this.olvPacket.AllColumns.Add(this.colPacket);
             this.olvPacket.CellEditUseWholeCell = false;
             this.olvPacket.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.colTime,
             this.colDelay,
             this.colLength,
+            this.colIO,
             this.colPacket});
             this.olvPacket.ContextMenuStrip = this.CntMnu;
             this.olvPacket.Cursor = System.Windows.Forms.Cursors.Default;
@@ -906,6 +909,11 @@
             this.btnEnableAutoReply.Text = "Enable auto reply";
             this.btnEnableAutoReply.Click += new System.EventHandler(this.btnEnableAutoReply_Click);
             // 
+            // colIO
+            // 
+            this.colIO.Text = "I/O";
+            this.colIO.Width = 25;
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1029,5 +1037,6 @@
         private System.Windows.Forms.ToolStripButton btnEnableAutoReply;
         private System.Windows.Forms.ToolStripButton btnAutoScroll;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private BrightIdeasSoftware.OLVColumn colIO;
     }
 }
