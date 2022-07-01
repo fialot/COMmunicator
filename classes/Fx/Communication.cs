@@ -48,6 +48,7 @@ namespace Fx.IO
         public string name;
         public int length;
         public string[] arguments;
+        public string argumentString;
     }
 
     /// <summary>

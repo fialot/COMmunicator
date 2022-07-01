@@ -18,6 +18,8 @@ using System.Threading;
 using Fx.Logging;
 using AppSettings;
 using Fx.IO;
+using System.Reflection;
+using Fx.Plugins;
 
 namespace COMunicator
 {
@@ -290,6 +292,7 @@ namespace COMunicator
 
         private void frmMain_Load(object sender, EventArgs e)
         {
+
             conn.ChangedState += new ChangedStateEventHandler(ConnChangedState);
 
             // ----- GET APPLICATION VERSION -> TO CAPTION -----
@@ -297,6 +300,11 @@ namespace COMunicator
 
             // ----- LOAD SETTINGS -----
             Settings.LoadXml();
+
+            // ----- Load plug-ins -----
+            Global.PL.LoadPlugins();
+            ProtocolCom.Plugins = Global.PL.PluginsProtocol;
+            LoadPlugins();
 
             // ----- Creating data folder -----
             if (!Directory.Exists(Files.ReplaceVarPaths(Settings.App.DataFolder))) Directory.CreateDirectory(Files.ReplaceVarPaths(Settings.App.DataFolder));
@@ -512,6 +520,31 @@ namespace COMunicator
 
         }
 
+        private void LoadPlugins()
+        {
+            foreach (var plugin in Global.PL.PluginsProtocol)
+            {
+                var item = new ToolStripMenuItem(plugin.GetName(), null, mnuProtocolPlugin_Click);
+                mnuShowType.DropDownItems.Add(item);
+            }
+
+        }
+
+        private void mnuProtocolPlugin_Click(object sender, EventArgs e)
+        {
+            foreach (var item in mnuShowType.DropDownItems)
+            {
+                if (item.GetType() == typeof(ToolStripMenuItem))
+                {
+                    ((ToolStripMenuItem)item).Checked = false;
+                }
+            }
+
+            ((ToolStripMenuItem)sender).Checked = true;
+
+            RefreshMessages(((ToolStripMenuItem)sender).Text);
+        }
+
         private void LoadMenu()
         {
             // ----- MENU -> ADD ITEM -----
@@ -537,6 +570,8 @@ namespace COMunicator
 
 
         }
+
+        
 
         void AddMenuItems(string[] items)
         {
@@ -740,18 +775,6 @@ namespace COMunicator
         }
 
         
-        private void chkString_Click(object sender, EventArgs e)
-        {
-            chkFormat.Checked = false;
-            chkByte.Checked = false;
-            chkHex.Checked = false;
-            chkString.Checked = false;
-            chkMarsA.Checked = false;
-            ((ToolStripMenuItem)sender).Checked = true;
-
-            RefreshMessages();
-        }
-
 
         private void CntText_Click(object sender, EventArgs e)
         {
@@ -1031,7 +1054,7 @@ namespace COMunicator
             RefreshMessages();
         }
 
-        private void RefreshMessages()
+        private void RefreshMessages(string viewName = "")
         {
             if (chkString.Checked)
             {
@@ -1048,6 +1071,10 @@ namespace COMunicator
             else if (chkMarsA.Checked)
             {
                 Global.LogPacket.SetPacketView(ePacketView.MARS_A);
+            } else if (viewName != "")
+            {
+                Global.LogPacket.SetCustomView((IPluginProtocol)Global.PL.GetPlugin(viewName));
+                Global.LogPacket.SetPacketView(ePacketView.Custom);
             }
 
             /*txtPackets.Rtf = Global.LogPacket.TextRTF();

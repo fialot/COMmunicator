@@ -224,7 +224,7 @@
             this.toolStripMenuItem5,
             this.chkMarsA});
             this.mnuShowType.Name = "mnuShowType";
-            this.mnuShowType.Size = new System.Drawing.Size(130, 22);
+            this.mnuShowType.Size = new System.Drawing.Size(180, 22);
             this.mnuShowType.Text = "Show Type";
             // 
             // chkString
@@ -232,16 +232,16 @@
             this.chkString.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.chkLine});
             this.chkString.Name = "chkString";
-            this.chkString.Size = new System.Drawing.Size(125, 22);
+            this.chkString.Size = new System.Drawing.Size(180, 22);
             this.chkString.Text = "String";
-            this.chkString.Click += new System.EventHandler(this.chkString_Click);
+            this.chkString.Click += new System.EventHandler(this.mnuProtocolPlugin_Click);
             // 
             // chkLine
             // 
             this.chkLine.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.mnutxtLine});
             this.chkLine.Name = "chkLine";
-            this.chkLine.Size = new System.Drawing.Size(148, 22);
+            this.chkLine.Size = new System.Drawing.Size(180, 22);
             this.chkLine.Text = "Line separator";
             this.chkLine.Click += new System.EventHandler(this.chkTime_Click);
             // 
@@ -253,40 +253,40 @@
             // chkByte
             // 
             this.chkByte.Name = "chkByte";
-            this.chkByte.Size = new System.Drawing.Size(125, 22);
+            this.chkByte.Size = new System.Drawing.Size(180, 22);
             this.chkByte.Text = "Byte";
-            this.chkByte.Click += new System.EventHandler(this.chkString_Click);
+            this.chkByte.Click += new System.EventHandler(this.mnuProtocolPlugin_Click);
             // 
             // chkHex
             // 
             this.chkHex.Name = "chkHex";
-            this.chkHex.Size = new System.Drawing.Size(125, 22);
+            this.chkHex.Size = new System.Drawing.Size(180, 22);
             this.chkHex.Text = "Hex Num";
-            this.chkHex.Click += new System.EventHandler(this.chkString_Click);
+            this.chkHex.Click += new System.EventHandler(this.mnuProtocolPlugin_Click);
             // 
             // chkFormat
             // 
             this.chkFormat.Name = "chkFormat";
-            this.chkFormat.Size = new System.Drawing.Size(125, 22);
+            this.chkFormat.Size = new System.Drawing.Size(180, 22);
             this.chkFormat.Text = "Format";
-            this.chkFormat.Click += new System.EventHandler(this.chkString_Click);
+            this.chkFormat.Click += new System.EventHandler(this.mnuProtocolPlugin_Click);
             // 
             // toolStripMenuItem5
             // 
             this.toolStripMenuItem5.Name = "toolStripMenuItem5";
-            this.toolStripMenuItem5.Size = new System.Drawing.Size(122, 6);
+            this.toolStripMenuItem5.Size = new System.Drawing.Size(177, 6);
             // 
             // chkMarsA
             // 
             this.chkMarsA.Name = "chkMarsA";
-            this.chkMarsA.Size = new System.Drawing.Size(125, 22);
+            this.chkMarsA.Size = new System.Drawing.Size(180, 22);
             this.chkMarsA.Text = "MARS-A";
-            this.chkMarsA.Click += new System.EventHandler(this.chkString_Click);
+            this.chkMarsA.Click += new System.EventHandler(this.mnuProtocolPlugin_Click);
             // 
             // ToolStripMenuItem4
             // 
             this.ToolStripMenuItem4.Name = "ToolStripMenuItem4";
-            this.ToolStripMenuItem4.Size = new System.Drawing.Size(127, 6);
+            this.ToolStripMenuItem4.Size = new System.Drawing.Size(177, 6);
             // 
             // mnuShow
             // 
@@ -294,7 +294,7 @@
             this.chkTime,
             this.chkBaudRate});
             this.mnuShow.Name = "mnuShow";
-            this.mnuShow.Size = new System.Drawing.Size(130, 22);
+            this.mnuShow.Size = new System.Drawing.Size(180, 22);
             this.mnuShow.Text = "Show";
             // 
             // chkTime

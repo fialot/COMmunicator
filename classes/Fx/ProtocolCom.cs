@@ -4,11 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Fx.Plugins;
 
 namespace Fx.IO.Protocol
 {
     public static class ProtocolCom
     {
+        public static List<IPluginProtocol> Plugins = null;
 
         /// <summary>
         /// Format Message
@@ -75,7 +77,7 @@ namespace Fx.IO.Protocol
                                 lastpos = -1;
                             }
                         }
-                        else if (fun.name == "nuvia")
+                        /*else if (fun.name == "nuvia")
                         {
                             if (fun.arguments.Length >= 1)
                             {
@@ -86,6 +88,17 @@ namespace Fx.IO.Protocol
                                 else if (fun.arguments.Length >= 1)
                                     insBytes = Protocol.Nuvia(0, Conv.HexToByte(fun.arguments[0]), new byte[0]);
                                 lastpos = -1;
+                            }
+                        }*/
+                        else
+                        {
+                            foreach(var item in Plugins)
+                            {
+                                if (fun.name == item.GetFunctionName())
+                                {
+                                    insBytes = item.CreatePacket(fun.argumentString);
+                                    lastpos = -1;
+                                }
                             }
                         }
                         insert(ref msg, ref byteList, ref boolList, pos, insBytes);
@@ -280,7 +293,8 @@ namespace Fx.IO.Protocol
                     return fun;
                 }
 
-                fun.arguments = msg.Substring(p1 + 1, p2 - (p1 + 1)).Split(new string[] { ";" }, StringSplitOptions.None);
+                fun.argumentString = msg.Substring(p1 + 1, p2 - (p1 + 1));
+                fun.arguments = fun.argumentString.Split(new string[] { ";" }, StringSplitOptions.None);
                 for (int i = 0; i < fun.arguments.Length; i++)
                 {
                     fun.arguments[i] = fun.arguments[i].Trim();

@@ -1,4 +1,5 @@
 ﻿using Fx.IO;
+using Fx.Plugins;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -12,6 +13,7 @@ namespace Fx.Logging
 {
     public enum ePacketView
     {
+        Custom,
         String,
         StringReplaceCommandChars,
         Bytes,
@@ -86,7 +88,7 @@ namespace Fx.Logging
         public string LineSeparatingChar { get; set; } = "";
 
 
-
+        private IPluginProtocol CustomView = null;
         private ePacketView PacketView = ePacketView.StringReplaceCommandChars;
         
 
@@ -119,12 +121,17 @@ namespace Fx.Logging
                 for (int i = 0; i < Recods.Count; i++)
                 {
                     var item = Recods[i];
-                    item.text = ConvertToText(item.data);
+                    item.text = ConvertToText(item.data, !item.input);
                     item.text = CreateLogText(item.description, item.text, item.withTime, item.input);
                     Recods.RemoveAt(i);
                     Recods.Insert(i, item);
                 }
             }
+        }
+
+        public void SetCustomView(IPluginProtocol customProtocol)
+        {
+            CustomView = customProtocol;
         }
 
 
@@ -153,8 +160,8 @@ namespace Fx.Logging
                 delay = new TimeSpan();
 
             LastLogTime = now;
-
-            text = ConvertToText(data);
+            
+            text = ConvertToText(data, !input);
             text = CreateLogText(description, text, withTime, input);
 
             // ----- Add message -----
@@ -239,7 +246,7 @@ namespace Fx.Logging
             return text;
         }
 
-        private string ConvertToText(byte[] message)
+        private string ConvertToText(byte[] message, bool request)
         {
             string text = "";
 
@@ -359,6 +366,13 @@ namespace Fx.Logging
                     }
                     text += dataMars;
 
+                    break;
+
+                case ePacketView.Custom:
+                    if (CustomView != null)
+                    {
+                        text = CustomView.ParsePacket(message, request);
+                    }
                     break;
             }
 
