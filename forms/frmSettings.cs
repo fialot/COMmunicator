@@ -143,7 +143,7 @@ namespace COMunicator
             OpenFileDialog dialog = new OpenFileDialog();
             try
             {
-                dialog.InitialDirectory = System.IO.Path.GetDirectoryName(Files.ReplaceVarPaths(txtSendingFile.Text));
+                dialog.InitialDirectory = System.IO.Path.GetDirectoryName(Paths.GetFullPath(txtSendingFile.Text));
             }
             catch { }
             
@@ -158,7 +158,7 @@ namespace COMunicator
             OpenFileDialog dialog = new OpenFileDialog();
             try
             {
-                dialog.InitialDirectory = System.IO.Path.GetDirectoryName(Files.ReplaceVarPaths(txtReplyFile.Text));
+                dialog.InitialDirectory = System.IO.Path.GetDirectoryName(Paths.GetFullPath(txtReplyFile.Text));
             }
             catch { }
 
@@ -173,7 +173,7 @@ namespace COMunicator
             OpenFileDialog dialog = new OpenFileDialog();
             try
             {
-                dialog.InitialDirectory = System.IO.Path.GetDirectoryName(Files.ReplaceVarPaths(txtLogFile.Text));
+                dialog.InitialDirectory = System.IO.Path.GetDirectoryName(Paths.GetFullPath(txtLogFile.Text));
             }
             catch { }
 
@@ -188,7 +188,7 @@ namespace COMunicator
             OpenFileDialog dialog = new OpenFileDialog();
             try
             {
-                dialog.InitialDirectory = System.IO.Path.GetDirectoryName(Files.ReplaceVarPaths(txtDataFolder.Text));
+                dialog.InitialDirectory = System.IO.Path.GetDirectoryName(Paths.GetFullPath(txtDataFolder.Text));
             }
             catch { }
 

@@ -101,7 +101,7 @@ namespace Fx.Plugins
             var arguments = input.Split(new string[] { ";" }, StringSplitOptions.None);
 
             if (arguments.Length >= 3)
-                return newPacket(Conv.ToIntDef(arguments[0], 0), Conv.HexToByte(arguments[1]), ProtocolFormat.Format(arguments[2], Encoding.UTF8));
+                return newPacket(Conv.ToInt(arguments[0], 0), Conv.HexToByte(arguments[1]), ProtocolFormat.Format(arguments[2], Encoding.UTF8));
             else if (arguments.Length >= 2)
                 return newPacket(0, Conv.HexToByte(arguments[0]), ProtocolFormat.Format(arguments[1], Encoding.UTF8));
             else if (arguments.Length >= 1)

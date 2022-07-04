@@ -95,7 +95,7 @@ namespace Fx.Plugins
             var arguments = input.Split(new string[] { ";" }, StringSplitOptions.None);
 
             if (arguments.Length >= 2)
-                return newPacket(Conv.ToIntDef(arguments[0], 0), ProtocolFormat.Format(arguments[1], Encoding.UTF8));
+                return newPacket(Conv.ToInt(arguments[0], 0), ProtocolFormat.Format(arguments[1], Encoding.UTF8));
             else if (arguments.Length >= 1)
                 return newPacket(0, ProtocolFormat.Format(arguments[0], Encoding.UTF8));
             else return new byte[0];
@@ -120,13 +120,11 @@ namespace Fx.Plugins
 
                 byte[] array = BitConverter.GetBytes(address);
 
-                ushort[] addr = Conv.ToUShort(array);
+                ushort[] addr = ArrayConv.ToUShort(array);
 
                 array = data; //Encoding.Default.GetBytes(data);
                 Array.Reverse(array);
-                ushort[] shortData = Conv.ToUShort(array);
-
-
+                ushort[] shortData = ArrayConv.ToUShort(array);
 
 
                 List<ushort> items = new List<ushort>();

@@ -307,9 +307,9 @@ namespace COMunicator
             LoadPlugins();
 
             // ----- Creating data folder -----
-            if (!Directory.Exists(Files.ReplaceVarPaths(Settings.App.DataFolder))) Directory.CreateDirectory(Files.ReplaceVarPaths(Settings.App.DataFolder));
+            if (!Directory.Exists(Paths.GetFullPath(Settings.App.DataFolder))) Directory.CreateDirectory(Paths.GetFullPath(Settings.App.DataFolder));
 
-            Global.LogPacket.LogFileDirectory = Files.ReplaceVarPaths(Settings.Messages.LogFileDirectory);
+            Global.LogPacket.LogFileDirectory = Paths.GetFullPath(Settings.Messages.LogFileDirectory);
             Global.LogPacket.SaveToFile = Settings.Messages.SaveToFile;
 ;
             // ----- APPLY SETTINGS TO FORM -----
@@ -582,11 +582,11 @@ namespace COMunicator
             // ----- Add default items -----
             
 
-            string[] items = Files.LoadFileLines(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + Path.DirectorySeparatorChar + "data" + Path.DirectorySeparatorChar + "menu_items.txt", true);
+            string[] items = Files.ReadLines(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + Path.DirectorySeparatorChar + "data" + Path.DirectorySeparatorChar + "menu_items.txt", true);
             AddMenuItems(items);
 
             // ----- Add User defined items -----
-            items = Files.LoadFileLines(Files.ReplaceVarPaths(Settings.App.DataFolder + Path.DirectorySeparatorChar + "menu_items.txt"), true);
+            items = Files.ReadLines(Paths.GetFullPath(Settings.App.DataFolder + Path.DirectorySeparatorChar + "menu_items.txt"), true);
             AddMenuItems(items);
 
 
@@ -821,12 +821,12 @@ namespace COMunicator
                 dialog.Filter = "Log File *.log|*.log|All Files (*.*)|*.*";
                 if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
-                    Files.SaveFile(dialog.FileName, Global.LogPacket.Text());
+                    Files.Save(dialog.FileName, Global.LogPacket.Text());
                 }
             }
             catch (Exception err)
             {
-                Dialogs.ShowErr(err.Message, "Error");
+                Dialogs.ShowError(err.Message, "Error");
             }
         }
 
@@ -927,7 +927,7 @@ namespace COMunicator
             
             if (Dialogs.InputBox("Add packet to list", "Name of packet:", ref txt) == DialogResult.OK)
             {
-                Files.SaveFile(Files.ReplaceVarPaths(Settings.App.DataFolder + Path.DirectorySeparatorChar + "menu_items.txt"), "\n" + txt + @"\:" + tbSend.Text, true);
+                Files.Save(Paths.GetFullPath(Settings.App.DataFolder + Path.DirectorySeparatorChar + "menu_items.txt"), "\n" + txt + @"\:" + tbSend.Text, true);
                 //AddToFile("polozky.txt", txt + @"\:" + tbSend.Text);
                 LoadMenu();
             }
@@ -1043,7 +1043,7 @@ namespace COMunicator
 
         private void mnuEditSend_Click(object sender, EventArgs e)
         {
-            System.Diagnostics.Process.Start(Files.ReplaceVarPaths(Settings.App.DataFolder + Path.DirectorySeparatorChar + "menu_items.txt"));
+            System.Diagnostics.Process.Start(Paths.GetFullPath(Settings.App.DataFolder + Path.DirectorySeparatorChar + "menu_items.txt"));
         }
 
         private void chkTime_Click(object sender, EventArgs e)

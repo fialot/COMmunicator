@@ -74,7 +74,7 @@ namespace Fx.IO.Protocol
                         {
                             ins = "";
                             if (fun.arguments.Length > 0)
-                                ins = Files.LoadFile(fun.arguments[0]);
+                                ins = Files.Read(fun.arguments[0]);
                             insBytes = encoding.GetBytes(ins);
                         }
                         else

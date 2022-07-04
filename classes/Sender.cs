@@ -189,7 +189,7 @@ namespace COMunicator
         public void RefreshReply()
         {
             // ----- READ REPLY FILE -----
-            ReplyData = LoadReplyFile(Files.ReplaceVarPaths(Settings.Messages.ReplyFile));
+            ReplyData = LoadReplyFile(Paths.GetFullPath(Settings.Messages.ReplyFile));
 
 
         }
@@ -197,7 +197,7 @@ namespace COMunicator
         Dictionary<string, string> LoadReplyFile(string fileName)
         {
             Dictionary<string, string> dict = new Dictionary<string, string>();
-            string[] lines = Files.LoadFileLines(fileName, true);
+            string[] lines = Files.ReadLines(fileName, true);
             string[] item;
             for (int i = 0; i < lines.Length; i++)
             {
@@ -355,7 +355,7 @@ namespace COMunicator
 
         void LoadAutoSendData()
         {
-            AutoSendData = Files.LoadFileLines(Files.ReplaceVarPaths(Settings.Messages.SendingFile), true);
+            AutoSendData = Files.ReadLines(Paths.GetFullPath(Settings.Messages.SendingFile), true);
             AutoSendDataIndex = 0;
         }
 

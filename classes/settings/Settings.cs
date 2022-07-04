@@ -46,8 +46,8 @@ namespace AppSettings
         /// <param name="path">Xml file path</param>
         public static void LoadXml(string path)
         {
-            string XMLtext = Files.LoadFile(path);
-
+            string XMLtext = Files.Read(path);
+            
             try
             {
                 bool save = false;
