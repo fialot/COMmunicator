@@ -86,48 +86,38 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="classes\Fx\AbortableBackgroundWorker.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="classes\Fx\Communication.cs" />
-    <Compile Include="classes\Fx\ConnectionStructs.cs" />
-    <Compile Include="classes\Fx\EncryptPassword.cs" />
     <Compile Include="classes\Global.cs" />
     <Compile Include="classes\History.cs" />
-    <Compile Include="classes\iniFile.cs" />
-    <Compile Include="classes\Fx\Paths.cs" />
-    <Compile Include="classes\Fx\ProcessLog.cs" />
+    <Compile Include="classes\ProcessLog.cs" />
     <Compile Include="classes\Sender.cs" />
     <Compile Include="classes\settings\AppSettings.cs" />
     <Compile Include="classes\settings\GuiSettings.cs" />
     <Compile Include="classes\settings\MsgSettings.cs" />
     <Compile Include="classes\settings\Settings.cs" />
-    <Compile Include="frmMain.cs">
+    <Compile Include="forms\frmMain.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmMain.Designer.cs">
+    <Compile Include="forms\frmMain.Designer.cs">
       <DependentUpon>frmMain.cs</DependentUpon>
     </Compile>
-    <Compile Include="frmSettings.cs">
+    <Compile Include="forms\frmSettings.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmSettings.Designer.cs">
+    <Compile Include="forms\frmSettings.Designer.cs">
       <DependentUpon>frmSettings.cs</DependentUpon>
     </Compile>
     <Compile Include="functions\Conv.cs" />
     <Compile Include="functions\DevFun.cs" />
     <Compile Include="functions\Dialogs.cs" />
     <Compile Include="functions\Files.cs" />
-    <Compile Include="classes\Fx\Protocol.cs" />
     <Compile Include="functions\Strings.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="classes\propGrid.cs" />
-    <Compile Include="classes\SocketClient.cs" />
-    <EmbeddedResource Include="frmMain.resx">
+    <EmbeddedResource Include="forms\frmMain.resx">
       <DependentUpon>frmMain.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmSettings.resx">
+    <EmbeddedResource Include="forms\frmSettings.resx">
       <DependentUpon>frmSettings.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -178,9 +168,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="classes\Fx\Plugins\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

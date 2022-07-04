@@ -10,8 +10,8 @@ using Fx.IO;
 using Fx.IO.Protocol;
 using Fx.Components;
 using GlobalClasses;
-using TCPClient;
 using System.ComponentModel;
+using Fx.Plugins;
 
 namespace COMunicator
 {
@@ -277,21 +277,13 @@ namespace COMunicator
         {
             string description = "";
             
-            if (Settings.Messages.PacketView == Fx.Logging.ePacketView.MARS_A)
+            if (Settings.Messages.PacketView == Fx.Logging.ePacketView.Custom)
             {
-                if (message.Length > 2)
-                {
-                    int frameNum = 0;
-                    try
-                    {
-                        int frame = Conv.SwapBytes(BitConverter.ToUInt16(message, 0));
-                        int length = (frame & 2047) - 6; // dala length
-                        frameNum = (frame & 12288) + 6 + (128 << 8) + +(1 << 8);
-                    }
-                    catch (Exception) { }
 
-                    Send(@"\s" + frameNum.ToString());
-                }
+                var protocol = (IPluginProtocol)Global.PL.GetPlugin(Settings.Messages.PacketViewPlugin);
+                Send(protocol.AcknowledgeReception(message));
+               
+                
             }
 
             var endChar = Settings.Connection.UsedEncoding.GetString(ProtocolFormat.Format(Settings.Messages.LineSeparatingChar, Settings.Connection.UsedEncoding));

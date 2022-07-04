@@ -18,7 +18,6 @@ namespace Fx.Logging
         StringReplaceCommandChars,
         Bytes,
         Hex,
-        MARS_A,
     }
 
     public delegate void NewRecordEventHandler(LogRecord record);
@@ -337,39 +336,6 @@ namespace Fx.Logging
                         if (text != "") text += " ";
                         text += message[i].ToString("X2");
                     }
-                    break;
-
-                case ePacketView.MARS_A:
-                    string dataMars = "";
-
-                    if (message.Length > 2)
-                    {
-                        int frameNum = 0;
-                        try
-                        {
-                            byte[] test = new byte[1];
-                            int frame = Conv.SwapBytes(BitConverter.ToUInt16(message, 0));
-                            int length = (frame & 2047) - 6; // dala length
-                            frameNum = (frame & 12288) + 6 + (128 << 8) + +(1 << 8);
-                            for (int i = 8; i < 8 + length; i++)
-                            {
-                                test[0] = message[i];
-                                var encTxt = UsedEncoding.GetString(test);
-                                if (message[i] > 31)
-                                {
-                                    if (message[i] != 0) dataMars += encTxt;
-                                }
-                                else dataMars += "{" + message[i].ToString() + "}";
-
-                            }
-                        }
-                        catch (Exception err)
-                        {
-
-                        }
-                    }
-                    text += dataMars;
-
                     break;
 
                 case ePacketView.Custom:

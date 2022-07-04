@@ -8,7 +8,6 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO.Ports;
 using System.IO;
-using TCPClient;
 //using myFunctions;
 using Fx.IO.Protocol;
 using GlobalClasses;
@@ -18,6 +17,7 @@ using System.Threading;
 using Fx.Logging;
 using AppSettings;
 using Fx.IO;
+
 using System.Reflection;
 using Fx.Plugins;
 
@@ -431,10 +431,6 @@ namespace COMunicator
                     Global.LogPacket.SetPacketView(ePacketView.StringReplaceCommandChars);
                     chkString.Checked = true;
                     break;
-                case ePacketView.MARS_A:
-                    Global.LogPacket.SetPacketView(ePacketView.MARS_A);
-                    chkMarsA.Checked = true;
-                    break;
                 case ePacketView.Custom:
                     foreach(var item in mnuShowType.DropDownItems)
                     {
@@ -499,8 +495,6 @@ namespace COMunicator
                 Settings.Messages.PacketView = ePacketView.Hex;
             else if (chkString.Checked)
                 Settings.Messages.PacketView = ePacketView.StringReplaceCommandChars;
-            else if (chkMarsA.Checked)
-                Settings.Messages.PacketView = ePacketView.MARS_A;
             else
             {
                 Settings.Messages.PacketView = ePacketView.Custom;
@@ -1095,10 +1089,7 @@ namespace COMunicator
             {
                 Global.LogPacket.SetPacketView(ePacketView.Hex);
             }
-            else if (chkMarsA.Checked)
-            {
-                Global.LogPacket.SetPacketView(ePacketView.MARS_A);
-            } else if (viewName != "")
+            else if (viewName != "")
             {
                 Global.LogPacket.SetCustomView((IPluginProtocol)Global.PL.GetPlugin(viewName));
                 Global.LogPacket.SetPacketView(ePacketView.Custom);

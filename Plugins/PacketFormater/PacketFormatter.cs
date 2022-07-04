@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Fx.IO;
+using Fx.Conversion;
 using Fx.Plugins;
 
 namespace Fx.IO.Protocol
@@ -77,27 +77,6 @@ namespace Fx.IO.Protocol
                                 ins = Files.LoadFile(fun.arguments[0]);
                             insBytes = encoding.GetBytes(ins);
                         }
-                        /*else if (fun.name == "marsa")
-                        {
-                            if (fun.arguments.Length >= 2)
-                            {
-                                insBytes = Protocol.MarsA(Conv.HexToUInt(fun.arguments[0]), FormatMsg(fun.arguments[1], encoding));
-                                lastpos = -1;
-                            }
-                        }*/
-                        /*else if (fun.name == "nuvia")
-                        {
-                            if (fun.arguments.Length >= 1)
-                            {
-                                if (fun.arguments.Length >= 3)
-                                    insBytes = Protocol.Nuvia(Conv.ToIntDef(fun.arguments[0], 0), Conv.HexToByte(fun.arguments[1]), FormatMsg(fun.arguments[2], encoding));
-                                else if (fun.arguments.Length >= 2)
-                                    insBytes = Protocol.Nuvia(0, Conv.HexToByte(fun.arguments[0]), FormatMsg(fun.arguments[1], encoding));
-                                else if (fun.arguments.Length >= 1)
-                                    insBytes = Protocol.Nuvia(0, Conv.HexToByte(fun.arguments[0]), new byte[0]);
-                                lastpos = -1;
-                            }
-                        }*/
                         else
                         {
                             foreach (var item in Plugins)

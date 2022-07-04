@@ -84,6 +84,11 @@ namespace Fx.Plugins
             return parsePacket(message, request);
         }
 
+        public byte[] AcknowledgeReception(byte[] message)
+        {
+            return new byte[0];
+        }
+
         #endregion
 
         /// <summary>

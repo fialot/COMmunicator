@@ -100,5 +100,12 @@ namespace Fx.Plugins
         /// <param name="request">Is request or reply</param>
         /// <returns>Text output</returns>
         string ParsePacket(byte[] message, bool request);
+
+        /// <summary>
+        /// Acknowledge of data reception
+        /// </summary>
+        /// <param name="message">Incomming data</param>
+        /// <returns>Acknowledge packet</returns>
+        byte[] AcknowledgeReception(byte[] message);
     }
 }
