@@ -120,11 +120,11 @@ namespace Fx.Plugins
 
                 byte[] array = BitConverter.GetBytes(address);
 
-                ushort[] addr = ArrayConv.ToUShort(array);
+                ushort[] addr = Conv.ToUInt16Array(array);
 
                 array = data; //Encoding.Default.GetBytes(data);
                 Array.Reverse(array);
-                ushort[] shortData = ArrayConv.ToUShort(array);
+                ushort[] shortData = Conv.ToUInt16Array(array);
 
 
                 List<ushort> items = new List<ushort>();

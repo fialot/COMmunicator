@@ -27,6 +27,13 @@ namespace Fx.Plugins
         Login = 0xE1,
     }
 
+    class nuvArguments
+    {
+        public byte Address = 0;
+        public byte Function = 0;
+        public byte[] Data = new byte[0];
+    }
+
     public class ProtocolNuvia: IPlugin, IPluginProtocol
     {
         #region Public
@@ -100,13 +107,29 @@ namespace Fx.Plugins
         {
             var arguments = input.Split(new string[] { ";" }, StringSplitOptions.None);
 
+            nuvArguments arg = new nuvArguments();
+
             if (arguments.Length >= 3)
-                return newPacket(Conv.ToByte(arguments[0], 0), Conv.ToByte(arguments[1]), ProtocolFormat.Format(arguments[2], Encoding.UTF8));
-            else if (arguments.Length >= 2)
-                return newPacket(0, Conv.ToByte(arguments[0]), ProtocolFormat.Format(arguments[1], Encoding.UTF8));
+            {
+                arg.Address = Conv.ToByte(arguments[0], 0);
+                arg.Function = Conv.ToByte(arguments[1]);
+                if (arg.Function == 0)
+                    arg.Function = (byte)Conv.ToEnum<NuviaCmd>(arguments[0], NuviaCmd.Link);
+                arg.Data = ProtocolFormat.Format(arguments[2], Encoding.UTF8);
+            }
             else if (arguments.Length >= 1)
-                return newPacket(0, Conv.ToByte(arguments[0]), new byte[0]);
-            else return new byte[0];
+            {
+                arg.Address = 0;
+                arg.Function = Conv.ToByte(arguments[0]);
+                if (arg.Function == 0)
+                    arg.Function = (byte)Conv.ToEnum<NuviaCmd>(arguments[0], NuviaCmd.Link);
+                if (arguments.Length >= 2)
+                    arg.Data = ProtocolFormat.Format(arguments[1], Encoding.UTF8);
+            }
+            else
+                return new byte[0];
+
+            return newPacket(arg);
         }
 
         /// <summary>
@@ -116,9 +139,9 @@ namespace Fx.Plugins
         /// <param name="command">Command</param>
         /// <param name="data">Data</param>
         /// <returns>Packet bytes</returns>
-        private byte[] newPacket(byte address, byte command, byte[] data)
+        private byte[] newPacket(nuvArguments arg)
         {
-            int size = 3 + data.Length;
+            int size = 3 + arg.Data.Length;
             byte[] packet = new byte[size + 3];
 
 
@@ -126,11 +149,11 @@ namespace Fx.Plugins
             packet[0] = (byte)((size >> 16) & 0xFF);
             packet[1] = (byte)((size >> 8) & 0xFF);
             packet[2] = (byte)(size & 0xFF);
-            packet[3] = (byte)address;
-            packet[4] = command;
+            packet[3] = (byte)arg.Address;
+            packet[4] = arg.Function;
 
             // ----- Data -----
-            Array.Copy(data, 0, packet, 5, data.Length);
+            Array.Copy(arg.Data, 0, packet, 5, arg.Data.Length);
 
             
             // ----- Checksum -----
@@ -143,17 +166,17 @@ namespace Fx.Plugins
         {
             // ----- Check packet length -----
             if (packet.Length < 6)
-                return "Error - Too short packet: " + BitConverter.ToString(packet).Replace("-", "");
+                return "Error - Too short packet: " + BitConverter.ToString(packet);
             int length = (packet[0] << 16) + (packet[1] << 8) + packet[2];
             if (length != packet.Length - 3)
-                return "Error - Corrupted packet: " + BitConverter.ToString(packet).Replace("-", "");
+                return "Error - Corrupted packet: " + BitConverter.ToString(packet);
 
             // ----- Check CheckSum -----
             byte CRC1 = packet[packet.Length - 1];
             byte CRC2 = checksum(packet, packet.Length - 1);
 
             if (CRC1 != CRC2)
-                return "Error - Invalid checksum: " + BitConverter.ToString(packet).Replace("-", "");
+                return "Error - Invalid checksum: " + BitConverter.ToString(packet);
 
             byte[] data = new byte[packet.Length - 6];
             Array.Copy(packet, 5, data, 0, data.Length);
@@ -171,10 +194,14 @@ namespace Fx.Plugins
                 case NuviaCmd.GetParam:
                 case NuviaCmd.SetParam:
                 case NuviaCmd.SetParamTemporary:
-                    text += Encoding.UTF8.GetString(ArrayConv.RemoveValues(data, 0));
+                    text += Encoding.UTF8.GetString(ArrayWork.RemoveValues(data, 0));
+                    break;
+                case NuviaCmd.GetConfig:
+                    if (!request)
+                        text += Encoding.UTF8.GetString(ArrayWork.RemoveValues(data, 0));
                     break;
                 default:
-                    text += BitConverter.ToString(packet).Replace("-", "");
+                    text += BitConverter.ToString(packet);
                     break;
             }
             return text;

@@ -258,21 +258,44 @@ namespace Fx.Plugins
         {
             // ----- Check packet length -----
             if (packet.Length < 4)
-                return "Error - Too short packet: " + BitConverter.ToString(packet).Replace("-", "");
+                return "Error - Too short packet: " + BitConverter.ToString(packet);
            
             // ----- Check CheckSum -----
             ushort CRC1 = (ushort)((packet[packet.Length - 1] * 256) + packet[packet.Length - 2]);
             ushort CRC2 = checksum(packet, packet.Length - 2);
 
             if (CRC1 != CRC2)
-                return "Error - Invalid checksum: " + BitConverter.ToString(packet).Replace("-", "");
+                return "Error - Invalid checksum (" + CRC1.ToString() + " != " + CRC2.ToString() + "): " + BitConverter.ToString(packet);
 
             byte[] data = new byte[packet.Length - 4];
             Array.Copy(packet, 2, data, 0, data.Length);
 
             string text = "";
 
-            text = BitConverter.ToString(packet);//.Replace("-", "");
+
+            switch ((mbFunctions)packet[1])
+            {
+                case mbFunctions.ReadHoldingRegisters:
+                case mbFunctions.ReadInputRegisters:
+                    var regs = Conv.ToUInt16Array(packet, 3);
+                    regs = ArrayWork.RemoveAt(regs, regs.Length - 1);
+                    text += "Registers:" + Environment.NewLine;
+                    text += Conv.ToString(regs, "; ");
+                    break;
+                case mbFunctions.ReadCoils:
+                case mbFunctions.ReadDiscreteInputs:
+                
+                case mbFunctions.ReadHoldingRegistersExt:
+                case mbFunctions.ReadInputRegistersExt:
+                case mbFunctions.WriteSigleCoil:
+                case mbFunctions.WriteSingleRegister:
+                case mbFunctions.WriteMultipleCoils:
+                case mbFunctions.WriteMultipleRegisters:
+                default:
+                    text += BitConverter.ToString(packet);
+                    break;
+
+            }
 
 
             return text;
