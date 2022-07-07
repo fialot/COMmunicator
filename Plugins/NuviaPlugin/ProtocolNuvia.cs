@@ -189,8 +189,20 @@ namespace Fx.Plugins
 
             switch ((NuviaCmd)packet[4])
             {
-                case NuviaCmd.Link:
                 case NuviaCmd.GetXml:
+                    if (request)
+                    {
+                        if (packet[5] == 1)
+                            text += "CZ";
+                        else
+                            text += "EN";
+                    } 
+                    else
+                    {
+                        text += Encoding.UTF8.GetString(ArrayWork.RemoveValues(data, 0));
+                    }
+                    break;
+                case NuviaCmd.Link:
                 case NuviaCmd.GetParam:
                 case NuviaCmd.SetParam:
                 case NuviaCmd.SetParamTemporary:
