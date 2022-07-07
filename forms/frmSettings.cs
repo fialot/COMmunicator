@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using System.IO.Ports;
 using AppSettings;
 using Fx.IO;
+using Fx.Conversion;
 
 namespace COMunicator
 {
@@ -47,7 +48,7 @@ namespace COMunicator
             Settings.Messages.ReplyFile = txtReplyFile.Text;
             Settings.Messages.EnableReplyFile = chbEnableReply.Checked;
             Settings.Messages.WaitForReply = chbEnableReplyWait.Checked;
-            Settings.Messages.WaitForReplyTimeout = Conv.ToIntDef(txtReplyTimeout.Text, 1000);
+            Settings.Messages.WaitForReplyTimeout = Conv.ToInt(txtReplyTimeout.Text, 1000);
 
             Settings.Messages.LogFileDirectory = txtLogFile.Text;
             Settings.Messages.SaveToFile = chbEnableLog.Checked;

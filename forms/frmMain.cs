@@ -8,7 +8,6 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO.Ports;
 using System.IO;
-//using myFunctions;
 using Fx.IO.Protocol;
 using GlobalClasses;
 
@@ -17,7 +16,7 @@ using System.Threading;
 using Fx.Logging;
 using AppSettings;
 using Fx.IO;
-
+using Fx.Conversion;
 using System.Reflection;
 using Fx.Plugins;
 
@@ -292,7 +291,6 @@ namespace COMunicator
 
         private void frmMain_Load(object sender, EventArgs e)
         {
-
             conn.ChangedState += new ChangedStateEventHandler(ConnChangedState);
 
             // ----- GET APPLICATION VERSION -> TO CAPTION -----
@@ -468,14 +466,14 @@ namespace COMunicator
         private void frmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
             Settings.Connection.SerialPort = cbbCOMPorts.Text;
-            Settings.Connection.BaudRate = Conv.ToIntDef(cbBaud.Text, 115200);
+            Settings.Connection.BaudRate = Conv.ToInt(cbBaud.Text, 115200);
 
             Settings.Connection.IP = cbIP.Text;
-            Settings.Connection.Port = Conv.ToIntDef(cbPort.Text, 17000);
+            Settings.Connection.Port = Conv.ToInt(cbPort.Text, 17000);
             if (Settings.Connection.Type == ConnectionType.UDP)
-                Settings.Connection.LocalPort = Conv.ToIntDef(txtLocalPort.Text, 17001);
+                Settings.Connection.LocalPort = Conv.ToInt(txtLocalPort.Text, 17001);
             else
-                Settings.Connection.LocalPort = Conv.ToIntDef(cbSPort.Text,17000);
+                Settings.Connection.LocalPort = Conv.ToInt(cbSPort.Text,17000);
             if (cbProtocol.SelectedIndex == 1) Settings.Connection.Type = ConnectionType.UDP;
             else Settings.Connection.Type = ConnectionType.Serial;
 
@@ -684,7 +682,7 @@ namespace COMunicator
                 btnNetSConn.Enabled = false;
                 Settings.Connection.Type = ConnectionType.Serial;
                 Settings.Connection.SerialPort = cbbCOMPorts.Text;
-                Settings.Connection.BaudRate = Conv.ToIntDef(cbBaud.Text, 115200);
+                Settings.Connection.BaudRate = Conv.ToInt(cbBaud.Text, 115200);
 
                 conn.Connect(Settings.Connection);
             }
@@ -697,7 +695,7 @@ namespace COMunicator
 
         private void btnBaudRate_Click(object sender, EventArgs e)
         {
-            conn.SetBaudRate(Conv.ToIntDef(cbBaud.Text, 115200));
+            conn.SetBaudRate(Conv.ToInt(cbBaud.Text, 115200));
         }
 
         private void btnSend_Click(object sender, EventArgs e)

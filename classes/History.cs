@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using myFunctions;
+using Fx.IO;
 
 namespace COMunicator
 {
@@ -20,7 +20,7 @@ namespace COMunicator
 
         public History(string fileName, int historyCount = 100)
         {
-            this.fileName = Files.ReplaceVarPaths(fileName);
+            this.fileName = Paths.GetFullPath(fileName);
             CreateHistory(this.fileName, historyCount);
         }
 
@@ -33,7 +33,7 @@ namespace COMunicator
 
         public void Save()
         {
-            Files.SaveFile(Files.ReplaceVarPaths(fileName), items);
+            Files.Save(Paths.GetFullPath(fileName), items);
         }
 
         public string Get()
@@ -130,7 +130,7 @@ namespace COMunicator
             selectedIndex = 0;
 
 
-            string[] CntItem = Files.LoadFileLines(fileName);
+            string[] CntItem = Files.ReadLines(fileName);
             int length = CntItem.Length;
             if (length > (historyCount + 1)) length = historyCount + 1;
             for (int i = 0; i < length; i++)

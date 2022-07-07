@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Fx.Conversion;
 
 namespace AppSettings
 {
@@ -55,14 +56,14 @@ namespace AppSettings
             element = xml.Element("tab");
             if (element != null)
             {
-                this.TabIndex = Conv.ToIntDef(element.Value, 0);
+                this.TabIndex = Conv.ToInt(element.Value, 0);
             }
 
             // ----- Scroll -----
             element = xml.Element("scroll");
             if (element != null)
             {
-                this.AutoScroll = Conv.ToBoolDef(element.Value, true);
+                this.AutoScroll = Conv.ToBool(element.Value, true);
             }
 
             return needSave;

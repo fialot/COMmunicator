@@ -8,6 +8,29 @@ using System.Threading.Tasks;
 
 namespace Fx.Plugins
 {
+
+    enum mbFunctions
+    {
+        ReadCoils = 0x01,
+        ReadDiscreteInputs = 0x02,
+        ReadHoldingRegisters = 0x03,
+        ReadInputRegisters = 0x04,
+        WriteSigleCoil = 0x05,
+        WriteSingleRegister = 0x06,
+        WriteMultipleCoils = 0x0F,
+        WriteMultipleRegisters = 0x10,
+
+        ReadHoldingRegistersExt = 0x41,
+        ReadInputRegistersExt = 0x42,
+    }
+
+    class mbArguments
+    {
+        public byte Address = 0;
+        public byte Function = 0;
+        public string[] Argument = new string[0];
+    }
+
     public class ProtocolMODBUS: IPlugin, IPluginProtocol
     {
         #region Public
@@ -79,15 +102,49 @@ namespace Fx.Plugins
         /// <returns>Packet bytes</returns>
         private byte[] processInput(string input)
         {
-            var arguments = input.Split(new string[] { ";" }, StringSplitOptions.None);
+            var args = GetArguments(input);
 
-            if (arguments.Length >= 3)
-                return newPacket(Conv.ToInt(arguments[0], 0), Conv.ToByte(arguments[1]), ProtocolFormat.Format(arguments[2], Encoding.UTF8));
-            else if (arguments.Length >= 2)
-                return newPacket(0, Conv.ToByte(arguments[0]), ProtocolFormat.Format(arguments[1], Encoding.UTF8));
-            else if (arguments.Length >= 1)
-                return newPacket(0, Conv.ToByte(arguments[0]), new byte[0]);
-            else return new byte[0];
+            return newPacket(args);
+        }
+
+        private mbArguments GetArguments(string input)
+        {
+            mbArguments args = new mbArguments();
+            var arguments = input.Split(new string[] { ";" }, StringSplitOptions.None);
+            
+            if (arguments.Length == 1)
+            {
+                args.Address = 0;
+                
+                args.Function = Conv.ToByte(arguments[0]);
+                if (args.Function == 0)
+                {
+                    args.Function = (byte)Conv.ToEnum<mbFunctions>(arguments[0], mbFunctions.ReadCoils);
+                }
+            }
+            else if (arguments.Length == 2)
+            {
+                args.Address = Conv.ToByte(arguments[0]);
+                args.Function = Conv.ToByte(arguments[1]);
+                if (args.Function == 0)
+                {
+                    args.Function = (byte)Conv.ToEnum<mbFunctions>(arguments[1], mbFunctions.ReadCoils);
+                }
+            }
+            else
+            {
+                args.Address = Conv.ToByte(arguments[0]);
+                args.Function = Conv.ToByte(arguments[1]);
+                if (args.Function == 0)
+                {
+                    args.Function = (byte)Conv.ToEnum<mbFunctions>(arguments[1], mbFunctions.ReadCoils);
+                }
+                var list = arguments.ToList();
+                list.RemoveRange(0, 2);
+                args.Argument = list.ToArray();
+            }
+
+            return args;
         }
 
         /// <summary>
@@ -97,20 +154,94 @@ namespace Fx.Plugins
         /// <param name="command">Command</param>
         /// <param name="data">Data</param>
         /// <returns>Packet bytes</returns>
-        private byte[] newPacket(int address, byte command, byte[] data)
+        private byte[] newPacket(mbArguments arg)
         {
+            byte[] data = new byte[0];
 
+
+            switch((mbFunctions)arg.Function)
+            {
+                case mbFunctions.ReadCoils:
+                case mbFunctions.ReadDiscreteInputs:
+                case mbFunctions.ReadHoldingRegisters:
+                case mbFunctions.ReadInputRegisters:
+                case mbFunctions.ReadHoldingRegistersExt:
+                case mbFunctions.ReadInputRegistersExt:
+                    data = new byte[4];
+                    if (arg.Argument.Length >= 2)
+                    {
+                        ushort regAddress = Conv.ToUShort(arg.Argument[0]);
+                        data[0] = (byte)((regAddress >> 8) & 0xFF);
+                        data[1] = (byte)(regAddress & 0xFF);
+
+                        ushort regLength = Conv.ToUShort(arg.Argument[1]);
+                        data[2] = (byte)((regLength >> 8) & 0xFF);
+                        data[3] = (byte)(regLength & 0xFF);
+                    }
+                    break;
+                case mbFunctions.WriteSigleCoil:
+                    data = new byte[4];
+                    if (arg.Argument.Length >= 2)
+                    {
+                        ushort regAddress = Conv.ToUShort(arg.Argument[0]);
+                        data[0] = (byte)((regAddress >> 8) & 0xFF);
+                        data[1] = (byte)(regAddress & 0xFF);
+
+                        bool regVal = Conv.ToBool(arg.Argument[1]);
+                        if (regVal)
+                            data[2] = 0xFF;
+                        else
+                            data[2] = 0x00;
+                        data[3] = 0;
+                    }
+                    break;
+                case mbFunctions.WriteSingleRegister:
+                    data = new byte[4];
+                    if (arg.Argument.Length >= 2)
+                    {
+                        ushort regAddress = Conv.ToUShort(arg.Argument[0]);
+                        data[0] = (byte)((regAddress >> 8) & 0xFF);
+                        data[1] = (byte)(regAddress & 0xFF);
+
+                        var values = ProtocolFormat.Format(arg.Argument[1], Encoding.UTF8);
+                        if (values.Length >= 2)
+                        {
+                            data[2] = values[1];
+                            data[3] = values[0];
+                        }
+                    }
+                    break;
+                case mbFunctions.WriteMultipleCoils:
+                case mbFunctions.WriteMultipleRegisters:
+                    if (arg.Argument.Length >= 3)
+                    {
+                        var values = ProtocolFormat.Format(arg.Argument[2], Encoding.UTF8);
+                        data = new byte[5 + values.Length];
+
+                        ushort regAddress = Conv.ToUShort(arg.Argument[0]);
+                        data[0] = (byte)((regAddress >> 8) & 0xFF);
+                        data[1] = (byte)(regAddress & 0xFF);
+
+                        ushort regLength = Conv.ToUShort(arg.Argument[1]);
+                        data[2] = (byte)((regLength >> 8) & 0xFF);
+                        data[3] = (byte)(regLength & 0xFF);
+
+                        data[4] = (byte)values.Length;
+                        Array.Copy(values, 0, data, 5, values.Length);
+                    }
+                    break;
+                default:
+                    data = ProtocolFormat.Format(Conv.ToString(arg.Argument), Encoding.UTF8);
+                    break;
+
+            }
 
             int size = data.Length + 4;
             byte[] packet = new byte[size];
 
-            // ----- check correct data -----
-            if (address > 255) address = 0;
-            if (address < 0) address = 0;
-
             // ----- Header -----
-            packet[0] = (byte)address;
-            packet[1] = (byte)command;
+            packet[0] = arg.Address;
+            packet[1] = arg.Function;
 
             // ----- Data -----
             Array.Copy(data, 0, packet, 2, data.Length);

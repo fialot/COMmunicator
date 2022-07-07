@@ -109,10 +109,7 @@
     <Compile Include="forms\frmSettings.Designer.cs">
       <DependentUpon>frmSettings.cs</DependentUpon>
     </Compile>
-    <Compile Include="functions\Conv.cs" />
     <Compile Include="functions\DevFun.cs" />
-    <Compile Include="functions\Dialogs.cs" />
-    <Compile Include="functions\Files.cs" />
     <Compile Include="functions\Strings.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

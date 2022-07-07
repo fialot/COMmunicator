@@ -101,11 +101,11 @@ namespace Fx.Plugins
             var arguments = input.Split(new string[] { ";" }, StringSplitOptions.None);
 
             if (arguments.Length >= 3)
-                return newPacket(Conv.ToInt(arguments[0], 0), Conv.HexToByte(arguments[1]), ProtocolFormat.Format(arguments[2], Encoding.UTF8));
+                return newPacket(Conv.ToByte(arguments[0], 0), Conv.ToByte(arguments[1]), ProtocolFormat.Format(arguments[2], Encoding.UTF8));
             else if (arguments.Length >= 2)
-                return newPacket(0, Conv.HexToByte(arguments[0]), ProtocolFormat.Format(arguments[1], Encoding.UTF8));
+                return newPacket(0, Conv.ToByte(arguments[0]), ProtocolFormat.Format(arguments[1], Encoding.UTF8));
             else if (arguments.Length >= 1)
-                return newPacket(0, Conv.HexToByte(arguments[0]), new byte[0]);
+                return newPacket(0, Conv.ToByte(arguments[0]), new byte[0]);
             else return new byte[0];
         }
 
@@ -116,14 +116,11 @@ namespace Fx.Plugins
         /// <param name="command">Command</param>
         /// <param name="data">Data</param>
         /// <returns>Packet bytes</returns>
-        private byte[] newPacket(int address, byte command, byte[] data)
+        private byte[] newPacket(byte address, byte command, byte[] data)
         {
             int size = 3 + data.Length;
             byte[] packet = new byte[size + 3];
 
-            // ----- check correct data -----
-            if (address > 255) address = 0;
-            if (address < 0) address = 0;
 
             // ----- Header -----
             packet[0] = (byte)((size >> 16) & 0xFF);

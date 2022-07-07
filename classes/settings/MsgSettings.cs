@@ -1,5 +1,6 @@
 ﻿using Fx.IO;
 using Fx.Logging;
+using Fx.Conversion;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -106,7 +107,7 @@ namespace AppSettings
                     attribute = element.Attribute("enable");
                     if (attribute != null)
                     {
-                        this.UseLineSeparatingChar = Conv.ToBoolDef(attribute.Value, false);
+                        this.UseLineSeparatingChar = Conv.ToBool(attribute.Value, false);
                     }
                 }
 
@@ -114,24 +115,24 @@ namespace AppSettings
                 element = group.Element("show");
                 if (element != null)
                 {
-                    this.MaxRecords = Conv.ToIntDef(element.Value, 100);
+                    this.MaxRecords = Conv.ToInt(element.Value, 100);
 
                     attribute = element.Attribute("direction");
                     if (attribute != null)
                     {
-                        this.ShowDirection = Conv.ToBoolDef(attribute.Value, false);
+                        this.ShowDirection = Conv.ToBool(attribute.Value, false);
                     }
 
                     attribute = element.Attribute("time");
                     if (attribute != null)
                     {
-                        this.ShowTime = Conv.ToBoolDef(attribute.Value, false);
+                        this.ShowTime = Conv.ToBool(attribute.Value, false);
                     }
 
                     attribute = element.Attribute("baudrate");
                     if (attribute != null)
                     {
-                        this.ShowBaudRate = Conv.ToBoolDef(attribute.Value, false);
+                        this.ShowBaudRate = Conv.ToBool(attribute.Value, false);
                     }
                 }
             }
@@ -148,7 +149,7 @@ namespace AppSettings
                     attribute = group.Attribute("clear");
                     if (attribute != null)
                     {
-                        this.ClearEditbox = Conv.ToBoolDef(attribute.Value, false);
+                        this.ClearEditbox = Conv.ToBool(attribute.Value, false);
                     }
 
                     // ----- End char -----
@@ -158,7 +159,7 @@ namespace AppSettings
                         attribute = element.Attribute("enable");
                         if (attribute != null)
                         {
-                            this.AddEndChar = Conv.ToBoolDef(attribute.Value, false);
+                            this.AddEndChar = Conv.ToBool(attribute.Value, false);
                         }
 
                         this.EndChar = element.Value;
@@ -172,14 +173,14 @@ namespace AppSettings
                     attribute = group.Attribute("enable");
                     if (attribute != null)
                     {
-                        this.EnableAutoSending = Conv.ToBoolDef(attribute.Value, false);
+                        this.EnableAutoSending = Conv.ToBool(attribute.Value, false);
                     }
 
                     // ----- Period -----
                     element = group.Element("period");
                     if (element != null)
                     {
-                        this.AutoSendingPeriod = Conv.ToIntDef(element.Value, 1000);
+                        this.AutoSendingPeriod = Conv.ToInt(element.Value, 1000);
                     }
 
                     // ----- Wait for reply -----
@@ -189,10 +190,10 @@ namespace AppSettings
                         attribute = element.Attribute("enable");
                         if (attribute != null)
                         {
-                            this.WaitForReply = Conv.ToBoolDef(attribute.Value, false);
+                            this.WaitForReply = Conv.ToBool(attribute.Value, false);
                         }
 
-                        this.WaitForReplyTimeout = Conv.ToIntDef(element.Value, 1000);
+                        this.WaitForReplyTimeout = Conv.ToInt(element.Value, 1000);
                     }
 
                     // ----- Autosending from file -----
@@ -202,13 +203,13 @@ namespace AppSettings
                         attribute = element.Attribute("enable");
                         if (attribute != null)
                         {
-                            this.EnableSendingFile = Conv.ToBoolDef(attribute.Value, false);
+                            this.EnableSendingFile = Conv.ToBool(attribute.Value, false);
                         }
 
                         attribute = element.Attribute("repeat");
                         if (attribute != null)
                         {
-                            this.SendingFileRepeating = Conv.ToBoolDef(attribute.Value, false);
+                            this.SendingFileRepeating = Conv.ToBool(attribute.Value, false);
                         }
 
                         this.SendingFile = element.Value;
@@ -224,7 +225,7 @@ namespace AppSettings
                     element = group.Element("lastCharTimeout");
                     if (element != null)
                     {
-                        this.LastCharTimeout = Conv.ToIntDef(element.Value, 15);
+                        this.LastCharTimeout = Conv.ToInt(element.Value, 15);
                     }
 
                     // ----- Reply file -----
@@ -234,7 +235,7 @@ namespace AppSettings
                         attribute = element.Attribute("enable");
                         if (attribute != null)
                         {
-                            this.EnableReplyFile = Conv.ToBoolDef(attribute.Value, false);
+                            this.EnableReplyFile = Conv.ToBool(attribute.Value, false);
                         }
 
                         this.ReplyFile = element.Value;
@@ -250,7 +251,7 @@ namespace AppSettings
                 attribute = group.Attribute("enable");
                 if (attribute != null)
                 {
-                    this.SaveToFile = Conv.ToBoolDef(attribute.Value, false);
+                    this.SaveToFile = Conv.ToBool(attribute.Value, false);
                 }
 
                 // ----- IP address -----
