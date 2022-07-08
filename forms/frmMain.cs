@@ -291,6 +291,7 @@ namespace COMunicator
 
         private void frmMain_Load(object sender, EventArgs e)
         {
+
             conn.ChangedState += new ChangedStateEventHandler(ConnChangedState);
 
             // ----- GET APPLICATION VERSION -> TO CAPTION -----

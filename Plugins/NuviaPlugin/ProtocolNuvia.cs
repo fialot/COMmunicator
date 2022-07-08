@@ -142,61 +142,60 @@ namespace Fx.Plugins
         private byte[] newPacket(nuvArguments arg)
         {
             int size = 3 + arg.Data.Length;
-            byte[] packet = new byte[size + 3];
-
+            CommBuffer buff = new CommBuffer();
 
             // ----- Header -----
-            packet[0] = (byte)((size >> 16) & 0xFF);
-            packet[1] = (byte)((size >> 8) & 0xFF);
-            packet[2] = (byte)(size & 0xFF);
-            packet[3] = (byte)arg.Address;
-            packet[4] = arg.Function;
+            buff.PutInt24(size, true);
+            buff.Put(arg.Address);
+            buff.Put(arg.Function);
 
             // ----- Data -----
-            Array.Copy(arg.Data, 0, packet, 5, arg.Data.Length);
+            buff.Put(arg.Data);
 
-            
             // ----- Checksum -----
-            packet[packet.Length - 1] = checksum(packet, packet.Length - 1);
-
-            return packet;
+            buff.Put(checksum(buff.ToArray(), buff.Length()));
+            
+            return buff.ToArray();
         }
 
         private string parsePacket(byte[] packet, bool request)
         {
+            CommBuffer buff = new CommBuffer(packet);
+
             // ----- Check packet length -----
-            if (packet.Length < 6)
+            if (buff.Length() < 6)
                 return "Error - Too short packet: " + BitConverter.ToString(packet);
-            int length = (packet[0] << 16) + (packet[1] << 8) + packet[2];
-            if (length != packet.Length - 3)
+            int length = buff.GetInt24(true);
+            if (length != buff.Length() - 3)
                 return "Error - Corrupted packet: " + BitConverter.ToString(packet);
 
             // ----- Check CheckSum -----
-            byte CRC1 = packet[packet.Length - 1];
-            byte CRC2 = checksum(packet, packet.Length - 1);
+            byte CRC1 = buff.GetAt(buff.Length() - 1);
+            byte CRC2 = checksum(buff.ToArray(), buff.Length() - 1);
 
             if (CRC1 != CRC2)
                 return "Error - Invalid checksum: " + BitConverter.ToString(packet);
 
-            byte[] data = new byte[packet.Length - 6];
-            Array.Copy(packet, 5, data, 0, data.Length);
+            byte[] data = buff.GetBytesAt(5, buff.Length() - 6);
+            //new byte[packet.Length - 6];
+            //Array.Copy(packet, 5, data, 0, data.Length);
 
             string text = "";
             if (request)
             {
-                text = ((NuviaCmd)packet[4]).ToString() + " ";
+                text = ((NuviaCmd)buff.GetAt(4)).ToString() + " ";
             }
 
-            switch ((NuviaCmd)packet[4])
+            switch ((NuviaCmd)buff.GetAt(4))
             {
                 case NuviaCmd.GetXml:
                     if (request)
                     {
-                        if (packet[5] == 1)
+                        if (buff.GetAt(5) == 1)
                             text += "CZ";
                         else
                             text += "EN";
-                    } 
+                    }
                     else
                     {
                         text += Encoding.UTF8.GetString(ArrayWork.RemoveValues(data, 0));
@@ -209,8 +208,90 @@ namespace Fx.Plugins
                     text += Encoding.UTF8.GetString(ArrayWork.RemoveValues(data, 0));
                     break;
                 case NuviaCmd.GetConfig:
-                    if (!request)
+                    if (request)
+                    {
+                        if (buff.GetAt(5) == 0)
+                            text += "Bootloader";
+                        else if (buff.GetAt(5) == 1)
+                            text += "Shared";
+                        else if (buff.GetAt(5) == 2)
+                            text += "App";
+                    }
+                    else
                         text += Encoding.UTF8.GetString(ArrayWork.RemoveValues(data, 0));
+                    break;
+                case NuviaCmd.SetConfig:
+                    if (request)
+                    {
+                        text += Encoding.UTF8.GetString(ArrayWork.RemoveValues(data, 0));
+                    }
+                    else
+                    {
+                        if (buff.GetAt(5) == 1)
+                            text += "Write succesfully";
+                        else
+                            text += "Write error";
+                    }
+                    break;
+                case NuviaCmd.LoadFactoryConfig:
+                    if (!request)
+                    {
+                        if (buff.GetAt(5) == 1)
+                            text += "Load succesfully";
+                        else
+                            text += "No permissions";
+                    }
+                    break;
+                case NuviaCmd.SaveFactoryConfig:
+                    if (!request)
+                    {
+                        if (buff.GetAt(5) == 1)
+                            text += "Save succesfully";
+                        else
+                            text += "No permissions";
+                    }
+                    break;
+                case NuviaCmd.ResetConfig:
+                    if (!request)
+                    {
+                        if (buff.GetAt(5) == 1)
+                            text += "Save succesfully";
+                        else
+                            text += "No permissions";
+                    }
+                    break;
+                case NuviaCmd.ResetAndStayInBld:
+                    if (!request)
+                    {
+                        if (buff.GetAt(5) == 1)
+                            text += "Start bootloader";
+                        else
+                            text += "No permissions";
+                    }
+                    break;
+                case NuviaCmd.Login:
+                    if (request)
+                    {
+                        if (buff.GetAt(5) == 1)
+                            text = "Login: " + Encoding.UTF8.GetString(ArrayWork.RemoveValues(data, 0));
+                        else if (buff.GetAt(5) == 2)
+                            text = "Logout";
+                        else if (buff.GetAt(5) == 3)
+                            text = "Change password: " + Encoding.UTF8.GetString(ArrayWork.RemoveValues(data, 0));
+                        else if (buff.GetAt(5) == 4)
+                            text = "Reset password: " + Encoding.UTF8.GetString(ArrayWork.RemoveValues(data, 0));
+                    }
+                    else
+                    {
+                        if (buff.GetAt(5) == 0)
+                            text += "OK";
+                        else if (buff.GetAt(5) == 1)
+                            text += "Bad parameter";
+                        else if (buff.GetAt(5) == 2)
+                            text += "Bad length";
+                        else if (buff.GetAt(5) == 3)
+                            text += "No permissions";
+                    }
                     break;
                 default:
                     text += BitConverter.ToString(packet);
