@@ -257,6 +257,7 @@ namespace COMunicator
                     stat += "   - Over 1s: " + conn.Statistic.ReplyCounter.Over1s.ToString() + Environment.NewLine;
                     stat += "   - Over 2s: " + conn.Statistic.ReplyCounter.Over2s.ToString() + Environment.NewLine;
                     stat += "Incomming time outs: " + conn.Statistic.ReplyCounter.TimeOut.ToString() + Environment.NewLine;
+                    stat += "Reconnections: " + conn.Statistic.ReplyCounter.Reconnections.ToString() + Environment.NewLine;
 
                     txtStatistic.Text = stat;
                 }

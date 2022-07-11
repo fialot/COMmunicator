@@ -29,6 +29,7 @@ namespace COMunicator
         public int Over1s;
         public int Over2s;
         public int TimeOut;
+        public int Reconnections;
 
         public void Clear()
         {
@@ -39,6 +40,7 @@ namespace COMunicator
             Over1s = 0;
             Over2s = 0;
             TimeOut = 0;
+            Reconnections = 0;
         }
     }
 
@@ -80,6 +82,8 @@ namespace COMunicator
         // ----- Backgropund Worker -----
         AbortableBackgroundWorker work = new AbortableBackgroundWorker();   // Backgound Worker for communication
         bool IsRunning = false;
+        bool TryReconnect = false;
+        ConnectionSetting lastConnSettings = new ConnectionSetting();
         BackgroundState workState = BackgroundState.Wait;
         string newStringMessage = "";
         byte[] newMessage = new byte[0];
@@ -111,6 +115,7 @@ namespace COMunicator
 
         public bool Connect(ConnectionSetting settings)
         {
+            lastConnSettings = settings;
             conn.LastCharInterval = Settings.Messages.LastCharTimeout;
             if (conn.IsOpen()) conn.Close();
 
@@ -120,6 +125,9 @@ namespace COMunicator
 
                 RefreshAutoSend();
                 RefreshReply();
+
+                if (settings.Type == ConnectionType.TCP)
+                    TryReconnect = true;
 
                 return true;
             }
@@ -131,6 +139,8 @@ namespace COMunicator
 
         public bool Disconnect()
         {
+            TryReconnect = false;
+
             conn.Close();
 
             autoSendingTimer.Enabled = false;
@@ -243,6 +253,11 @@ namespace COMunicator
                     break;
                 case comStatus.Open:
                     Status.IsConnected = true;
+                    if (TryReconnect)
+                    {
+                        Statistic.ReplyCounter.Reconnections++;
+                    }
+
                     if (ChangedState != null)
                     {
                         ChangedState(StateChange.Connected);
@@ -252,7 +267,8 @@ namespace COMunicator
                     Status.IsConnected = false;
                     if (ChangedState != null)
                     {
-                        ChangedState(StateChange.ConnectionError);
+                        if (!TryReconnect)
+                            ChangedState(StateChange.ConnectionError);
                     }
                     break;
                 case comStatus.Started:
@@ -434,11 +450,21 @@ namespace COMunicator
                     switch (workState)
                     {
                         case BackgroundState.Wait:
+                            if (TryReconnect)
+                            {
+                                if (!conn.IsOpen())
+                                {
+                                    System.Threading.Thread.Sleep(5000);
+                                    workState = BackgroundState.Connect;
+                                }   
+                            }
 
                             break;
 
                         case BackgroundState.Connect:
-
+                            if (!conn.IsOpen())
+                                conn.Connect(lastConnSettings);
+                            workState = BackgroundState.Wait;
                             break;
 
                         case BackgroundState.SendString:
