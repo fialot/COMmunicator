@@ -22,6 +22,8 @@ namespace Fx.Plugins
 
         ReadHoldingRegistersExt = 0x41,
         ReadInputRegistersExt = 0x42,
+
+        GetData = 70,
     }
 
     class mbArguments
@@ -230,6 +232,13 @@ namespace Fx.Plugins
                         Array.Copy(values, 0, data, 5, values.Length);
                     }
                     break;
+                case mbFunctions.GetData:
+                    data = new byte[2];
+                    data[0] = Conv.ToByte(arg.Argument[0]);
+                    if (arg.Argument.Length > 1)
+                        data[1] = Conv.ToByte(arg.Argument[1]);
+                    break;
+
                 default:
                     data = ProtocolFormat.Format(Conv.ToString(arg.Argument), Encoding.UTF8);
                     break;
